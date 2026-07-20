@@ -1,0 +1,50 @@
+/* ===== 自定义美化样式 ===== */
+:root {
+  --primary: #49B1F5;
+}
+
+/* ----- 卡片圆角 & 悬停效果 ----- */
+.recent-post-item,
+.post-block,
+.sidebar-card {
+  border-radius: 20px !important;
+  transition: transform 0.25s ease, box-shadow 0.3s ease !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+}
+.recent-post-item:hover,
+.post-block:hover,
+.sidebar-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.14) !important;
+}
+
+/* ----- 自定义滚动条（蓝色细条） ----- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f0f4fa;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a9bd9;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) #f0f4fa;
+}
+
+/* ----- 阅读进度条颜色（配合主题自带 readingProgress 覆盖） ----- */
+.reading-progress,
+#progress,
+.progress-bar,
+#rightside-config-progress {
+  background: var(--primary) !important;
+}
