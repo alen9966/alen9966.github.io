@@ -264,6 +264,26 @@
 <li><code>DC-310VToDC-300V</code></li>
 </ul>
 <p>这基本对应了一条很清晰的电源路径：<code>24V</code> 输入先经过开关级建立 <code>±310V</code> 母线，再交给后级正负两路分立 LDO 做最终稳压。原理图里还能看到 <code>6.8uH</code> 和 <code>300kHz</code> 这些参数，前级大概率就是开关升压链路；后级则明显是为了低噪声目标单独拉出来的线性稳压部分。</p>
+<p>原始原理图我也一并放到站点里了，后面查细节可以直接打开：</p>
+<ul>
+<li><a href="/files/oscilloscope-power/SCH_Schematic1_1_2026-07-21.pdf">完整原理图 PDF</a></li>
+</ul>
+<h3 id="关键部分-1：总电源链路"><a href="#关键部分-1：总电源链路" class="headerlink" title="关键部分 1：总电源链路"></a>关键部分 1：总电源链路</h3><p><img src="/images/projects/oscilloscope-power-schematic-overview.svg" alt="原理图关键链路总览"></p>
+<p>这一张先把原理图的大框架拉直，后面看细节时不容易丢方向：</p>
+<ul>
+<li><code>24V</code> 输入先分成两条主线，一条去做辅助低压，另一条去建立 <code>±310V</code> 母线。</li>
+<li>辅助低压部分给参考源、运放和监测链路供电，决定控制环能不能先站稳。</li>
+<li><code>±310V</code> 不是最终目标，而是给分立 LDO 留出的工作余量。</li>
+<li>最终输出落在 <code>±300V</code>，核心诉求是给高压运放提供更干净的电源。</li>
+</ul>
+<h3 id="关键部分-2：辅助电源"><a href="#关键部分-2：辅助电源" class="headerlink" title="关键部分 2：辅助电源"></a>关键部分 2：辅助电源</h3><p><img src="/images/projects/oscilloscope-power-schematic-aux.svg" alt="辅助电源关键部分"></p>
+<p>辅助电源这块虽然不直接输出高压，但实际调试时必须先过它：</p>
+<ul>
+<li>从原理图文字层看，<code>DC24VToDC12V</code> 是一块独立功能区。</li>
+<li><code>TPS7A3901DSCR</code> 明确出现在这部分里，说明这里至少承担双极性低压供电任务。</li>
+<li>网络名里有 <code>+12VIN</code>、<code>-12VIN</code>、<code>5V</code>、<code>EN</code>，说明这块不仅仅是“给运放上电”，还带着控制和使能接口。</li>
+<li>后面上电时，如果 <code>REF5025AIDR</code>、<code>OPA2192</code>、<code>ADA4622</code> 这类器件供电不正常，就没必要马上怀疑高压功率级。</li>
+</ul>
 <h3 id="关键器件"><a href="#关键器件" class="headerlink" title="关键器件"></a>关键器件</h3><p>目前从原理图里已经能识别出这些核心器件：</p>
 <ul>
 <li><code>REF5025AIDR</code>：基准源，后级稳压和监测链路的低噪声参考很可能从这里来。</li>
@@ -283,6 +303,15 @@
 <li><code>ENA</code>、<code>ENB</code>、<code>EN</code></li>
 </ul>
 <p>这些名字说明后级不是一个“纯分压 + 三极管”的简化高压稳压，而是已经把参考、反馈、电压监测、电流监测和使能控制都考虑进去了。这一点对后面调试很重要，因为它意味着这个板子不是只看输出电压对不对，还要看监测量和控制量是不是一致。</p>
+<h3 id="关键部分-3：分立-LDO"><a href="#关键部分-3：分立-LDO" class="headerlink" title="关键部分 3：分立 LDO"></a>关键部分 3：分立 LDO</h3><p><img src="/images/projects/oscilloscope-power-schematic-ldo.svg" alt="分立 LDO 关键部分"></p>
+<p>这部分是我现在最关注的原理图核心，因为最终纹波抑制和供电干净程度主要看这里：</p>
+<ul>
+<li>高压输入是 <code>+310VIN</code> 和 <code>-310VIN</code>，输出目标是 <code>+300V</code> 和 <code>-300V</code>。</li>
+<li><code>REF5025AIDR</code>、<code>OPA2192IDR</code>、<code>ADA4622-2ARZ</code> 组成参考和误差放大这一层，负责把目标值和反馈值拢到一起。</li>
+<li><code>TIP50G</code>、<code>MJE5731AG</code>、<code>PZTA42-QX</code>、<code>PZTA92(T1G)</code> 这些高压器件更像执行级，真正把高压输出拉到目标点。</li>
+<li><code>FBP</code>、<code>FBN</code>、<code>VREFA</code>、<code>VREFB</code> 是后面判断环路有没有按预期工作的重点节点。</li>
+<li><code>VMON</code>、<code>IMON</code>、<code>IPROG</code> 这些网络后面最好都留一份“理论值 &#x2F; 仿真值 &#x2F; 实测值”对照，不然调试记录会很散。</li>
+</ul>
 <h3 id="PCB-观察"><a href="#PCB-观察" class="headerlink" title="PCB 观察"></a>PCB 观察</h3><p><img src="/images/projects/oscilloscope-power-pcb.png" alt="示波器校准仪电源 PCB"></p>
 <p>从 PCB 截图可以先读出几件事：</p>
 <ul>
