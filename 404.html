@@ -1,214 +1,127 @@
-  <!DOCTYPE html>
-<html lang="zh-CN"  
-  data-theme-mode="auto"
->
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  
-  
-  
-  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
-  <title>
-    幻想日和
-  </title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="preload" as="style" href="https://fontsapi.zeoseven.com/292/main/result.css" onload="this.rel='stylesheet'" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
-    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    
-<link rel="stylesheet" href="/css/loader.css">
+    <meta charset="utf-8">
+    <title>404 - Not Found</title>
+    <link rel="icon" href="/images/favicon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            outline: none;
+            font-family: \5FAE\8F6F\96C5\9ED1, 宋体;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -khtml-user-select: none;
+            user-select: none;
+            cursor: default;
+            font-weight: lighter;
+        }
 
-    <meta name="description" content="记录二次元日常、观番笔记、手账灵感和技术碎碎念。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="幻想日和">
-<meta property="og:url" content="https://alen9966.github.io/404.html">
-<meta property="og:site_name" content="幻想日和">
-<meta property="og:description" content="记录二次元日常、观番笔记、手账灵感和技术碎碎念。">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://alen9966.github.io/images/banner.webp">
-<meta property="article:author" content="Alen">
-<meta property="article:tag" content="二次元">
-<meta property="article:tag" content="ACG">
-<meta property="article:tag" content="动漫">
-<meta property="article:tag" content="Blog">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://alen9966.github.io/images/banner.webp">
-      <meta name="keywords" content="二次元, ACG, 动漫, Blog">
-    <link rel="alternate" href="/atom.xml" title="幻想日和" type="application/atom+xml">
-    <link rel="shortcut icon" href="/images/favicon.ico">
-  
-<link rel="stylesheet" href="/css/style.css">
+        .center {
+            margin: 0 auto;
+            color: #fff;
+            font-weight: bolder;
+            font-size: 72px;
+        }
 
-  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
-    
-<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+        .whole {
+            width: 100%;
+            height: 100%;
+            line-height: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: -1000;
+            overflow: hidden;
+        }
 
-    
-<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+        .whole img {
+            width: 100%;
+            height: 100%;
+        }
 
+        .mask {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #000;
+            opacity: 0.6;
+            filter: alpha(opacity=60);
+        }
+
+        .b {
+            width: 100%;
+            text-align: center;
+            height: 400px;
+            position: absolute;
+            top: 50%;
+            margin-top: -230px
+        }
+
+        .a {
+            width: 150px;
+            height: 50px;
+            margin-top: 30px
+        }
+
+        .a a {
+            display: block;
+            float: left;
+            width: 150px;
+            height: 50px;
+            background: #fff;
+            text-align: center;
+            line-height: 50px;
+            font-size: 18px;
+            border-radius: 25px;
+            color: #333
+        }
+
+        .a a:hover {
+            color: #000;
+            box-shadow: #fff 0 0 20px
+        }
+
+        p {
+            color: #fff;
+            margin-top: 40px;
+            font-size: 24px;
+        }
+
+        #num {
+            margin: 0 5px;
+            font-weight: bold;
+        }
+    </style>
+    <script type="text/javascript">
+        var num = 5;
+        function redirect() {
+            num--;
+            document.getElementById("num").innerHTML = num;
+            if (num < 0) {
+                document.getElementById("num").innerHTML = 0;
+                location.href = "https://github.com/adk23333";
+            }
+        }
+        setInterval("redirect()", 1000);
+    </script>
 </head>
 
-<body>
-  <div id="container">
-    <div id="wrap">
-      <div id="header-nav">
-  <nav id="main-nav" aria-label="Primary navigation">
-        <a class="main-nav-link-wrap" href="/">
-            <div class="main-nav-icon icon rotate">
-                &#xe62b;
-            </div>
-          <span class="main-nav-link">首页</span>
-        </a>
-        <a class="main-nav-link-wrap" href="/archives">
-            <div class="main-nav-icon icon rotate">
-                &#xe62b;
-            </div>
-          <span class="main-nav-link">归档</span>
-        </a>
-        <a class="main-nav-link-wrap" href="/about">
-            <div class="main-nav-icon icon rotate">
-                &#xe62b;
-            </div>
-          <span class="main-nav-link">关于</span>
-        </a>
-        <a class="main-nav-link-wrap" href="/friend">
-            <div class="main-nav-icon icon rotate">
-                &#xe62b;
-            </div>
-          <span class="main-nav-link">友链</span>
-        </a>
-    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
-  </nav>
-  <nav id="sub-nav" aria-label="Secondary navigation">
-      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
-      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
-  </nav>
+<!-- <body onload="redirect();">
+<div class="whole">
+    <img src="https://wx4.sinaimg.cn/large/006bYVyvgy1ftan82duvvj30xc0p0mzb.jpg">
+    <div class="mask"></div>
 </div>
-<header id="header" aria-label="Site header">
-      <picture>
-      </picture>
-        <img  fetchpriority="high" src="/images/banner.webp" alt="">
-  <div id="header-outer">
-    <div id="header-title">
-        <a href="/" id="logo">
-          <h1 data-aos="slide-up">4 0 4 (ﾟ⊿ﾟ)ﾂ</h1>
-        </a>
-        <h2 id="subtitle-wrap" data-aos="slide-down">
-          <a href="/" id="subtitle">満 身 創 痍</a>
-        </h2>
-    </div>
-  </div>
-</header>
-
-    </div>
-  </div>
-    <div class="site-search">
-      <div class="reimu-popup popup">
-        <div class="reimu-search">
-          <div class="reimu-search-input-icon"></div>
-          <div id="reimu-search-input"></div>
-          <div class="popup-btn-close"></div>
-        </div>
-        <div class="reimu-results">
-          <div id="reimu-stats"></div>
-          <div id="reimu-hits"></div>
-          <div id="reimu-pagination" class="reimu-pagination"></div>
-        </div>
-        <img class="reimu-bg" src="/images/reimu.png"/>
-      </div>
-    </div>
-  
-<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
-
-
-<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
-
-
-
-
-<script src="/js/script.js"></script>
-
-
-  
-<script src="/js/aos.js"></script>
-
-  <script>
-    var aosInit = () => {
-      AOS.init({
-        duration: 1000,
-        easing: "ease",
-        once: true,
-        offset: 50,
-      });
-    };
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', aosInit);
-    } else {
-      aosInit();
-    }
-  </script>
-
-
-<script src="/js/pjax_script.js" data-pjax></script>
-
-
-  
-<script src="/js/generator_search.js" defer></script>
-
-
-
-  <script>
-    var setupFirework = () => {
-      if (!false || !window.matchMedia('(max-width: 768px)').matches) {
-        window.firework && window.firework(JSON.parse('{"excludeElements":["a","button"],"particles":[{"shape":"circle","move":["emit"],"easing":"easeOutExpo","colors":["var(--red-1)","var(--red-2)","var(--red-3)","var(--red-4)"],"number":20,"duration":[1200,1800],"shapeOptions":{"radius":[16,32],"alpha":[0.3,0.5]}},{"shape":"circle","move":["diffuse"],"easing":"easeOutExpo","colors":["var(--red-0)"],"number":1,"duration":[1200,1800],"shapeOptions":{"radius":20,"alpha":[0.2,0.5],"lineWidth":6}}]}'));
-      }
-    }
-  </script>
-  
-<script src="https://npm.webcache.cn/mouse-firework@0.2.0/dist/index.umd.js" integrity="sha384-qi9WggRt19tv8Vc7pCHW3ulMNLwrn515zaLEWZjl1px07vz8+pUoWX8n1rgq282T" crossorigin="anonymous" onload="setupFirework()" defer></script>
-
-
-
-
-
-
-<div id="lazy-script">
-  <div>
-  </div>
-</div>
-
-
-  <script>
-    console.log(String.raw`%c 
- ______     ______     __     __    __     __  __    
-/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
-\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
- \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
-  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
-                                                  
-`,'color: #ff5252;')
-    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
-  </script>
-  
-
-
-  
-<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
-
-
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      for (let registration of registrations) {
-        registration.unregister();
-      }
-    });
-  }
-</script>
-
-
-
-
+<div class="b">
+    <h1 class="center">可能输错网址或此页面从未存在过</h1>
+    <p><br><br><br><br>
+        <span id="num"></span>秒后将继续探险...
+    </p>
+</div> -->
 </body>
+<script type="text/javascript" src="//qzonestyle.gtimg.cn/qzone/hybrid/app/404/search_children.js" charset="utf-8" homePageUrl="https://github.com/adk23333" homePageName="返回主页"></script>
 </html>
-

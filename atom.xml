@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>硬件项目手记</title>
+  
+  <subtitle>按项目记录原理图、PCB、问题和调试</subtitle>
+  <link href="https://alen9966.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://alen9966.github.io/"/>
+  <updated>2026-07-21T02:21:04.097Z</updated>
+  <id>https://alen9966.github.io/</id>
+  
+  <author>
+    <name>Alen</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>超声波探伤仪的面板</title>
+    <link href="https://alen9966.github.io/2026/07/21/ultrasonic-flaw-detector-panel/"/>
+    <id>https://alen9966.github.io/2026/07/21/ultrasonic-flaw-detector-panel/</id>
+    <published>2026-07-21T02:50:00.000Z</published>
+    <updated>2026-07-21T02:21:04.097Z</updated>
+    
+    <content type="html"><![CDATA[<p>这篇先把“超声波探伤仪的面板”文章骨架搭起来，后面你把接口关系、面板结构和实际调试情况告诉我，我继续往里填。</p><h2 id="前置知识和物理结构"><a href="#前置知识和物理结构" class="headerlink" title="前置知识和物理结构"></a>前置知识和物理结构</h2><ul><li>这里后面补面板在整机中的位置</li><li>这里后面补面板负责的功能范围</li><li>这里后面补按键、显示、编码器或者接口的物理分布</li><li>这里后面补和主控板、前端板或电源板之间的连接关系</li></ul><h2 id="原理图与-PCB"><a href="#原理图与-PCB" class="headerlink" title="原理图与 PCB"></a>原理图与 PCB</h2><ul><li>这里后面补面板电路划分</li><li>这里后面补显示、按键、指示灯和外部接口的连接方式</li><li>这里后面补排线、连接器或者固定孔位约束</li><li>这里后面补 PCB 布局、结构边界和装配注意点</li></ul><h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><ul><li>这里后面补结构配合问题</li><li>这里后面补接口定义或信号异常问题</li><li>这里后面补焊接后发现的功能异常</li><li>这里后面补每个问题的定位过程和改动结果</li></ul><h2 id="焊接与调试"><a href="#焊接与调试" class="headerlink" title="焊接与调试"></a>焊接与调试</h2><ul><li>这里后面补焊接顺序和装配过程</li><li>这里后面补面板单板测试内容</li><li>这里后面补联机调试步骤</li><li>这里后面补当前状态和后续待确认项</li></ul>]]></content>
+    
+    
+    <summary type="html">先把超声波探伤仪面板项目的文章框架搭起来，后面补按键、显示、接口和调试过程。</summary>
+    
+    
+    
+    <category term="项目记录" scheme="https://alen9966.github.io/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/"/>
+    
+    
+    <category term="PCB" scheme="https://alen9966.github.io/tags/PCB/"/>
+    
+    <category term="调试" scheme="https://alen9966.github.io/tags/%E8%B0%83%E8%AF%95/"/>
+    
+    <category term="面板设计" scheme="https://alen9966.github.io/tags/%E9%9D%A2%E6%9D%BF%E8%AE%BE%E8%AE%A1/"/>
+    
+    <category term="接口" scheme="https://alen9966.github.io/tags/%E6%8E%A5%E5%8F%A3/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>示波器校准仪的电源</title>
+    <link href="https://alen9966.github.io/2026/07/21/oscilloscope-calibrator-power/"/>
+    <id>https://alen9966.github.io/2026/07/21/oscilloscope-calibrator-power/</id>
+    <published>2026-07-21T02:40:00.000Z</published>
+    <updated>2026-07-21T02:38:45.337Z</updated>
+    
+    <content type="html"><![CDATA[<p>这块板现在的目标比较明确：给高压运放提供一组更干净的 <code>±300V</code> 电源。现有方案不是直接从 <code>24V</code> 线性跌落到高压输出，而是先建立 <code>±310V</code> 母线，再通过分立 LDO 把输出收敛到 <code>±300V</code>。按目前给出的目标，整板按 <code>200W</code> 级别考虑，重点不在极限效率，而在纹波、噪声和后级动态负载下的供电稳定性。</p><p>目前手上的资料包括原理图、PCB 截图和 <code>.ms14</code> 仿真文件。这一版先把已经确认的结构写清楚，把还没实测的部分明确标成待验证，后面你把仿真波形、打板结果和调试数据给我，我再继续往里补。</p><h2 id="前置知识和物理结构"><a href="#前置知识和物理结构" class="headerlink" title="前置知识和物理结构"></a>前置知识和物理结构</h2><p>这块电源板更像一块高压模拟供电板，而不是整机的主功率电源。它的任务是把系统已有的高压母线进一步净化，最后送给高压运放，所以这里最关键的不是“能不能出高压”，而是“高压够不够干净”。</p><ul><li>输入边界目前可以确认有 <code>24V</code> 入口，同时原理图里还能看到 <code>DC24VToDC310V</code>、<code>DC24VToDC-310V</code> 和 <code>DC24VToDC12V</code> 这些功能块名称，说明板上至少包含前级升压和辅助电源两部分。</li><li>输出目标已经明确为 <code>+300V</code> 和 <code>-300V</code>，而中间母线是 <code>+310V</code> 和 <code>-310V</code>。这 <code>10V</code> 左右的压差本质上是在给后级线性稳压留工作余量，用线性级换更高的纹波抑制。</li><li>负载对象是高压运放，这意味着后级更关心电源噪声、基准漂移、地参考干净程度和双极性输出的一致性，而不是单纯的稳压精度数字。</li><li>按 <code>200W</code> 级别设计后，很多原本在小功率板子上可以忽略的问题都必须提前考虑，包括高压器件耐压余量、线性级耗散、启动过程冲击、电流监测以及布局上的爬电和回流路径。</li></ul><p>从这个目标倒推，整块板的合理分工应该是：</p><ol><li><code>24V</code> 前级负责把系统输入抬到高压母线。</li><li>辅助电源负责给参考、误差放大和监测电路提供低压工作环境。</li><li>分立 LDO 负责把 <code>±310V</code> 最后压到 <code>±300V</code>，尽量把前级开关纹波拦在高压运放前面。</li></ol><h2 id="原理图与-PCB"><a href="#原理图与-PCB" class="headerlink" title="原理图与 PCB"></a>原理图与 PCB</h2><h3 id="当前能确认的电源链路"><a href="#当前能确认的电源链路" class="headerlink" title="当前能确认的电源链路"></a>当前能确认的电源链路</h3><p>从原理图文字层已经能确认几个关键分块：</p><ul><li><code>DC24VToDC310V</code></li><li><code>DC24VToDC-310V</code></li><li><code>DC24VToDC12V</code></li><li><code>DC310VToDC300V</code></li><li><code>DC-310VToDC-300V</code></li></ul><p>这基本对应了一条很清晰的电源路径：<code>24V</code> 输入先经过开关级建立 <code>±310V</code> 母线，再交给后级正负两路分立 LDO 做最终稳压。原理图里还能看到 <code>6.8uH</code> 和 <code>300kHz</code> 这些参数，前级大概率就是开关升压链路；后级则明显是为了低噪声目标单独拉出来的线性稳压部分。</p><h3 id="关键器件"><a href="#关键器件" class="headerlink" title="关键器件"></a>关键器件</h3><p>目前从原理图里已经能识别出这些核心器件：</p><ul><li><code>REF5025AIDR</code>：基准源，后级稳压和监测链路的低噪声参考很可能从这里来。</li><li><code>TPS7A3901DSCR</code>：辅助低压电源部分的重要器件，原理图同时出现了 <code>+12V</code>、<code>-12V</code>、<code>+12VIN</code>、<code>-12VIN</code>，说明模拟控制部分有独立双极性低压供电。</li><li><code>OPA2192IDR</code>、<code>ADA4622-2ARZ</code>：从网名和器件类型看，应该承担误差放大、缓冲、监测或控制放大任务。</li><li><code>MJE5731AG</code>、<code>TIP50G</code>、<code>PZTA42-QX</code>、<code>PZTA92</code>、<code>PZTA92T1G</code>：这些高压晶体管基本可以确认是分立 LDO 和高压控制链里的关键执行器件。</li></ul><p>原理图里的网络名也很有信息量，能看到：</p><ul><li><code>VREFA</code>、<code>VREFB</code></li><li><code>FBP</code>、<code>FBN</code></li><li><code>IPROGA</code>、<code>IPROGB</code></li><li><code>IMONA</code>、<code>IMONB</code></li><li><code>VMONA</code>、<code>VMONB</code></li><li><code>VMODA</code>、<code>VMODB</code></li><li><code>IMODEA</code>、<code>IMODEB</code></li><li><code>ENA</code>、<code>ENB</code>、<code>EN</code></li></ul><p>这些名字说明后级不是一个“纯分压 + 三极管”的简化高压稳压，而是已经把参考、反馈、电压监测、电流监测和使能控制都考虑进去了。这一点对后面调试很重要，因为它意味着这个板子不是只看输出电压对不对，还要看监测量和控制量是不是一致。</p><h3 id="PCB-观察"><a href="#PCB-观察" class="headerlink" title="PCB 观察"></a>PCB 观察</h3><p><img src="/images/projects/oscilloscope-power-pcb.png" alt="示波器校准仪电源 PCB"></p><p>从 PCB 截图可以先读出几件事：</p><ul><li>左侧有 <code>+24V</code> 和 <code>PGND</code> 输入区，说明前级功率入口是单独收进来的。</li><li>顶部能看到 <code>GND 24V EN 5V</code>，右上又有 <code>24V</code>、<code>+12V</code>、<code>-12V</code> 一组接口，辅助低压和控制信号是单独引出的。</li><li>右侧连接器丝印直接标了 <code>-310V</code>、<code>GND</code>、<code>GND</code>、<code>+310V</code>，这基本坐实了板上高压母线的接口定义。</li><li>中间偏右位置是密集的小信号与控制区，能看到 <code>TP-REF</code>、<code>TP-LDO-FB</code> 之类测试点，说明调试时会重点看参考和反馈节点。</li><li>板上四个大电解把高压区域撑得比较明显，说明母线储能和后级滤波都留了足够位置。</li></ul><p>从布局分区看，当前方向是合理的：功率入口、高压母线、辅助低压、参考放大和高压输出基本被拆开了，没有把所有东西堆在一起。后面真正需要重点盯的是两类细节：</p><ul><li>高压大电流回路和小信号参考地之间有没有被开关回流污染。</li><li>分立 LDO 的反馈节点、参考节点和功率管散热铜皮之间有没有互相影响。</li></ul><h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><p>这部分目前还没有实测数据，我先把接下来最有可能遇到的问题列出来，后面一旦你测到现象，我就按这个结构改成正式问题记录。</p><ul><li>第一个重点是 <code>±310V</code> 母线上的开关纹波到底有多大，以及分立 LDO 在目标频段内能压掉多少。这里不仅要看直流值，还要看开关频率附近的残余纹波。</li><li>第二个重点是正负两路跟踪一致性。高压运放供电时，如果 <code>+300V</code> 和 <code>-300V</code> 的偏差、启动时序或动态恢复不一致，后级行为可能会很难看。</li><li>第三个重点是线性级器件的耗散和安全工作区。虽然 <code>310V</code> 到 <code>300V</code> 只差 <code>10V</code>，但一旦实际负载电流上来，功率管温升和热漂移仍然不能靠经验估。</li><li>第四个重点是监测链路本身的可信度。既然原理图里已经做了 <code>VMON</code>、<code>IMON</code>、<code>IPROG</code> 这些节点，后面要确认监测值和真实输出之间的对应关系，而不是只盯示波器上的一个高压探头读数。</li></ul><h2 id="焊接与调试"><a href="#焊接与调试" class="headerlink" title="焊接与调试"></a>焊接与调试</h2><p>这部分现在可以先按下面的顺序推进，后面你每走完一步把现象给我，我就能直接补成完整调试日志。</p><ol><li>不上高压，先做冷检查。确认高压器件方向、关键阻值、参考源焊接、反馈链路和输入输出之间没有低阻短路。</li><li>单独验证辅助低压部分。优先确认 <code>5V</code>、<code>+12V</code>、<code>-12V</code> 是否正常，参考源和运放供电先站稳，否则后面的高压闭环没有意义。</li><li>分段看前级升压。先限流上电，确认 <code>+310V</code>、<code>-310V</code> 母线是否能稳定建立，再看空载纹波和启动过程。</li><li>再闭合分立 LDO。重点测 <code>TP-REF</code>、<code>TP-LDO-FB</code> 一类测试点，确认参考、反馈和输出之间的关系是不是和设计预期一致。</li><li>最后做带载测试。这里要至少补三组数据：空载、典型负载、接近目标负载时的输出电压、纹波和温升。</li></ol><p><code>.ms14</code> 仿真文件后面我想重点补两类内容：一类是启动和负载变化波形，另一类是分立 LDO 反馈链路的稳定性。等你把仿真里真正关心的节点和结果告诉我，这一段可以补成更像样的“原理 + 实测”对照记录。</p>]]></content>
+    
+    
+    <summary type="html">给高压运放做一块 ±300V 低纹波电源，前级建立 ±310V 母线，后级用分立 LDO 做最后一级净化。</summary>
+    
+    
+    
+    <category term="项目记录" scheme="https://alen9966.github.io/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/"/>
+    
+    
+    <category term="电源设计" scheme="https://alen9966.github.io/tags/%E7%94%B5%E6%BA%90%E8%AE%BE%E8%AE%A1/"/>
+    
+    <category term="原理图" scheme="https://alen9966.github.io/tags/%E5%8E%9F%E7%90%86%E5%9B%BE/"/>
+    
+    <category term="PCB" scheme="https://alen9966.github.io/tags/PCB/"/>
+    
+    <category term="调试" scheme="https://alen9966.github.io/tags/%E8%B0%83%E8%AF%95/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>这个博客后面会按什么结构写项目</title>
+    <link href="https://alen9966.github.io/2026/07/21/project-writing-framework/"/>
+    <id>https://alen9966.github.io/2026/07/21/project-writing-framework/</id>
+    <published>2026-07-21T02:30:00.000Z</published>
+    <updated>2026-07-21T02:21:04.097Z</updated>
+    
+    <content type="html"><![CDATA[<p>后面这个博客不再按散点主题写，而是直接按项目写。</p><p>每个项目先固定一个统一结构，这样后面你把细节给我，我可以直接往里补，不用每次重新想文章怎么拆。</p><h2 id="固定结构"><a href="#固定结构" class="headerlink" title="固定结构"></a>固定结构</h2><h3 id="1-前置知识和物理结构"><a href="#1-前置知识和物理结构" class="headerlink" title="1. 前置知识和物理结构"></a>1. 前置知识和物理结构</h3><p>这一段先交代项目是干什么的、板子在整机里的位置、和哪些模块发生关系，以及阅读这个项目需要先知道哪些背景。</p><h3 id="2-原理图与-PCB"><a href="#2-原理图与-PCB" class="headerlink" title="2. 原理图与 PCB"></a>2. 原理图与 PCB</h3><p>这一段集中写电路方案、关键器件、接口关系、供电链路、布局布线和板框约束，不把这些信息拆散。</p><h3 id="3-遇到的问题"><a href="#3-遇到的问题" class="headerlink" title="3. 遇到的问题"></a>3. 遇到的问题</h3><p>这一段单独记设计、打板、上电、联调过程中遇到的问题，尽量写清现象、判断和处理方式。</p><h3 id="4-焊接与调试"><a href="#4-焊接与调试" class="headerlink" title="4. 焊接与调试"></a>4. 焊接与调试</h3><p>这一段写焊接顺序、上电检查、分段验证、测试方法和最终调试结果，方便以后回看或者复做。</p><h2 id="这样写的好处"><a href="#这样写的好处" class="headerlink" title="这样写的好处"></a>这样写的好处</h2><ul><li>每个项目结构统一，翻起来快</li><li>同类问题更容易横向比较</li><li>后面补内容的时候不会越写越散</li></ul><p>从现在开始，新的项目内容都按这个框架往下接。</p>]]></content>
+    
+    
+    <summary type="html">后面所有项目都按同一套结构写，先把框架立住，后面补项目内容会更顺。</summary>
+    
+    
+    
+    <category term="项目记录" scheme="https://alen9966.github.io/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/"/>
+    
+    
+    <category term="写作框架" scheme="https://alen9966.github.io/tags/%E5%86%99%E4%BD%9C%E6%A1%86%E6%9E%B6/"/>
+    
+    <category term="项目记录" scheme="https://alen9966.github.io/tags/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/"/>
+    
+  </entry>
+  
+</feed>
