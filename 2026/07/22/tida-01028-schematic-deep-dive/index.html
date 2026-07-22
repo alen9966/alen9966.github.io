@@ -1,0 +1,591 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统 | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" as="style" href="https://fontsapi.zeoseven.com/292/main/result.css" onload="this.rel='stylesheet'" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
+
+    <meta name="description" content="独立拆解 TI TIDA-01028 的 26 页正式原理图，梳理四路宽带模拟前端、双 ADC12DJ3200、LMK04828 与双 LMX2594 时钟树、FMC+ 接口和低噪声电源架构。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统">
+<meta property="og:url" content="https://alen9966.github.io/2026/07/22/tida-01028-schematic-deep-dive/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="独立拆解 TI TIDA-01028 的 26 页正式原理图，梳理四路宽带模拟前端、双 ADC12DJ3200、LMK04828 与双 LMX2594 时钟树、FMC+ 接口和低噪声电源架构。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/projects/tida-01028-architecture.svg">
+<meta property="article:published_time" content="2026-07-22T06:30:00.000Z">
+<meta property="article:modified_time" content="2026-07-22T07:20:44.420Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="示波器">
+<meta property="article:tag" content="ADC">
+<meta property="article:tag" content="原理图">
+<meta property="article:tag" content="JESD204B">
+<meta property="article:tag" content="时钟设计">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/projects/tida-01028-architecture.svg">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">页面整理中...</div>
+    </div>
+  </div>
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">问题</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/anime/hyouka-bg-index.jpg" alt="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%85%88%E5%BB%BA%E7%AB%8B%E6%95%B4%E6%9C%BA%E8%A7%86%E8%A7%92"><span class="toc-number">1.</span> <span class="toc-text">一、先建立整机视角</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%A8%A1%E6%8B%9F%E8%BE%93%E5%85%A5%E9%93%BE%E8%B7%AF%E4%B8%BA%E4%BB%80%E4%B9%88%E5%90%8C%E6%97%B6%E6%94%BE%E4%B8%A4%E7%BA%A7%E6%94%BE%E5%A4%A7%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">二、模拟输入链路为什么同时放两级放大器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A9%B1%E5%8A%A8-ADC-%E6%97%B6%E9%9C%80%E8%A6%81%E6%A0%B8%E5%AF%B9%E7%9A%84%E5%9B%9B%E4%BB%B6%E4%BA%8B"><span class="toc-number">2.1.</span> <span class="toc-text">驱动 ADC 时需要核对的四件事</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%8F%8C-ADC-%E5%A6%82%E4%BD%95%E5%BD%A2%E6%88%90-12-8-GSPS"><span class="toc-number">3.</span> <span class="toc-text">三、双 ADC 如何形成 12.8 GSPS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%97%B6%E9%92%9F%E6%A0%91%E6%89%8D%E6%98%AF%E8%BF%99%E5%A5%97%E8%AE%BE%E8%AE%A1%E7%9A%84%E6%A0%B8%E5%BF%83"><span class="toc-number">4.</span> <span class="toc-text">四、时钟树才是这套设计的核心</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%8A%96%E5%8A%A8%E9%A2%84%E7%AE%97%E5%88%A4%E6%96%AD%E6%97%B6%E9%92%9F%E6%98%AF%E5%90%A6%E5%A4%9F%E7%94%A8"><span class="toc-number">4.1.</span> <span class="toc-text">用抖动预算判断时钟是否够用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81JESD204B%E3%80%81SYSREF-%E4%B8%8E%E7%A1%AE%E5%AE%9A%E6%80%A7%E5%BB%B6%E8%BF%9F"><span class="toc-number">5.</span> <span class="toc-text">五、JESD204B、SYSREF 与确定性延迟</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%94%B5%E6%BA%90%E9%A1%B5%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8D%A0%E4%BA%86%E4%BA%94%E5%BC%A0"><span class="toc-number">6.</span> <span class="toc-text">六、电源页为什么占了五张</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E6%8C%89%E8%BF%99%E4%B8%AA%E9%A1%BA%E5%BA%8F%E5%AE%A1%E6%9F%A5%E5%8E%9F%E7%90%86%E5%9B%BE"><span class="toc-number">7.</span> <span class="toc-text">七、按这个顺序审查原理图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E8%BF%99%E4%BB%BD%E5%8F%82%E8%80%83%E8%AE%BE%E8%AE%A1%E6%9C%80%E9%87%8D%E8%A6%81%E7%9A%84%E5%90%AF%E7%A4%BA"><span class="toc-number">8.</span> <span class="toc-text">八、这份参考设计最重要的启示</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">5</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">14</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">问题</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-tida-01028-schematic-deep-dive" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-07-22T06:30:00.000Z" itemprop="datePublished">2026-07-22</time>
+    <time style="display: none;" id="post-update-time">2026-07-22</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-07-22T07:20:44.420Z" itemprop="dateModified">2026-07-22</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p><code>TIDRZ70</code> 是 TI 参考设计 <code>TIDA-01028</code> 的完整原理图。它不是一张“高速 ADC 最小系统”，而是一套可以直接用来学习宽带采集平台分区方法的工程样本：四路模拟输入、两颗 <code>ADC12DJ3200</code>、两套射频采样时钟、一个系统级时钟清理器、JESD204B 高速串行链路、FMC+ 接口，以及为这些模块服务的多路低噪声电源。</p>
+<p>这篇文章不逐个抄元件参数，而是回答五个更重要的问题：信号怎样走、时钟怎样保证同步、数据怎样进入 FPGA、电源为什么要拆成这么多路，以及看类似原理图时应该先检查什么。</p>
+<p><img src="/images/projects/tida-01028-architecture.svg" alt="TIDA-01028 系统架构"></p>
+<h2 id="一、先建立整机视角"><a href="#一、先建立整机视角" class="headerlink" title="一、先建立整机视角"></a>一、先建立整机视角</h2><p>整套系统可以沿数据流划分为五个区域：</p>
+<ol>
+<li>四路模拟输入：每路都预留变压器直通和 <code>LMH5401 + LMH6401</code> 有源放大路径。</li>
+<li>两颗 <code>ADC12DJ3200</code>：每颗负责两路输入，也可以在单通道模式下把内部两个 ADC 核交织使用。</li>
+<li>时钟树：<code>LMK61E2</code>、<code>LMK04828</code>、<code>LMK00304</code> 和两颗 <code>LMX2594</code> 共同生成器件时钟、SYSREF 和 FPGA 参考时钟。</li>
+<li>FMC+：传输 JESD204B 数据通道、同步信号、参考时钟和控制信号。</li>
+<li>电源：输入保护、开关降压和低噪声 LDO 分层供电，并按 ADC、时钟和模拟前端划分地与电源域。</li>
+</ol>
+<p>原理图第 1 页的价值就在这里：先找到功能块和跨页网络，再进入单页细节。直接从第 2 页开始追电阻电容，很容易失去系统边界。</p>
+<h2 id="二、模拟输入链路为什么同时放两级放大器"><a href="#二、模拟输入链路为什么同时放两级放大器" class="headerlink" title="二、模拟输入链路为什么同时放两级放大器"></a>二、模拟输入链路为什么同时放两级放大器</h2><p>四个通道结构基本相同。SMA 输入之后不是简单接到 ADC，而是提供了多种装配选择：</p>
+<ul>
+<li>变压器或巴伦路径适合交流耦合，噪声低、结构直接；</li>
+<li><code>LMH5401</code> 把单端信号变为差分信号，并完成阻抗与共模转换；</li>
+<li><code>LMH6401</code> 是数字可编程全差分放大器，用于增益调整；</li>
+<li>后级 LC 网络、串联电阻和可选滤波器负责带宽整形、阻抗匹配与抗混叠；</li>
+<li>ADC 输入端的共模和差分终端必须与驱动器、走线阻抗一起评估。</li>
+</ul>
+<p>这里最值得借鉴的不是某个固定阻值，而是“把实验路径留在装配选项中”。原理图里大量 <code>DNP</code>、0 欧电阻和交叉删除标记说明这块 PCB 同时承担了验证平台的角色。真正生产化时应收敛为唯一链路，否则寄生支路、焊盘和长 stub 都可能损害高频响应。</p>
+<h3 id="驱动-ADC-时需要核对的四件事"><a href="#驱动-ADC-时需要核对的四件事" class="headerlink" title="驱动 ADC 时需要核对的四件事"></a>驱动 ADC 时需要核对的四件事</h3><p>第一是满量程。放大器的最大差分输出必须与 ADC 满量程匹配，并给峰值因数和失真留余量。</p>
+<p>第二是共模。<code>LMH5401</code>、<code>LMH6401</code> 和 ADC 输入共模不能各自独立决定，应把共模源的噪声、驱动能力和上电过程一起检查。</p>
+<p>第三是噪声与线性度。级联增益不能只看带宽，还要计算总噪声密度、输入参考噪声、OIP3 和高频谐波。</p>
+<p>第四是稳定性。高速全差分放大器面对 ADC 的采样回踢和容性负载时，输出隔离电阻与 RC&#x2F;LC 网络往往决定稳定裕量。</p>
+<h2 id="三、双-ADC-如何形成-12-8-GSPS"><a href="#三、双-ADC-如何形成-12-8-GSPS" class="headerlink" title="三、双 ADC 如何形成 12.8 GSPS"></a>三、双 ADC 如何形成 12.8 GSPS</h2><p><code>ADC12DJ3200</code> 在双通道模式下可提供两路 3.2 GSPS；在单通道模式下，内部两个 ADC 核以相差 180 度的时钟交织，得到 6.4 GSPS。板上再使用两颗 ADC，并让第二颗器件的采样相位相对第一颗错开 90 度，理论上就得到四相采样：</p>
+<p><code>0°、90°、180°、270°</code></p>
+<p>对应的等效采样率是：</p>
+<p><code>4 × 3.2 GSPS = 12.8 GSPS</code></p>
+<p>3.2 GHz 时钟周期为 312.5 ps，四相之间的理想间隔是：</p>
+<p><code>312.5 ps / 4 = 78.125 ps</code></p>
+<p>必须区分三个概念：78.125 ps 是相邻采样点的目标时间差；时钟器件的相位调节步进是校准分辨率；附加抖动则是噪声指标。三者不能混为“延时精度”。</p>
+<p>交织系统最终还要校准失调、增益、时间偏差和通道频响。尤其是时间偏差，其误差随输入频率升高而迅速增大，通常是宽带交织最难解决的一项。</p>
+<h2 id="四、时钟树才是这套设计的核心"><a href="#四、时钟树才是这套设计的核心" class="headerlink" title="四、时钟树才是这套设计的核心"></a>四、时钟树才是这套设计的核心</h2><p>原理图第 11 至 15 页构成完整时钟系统：</p>
+<ul>
+<li><code>LMK61E2</code> 提供板载低抖动参考源；</li>
+<li><code>LMK04828</code> 清理和分配参考时钟，同时产生系统所需的 SYSREF 与 FPGA 参考时钟；</li>
+<li><code>LMK00304</code> 承担差分时钟缓冲和扇出；</li>
+<li>两颗 <code>LMX2594</code> 分别为两颗 ADC 产生 3.2 GHz 器件时钟；</li>
+<li>ADC 内部孔径延时调节用于采样时刻的最终细调。</li>
+</ul>
+<p>双 PLL 的意义不只是“多一个输出”。它允许两个 ADC 的采样相位独立调整，同时共享同一个低频参考和同步体系。设计时必须确保两颗 PLL 的同步过程、分频器复位、SYSREF 关系和上电编程顺序是确定的。</p>
+<h3 id="用抖动预算判断时钟是否够用"><a href="#用抖动预算判断时钟是否够用" class="headerlink" title="用抖动预算判断时钟是否够用"></a>用抖动预算判断时钟是否够用</h3><p>仅考虑采样时钟抖动时，信噪比上限可估算为：</p>
+<p><code>SNRjitter = -20 log10(2π fin tj)</code></p>
+<p>其中 <code>fin</code> 是输入频率，<code>tj</code> 是总 RMS 抖动。输入频率越高，允许的抖动越小。总抖动应对参考源、清理器、PLL、缓冲器、ADC 孔径抖动和电源耦合进行均方根合成，而不是只引用某一颗芯片数据手册中最漂亮的数字。</p>
+<h2 id="五、JESD204B、SYSREF-与确定性延迟"><a href="#五、JESD204B、SYSREF-与确定性延迟" class="headerlink" title="五、JESD204B、SYSREF 与确定性延迟"></a>五、JESD204B、SYSREF 与确定性延迟</h2><p>两颗 ADC 的高速数据通过 JESD204B 串行通道送往 FMC+。除了数据差分对，原理图还把下列信号送到 FPGA：</p>
+<ul>
+<li>每颗 ADC 的 <code>SYNC</code>；</li>
+<li>FPGA 的参考时钟；</li>
+<li>SYSREF；</li>
+<li>SPI 控制和状态信号。</li>
+</ul>
+<p>如果只要求“能收到数据”，链路训练成功似乎就够了；如果要做跨 ADC 的时间交织，则每次上电后的延迟都必须可重复。SYSREF 的建立保持时间、走线偏差、接收端时钟域和 FPGA 内部 lane 对齐都要进入验证范围。</p>
+<p>布局时应把 JESD204B 看作高速串行通道，而不是普通数字线：控制阻抗、过孔数量、参考平面连续性、连接器损耗、差分对内偏差和通道间偏差都要有预算。FMC+ 只是连接器标准，不会自动保证链路质量。</p>
+<h2 id="六、电源页为什么占了五张"><a href="#六、电源页为什么占了五张" class="headerlink" title="六、电源页为什么占了五张"></a>六、电源页为什么占了五张</h2><p>第 22 至 26 页展示了参考设计的供电策略。入口使用 <code>TPS25926</code> 一类器件完成保护和受控上电；<code>TPS82130</code> 等开关电源先高效率地产生中间电压；<code>TPS7A8400</code>、<code>TPS7A8300</code>、<code>TPS7A3301</code> 等低噪声 LDO 再给 ADC、LMH 放大器和时钟器件提供干净电源。</p>
+<p>这种“开关电源预降压 + LDO 最后净化”的结构同时兼顾效率与噪声，但有三个前提：</p>
+<ol>
+<li>开关频率及其谐波不能落入关键观测频带或通过混频进入带内；</li>
+<li>LDO 必须有足够压差，且高频 PSRR 不能只看低频典型值；</li>
+<li>上电时序、PG 和 EN 链必须满足 ADC、PLL 与放大器的要求。</li>
+</ol>
+<p>原理图按 <code>GND_ADC1</code>、<code>GND_ADC2</code>、<code>GND_PLL</code>、各路 <code>AGND</code> 等网络分区。网络命名表达了功能隔离意图，但 PCB 上不能因此随意切割高速信号的回流路径。更稳妥的方法是保持连续参考平面，通过器件布局、电流路径和电源滤波控制噪声，而不是让高速差分线跨越地缝。</p>
+<h2 id="七、按这个顺序审查原理图"><a href="#七、按这个顺序审查原理图" class="headerlink" title="七、按这个顺序审查原理图"></a>七、按这个顺序审查原理图</h2><p>面对 26 页以上的高速采集原理图，我会按下面的顺序检查：</p>
+<ol>
+<li>从框图列出所有数据流、时钟流、控制流和电源流。</li>
+<li>沿每个模拟通道核对满量程、共模、增益、噪声、滤波和装配选项。</li>
+<li>为时钟树建立频率、相位、抖动和同步表，明确每个输出的接收者。</li>
+<li>根据 JESD204B 参数计算 lane rate，核对 FPGA 收发器、连接器和参考时钟能力。</li>
+<li>建立电源树，统计每路电压、电流、容差、噪声、时序和散热。</li>
+<li>最后检查 SPI 地址、复位、状态脚、测试点、DNP 冲突和跨页网络名。</li>
+</ol>
+<h2 id="八、这份参考设计最重要的启示"><a href="#八、这份参考设计最重要的启示" class="headerlink" title="八、这份参考设计最重要的启示"></a>八、这份参考设计最重要的启示</h2><p>TIDA-01028 真正展示的是系统协同：模拟前端决定输入带宽和失真，时钟决定高频 SNR 与交织精度，电源决定底噪和杂散，JESD204B 与 FPGA 决定数据能否稳定重组。任何单颗器件的“最高指标”都不能直接代表整机性能。</p>
+<p>如果要基于这套架构做自己的采集板，第一版目标不应是立刻达到 12.8 GSPS，而应依次验证单通道模拟性能、单颗 ADC 数据链、双器件确定性同步，最后才开启交织与数字校准。把问题按层拆开，调试成本会低很多。</p>
+<blockquote>
+<p>资料来源：Texas Instruments，TIDA-01028 原理图文件 TIDRZ70，2019。参考设计仅用于工程学习，实际产品必须重新完成器件选型、仿真、布局审查和整机验证。</p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录" data-aos="zoom-in">学习记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/ADC/" rel="tag" title="ADC">ADC</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/JESD204B/" rel="tag" title="JESD204B">JESD204B</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E5%8E%9F%E7%90%86%E5%9B%BE/" rel="tag" title="原理图">原理图</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%97%B6%E9%92%9F%E8%AE%BE%E8%AE%A1/" rel="tag" title="时钟设计">时钟设计</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E7%A4%BA%E6%B3%A2%E5%99%A8/" rel="tag" title="示波器">示波器</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/projects/cover-oscilloscope-sampling.svg" data-sizes="auto" alt="示波器如何突破 ADC 采样率：时间交织与频谱分片" class="lazyload">
+      <a href="/2026/07/22/oscilloscope-time-interleaving-and-spectrum-slicing/" aria-label="后一篇: 示波器如何突破 ADC 采样率：时间交织与频谱分片"  title="后一篇: 示波器如何突破 ADC 采样率：时间交织与频谱分片"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          示波器如何突破 ADC 采样率：时间交织与频谱分片
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+      <div>
+        <span class="icon-brush"></span>
+        7.8k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        00:30
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%85%88%E5%BB%BA%E7%AB%8B%E6%95%B4%E6%9C%BA%E8%A7%86%E8%A7%92"><span class="toc-number">1.</span> <span class="toc-text">一、先建立整机视角</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%A8%A1%E6%8B%9F%E8%BE%93%E5%85%A5%E9%93%BE%E8%B7%AF%E4%B8%BA%E4%BB%80%E4%B9%88%E5%90%8C%E6%97%B6%E6%94%BE%E4%B8%A4%E7%BA%A7%E6%94%BE%E5%A4%A7%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">二、模拟输入链路为什么同时放两级放大器</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A9%B1%E5%8A%A8-ADC-%E6%97%B6%E9%9C%80%E8%A6%81%E6%A0%B8%E5%AF%B9%E7%9A%84%E5%9B%9B%E4%BB%B6%E4%BA%8B"><span class="toc-number">2.1.</span> <span class="toc-text">驱动 ADC 时需要核对的四件事</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%8F%8C-ADC-%E5%A6%82%E4%BD%95%E5%BD%A2%E6%88%90-12-8-GSPS"><span class="toc-number">3.</span> <span class="toc-text">三、双 ADC 如何形成 12.8 GSPS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%97%B6%E9%92%9F%E6%A0%91%E6%89%8D%E6%98%AF%E8%BF%99%E5%A5%97%E8%AE%BE%E8%AE%A1%E7%9A%84%E6%A0%B8%E5%BF%83"><span class="toc-number">4.</span> <span class="toc-text">四、时钟树才是这套设计的核心</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8%E6%8A%96%E5%8A%A8%E9%A2%84%E7%AE%97%E5%88%A4%E6%96%AD%E6%97%B6%E9%92%9F%E6%98%AF%E5%90%A6%E5%A4%9F%E7%94%A8"><span class="toc-number">4.1.</span> <span class="toc-text">用抖动预算判断时钟是否够用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81JESD204B%E3%80%81SYSREF-%E4%B8%8E%E7%A1%AE%E5%AE%9A%E6%80%A7%E5%BB%B6%E8%BF%9F"><span class="toc-number">5.</span> <span class="toc-text">五、JESD204B、SYSREF 与确定性延迟</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E7%94%B5%E6%BA%90%E9%A1%B5%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8D%A0%E4%BA%86%E4%BA%94%E5%BC%A0"><span class="toc-number">6.</span> <span class="toc-text">六、电源页为什么占了五张</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E6%8C%89%E8%BF%99%E4%B8%AA%E9%A1%BA%E5%BA%8F%E5%AE%A1%E6%9F%A5%E5%8E%9F%E7%90%86%E5%9B%BE"><span class="toc-number">7.</span> <span class="toc-text">七、按这个顺序审查原理图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E8%BF%99%E4%BB%BD%E5%8F%82%E8%80%83%E8%AE%BE%E8%AE%A1%E6%9C%80%E9%87%8D%E8%A6%81%E7%9A%84%E5%90%AF%E7%A4%BA"><span class="toc-number">8.</span> <span class="toc-text">八、这份参考设计最重要的启示</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">5</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">14</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">问题</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/anime/natsume-series7-main.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+  
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统",
+          url: "https://alen9966.github.io/2026/07/22/tida-01028-schematic-deep-dive/",
+          excerpt: "",
+          description: "独立拆解 TI TIDA-01028 的 26 页正式原理图，梳理四路宽带模拟前端、双 ADC12DJ3200、LMK04828 与双 LMX2594 时钟树、FMC+ 接口和低噪声电源架构。",
+          stripContent: "TIDRZ70 是 TI 参考设计 TIDA-01028 的完整原理图。它不是一张“高速 ADC 最小系统”，而是一套可以直接用来学习宽带采集平台分区方法的工程样本：四路模拟输入、两颗 ADC12DJ3200、两套射频采样时钟、一个系统级时钟清理器、JESD204B 高速串行链路、FMC+ 接口，以及为这些模块服务的多路低噪声电源。 这篇文章不逐个抄元件参数，而是回答五个更重要的问题：信号怎样走、时钟怎样保证同步、数据怎样进入 FPGA、电源为什么要拆成这么多路，以及看类似原理图时应该先检查什么",
+          date: "Wed Jul 22 2026 14:30:00 GMT+0800",
+          updated: "Wed Jul 22 2026 15:20:44 GMT+0800",
+          cover: "/images/projects/cover-tida-01028.svg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

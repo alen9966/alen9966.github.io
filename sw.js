@@ -1,4 +1,4 @@
-const VERSION = "1784699621497";const preCache = ["/images/taichi.png","/images/anime/hyouka-bg-index.jpg","/css/loader.css","/css/style.css","/js/script.js"];const cacheDomain = [
+const VERSION = "1784704873651";const preCache = ["/images/taichi.png","/images/anime/hyouka-bg-index.jpg","/css/loader.css","/css/style.css","/js/script.js"];const cacheDomain = [
   "fonts.googleapis.com",
   "npm.webcache.cn",
   "unpkg.com",
