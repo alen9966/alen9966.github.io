@@ -1,622 +1,692 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
   <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
   
-  <title itemprop="name">硬件项目手记</title>
   
-    <link rel="shortcut icon" href="/images/projects/avatar-board.svg">
   
-  <meta http-equiv="x-dns-prefetch-control" content="on">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+SerifMerriweather|Merriweather+Sans|Source+Code+Pro|Ubuntu:400,700|Noto+Serif+SC" media="all">
-  <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
-  <link rel="stylesheet" id="saukra_css-css" href="/css/style.css" type="text/css" media="all">
-  <link rel="stylesheet" href="/css/lib.min.css" media="all">
-  <link rel="stylesheet" href="/css/font.css" media="all">
-  <link rel="stylesheet" href="/css/insight.css" media="all">
-  <link rel="stylesheet" href="/css/jquery.fancybox.min.css" media="all">
-  <link rel="stylesheet" href="/css/zoom.css" media="all">
-  <link rel="stylesheet" type="text/css" href="/css/sharejs.css">
-<!--   <link rel="stylesheet" id="saukra_css-css" href="https://2heng.xin/wp-content/cache/autoptimize/css/autoptimize_ad42a61f4c7d4bdd9f91afcff6b5dda5.css
-" type="text/css" media="all"> -->
-  <script>
-  /*Initial Variables*/
-  var mashiro_option = new Object();
-  var mashiro_global = new Object();
-  mashiro_option.NProgressON = true;
-  /* 
-   * 邮箱信息之类的东西可以填在这里，这些js变量基本都作用于sakura-app.js
-   * 这样的设置仅是为了方便在基于PHP开发的主题中设置js变量，既然移植到了Node上，我想或许可以精简这一逻辑吧
-   */
-  mashiro_option.email_domain = "";
-  mashiro_option.email_name = "";
-  mashiro_option.cookie_version_control = "";
-  mashiro_option.qzone_autocomplete = false;
-  mashiro_option.site_name = "硬件项目手记";
-  mashiro_option.author_name = "项目手记";
-  mashiro_option.site_url = "https://alen9966.github.io/";
-  mashiro_option.v_appId = "";
-  mashiro_option.v_appKey = "";
-  mashiro_option.mathjax = "0";
-  mashiro_option.qq_api_url = "https://api.mashiro.top/qqinfo/"; 
-  mashiro_option.qq_avatar_api_url = "https://api.mashiro.top/qqinfo/";
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" as="style" href="https://fontsapi.zeoseven.com/292/main/result.css" onload="this.rel='stylesheet'" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    
+<link rel="stylesheet" href="/css/loader.css">
 
-  // mashiro_option.jsdelivr_css_src = "https://cdn.jsdelivr.net/gh/moezx/cdn@3.4.5/css/lib.min.css";
-  // mashiro_option.float_player_on = true;
+    <meta name="description" content="从原理图到实测波形，记录硬件设计中的选择、失误与验证。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="硬件项目手记">
+<meta property="og:url" content="https://alen9966.github.io/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="从原理图到实测波形，记录硬件设计中的选择、失误与验证。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/banner.webp">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="硬件项目">
+<meta property="article:tag" content="原理图">
+<meta property="article:tag" content="PCB">
+<meta property="article:tag" content="电源设计">
+<meta property="article:tag" content="调试记录">
+<meta property="article:tag" content="Blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/banner.webp">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
 
-  /*End of Initial Variables*/
-  </script>
-  <script type="text/javascript">
-  var bg = "/images/projects/hero-board.svg".split(",");
-  var bgindex = Math.floor(Math.random()*bg.length);
-  if (!!window.ActiveXObject || "ActiveXObject" in window) { //is IE?
-    alert('朋友，IE浏览器未适配哦~');
-  }
-  </script>
-  <style type="text/css">
-  .hljs-ln{border-collapse:collapse}.hljs-ln td{padding:0}.hljs-ln-n:before{content:attr(data-line-number)}
-  </style>
-  <style type="text/css">.site-top .lower nav{display:block !important;}.author-profile i,.post-like a,.post-share .show-share,.sub-text,.we-info a,span.sitename,.post-more i:hover,#pagination a:hover,.post-content a:hover,.float-content i:hover{color:#78A9FF}.feature i,.download,.navigator i:hover,.links ul li:before,.ar-time i,span.ar-circle,.object,.comment .comment-reply-link,.siren-checkbox-radio:checked + .siren-checkbox-radioInput:after{background:#78A9FF}::-webkit-scrollbar-thumb{background:#78A9FF}.download,.navigator i:hover,.link-title,.links ul li:hover,#pagination a:hover,.comment-respond input[type='submit']:hover{border-color:#78A9FF}.entry-content a:hover,.site-info a:hover,.comment h4 a,#comments-navi a.prev,#comments-navi a.next,.comment h4 a:hover,.site-top ul li a:hover,.entry-title a:hover,#archives-temp h3,span.page-numbers.current,.sorry li a:hover,.site-title a:hover,i.iconfont.js-toggle-search.iconsearch:hover,.comment-respond input[type='submit']:hover{color:#78A9FF}.comments .comments-main{display:block !important;}.comments .comments-hidden{display:none !important;}background-position:center center;background-attachment:inherit;}
-  </style>
-  <link rel="stylesheet" href="/css/custom.css" media="all">
-<link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    
+<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
+
+    
+<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/css/site-home.css">
 </head>
 
-<body class="page-template page-template-user page-template-page-analytics page-template-userpage-analytics-php page page-id-1297 chinese-font serif isWebKit">
-  <div class="scrollbar" id="bar">
+  <body>
+      <div id='loader'>
+    <div class="loading-left-bg loading-bg"></div>
+    <div class="loading-right-bg loading-bg"></div>
+    <div class="spinner-box">
+      <div class="loading-taichi rotate">
+          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
+            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
+            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
+           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
+          </svg>
+      </div>
+      <div class="loading-word">页面整理中...</div>
+    </div>
   </div>
-  <a href="#" class="cd-top faa-float animated"></a>
-  <section id="main-container">
-    <div class="headertop filter-grid">
-  <div id="banner_wave_1"></div>
-  <div id="banner_wave_2"></div>
-  <figure id="centerbg" class="centerbg">
-    <div class="focusinfo no-select">
-      <div class="header-tou">
-        <a href="https://alen9966.github.io/">
-          <img src="/images/projects/avatar-board.svg">
+  <script>
+    var time = null;
+    var loaderEl = document.getElementById('loader');
+    var startLoading = () => {
+      time = Date.now();
+      loaderEl.classList.remove("loading");
+    }
+    var hideLoader = () => {
+      document.body.style.overflow = 'auto';
+      loader.classList.add('loading');
+    };
+
+    var endLoading = () => {
+      if (!time) {
+        hideLoader();
+      } else {
+        if (Date.now() - time > 500) {
+          time = null;
+          hideLoader();
+        } else {
+          setTimeout(endLoading, 500 - (Date.now() - time));
+          time = null;
+        }
+      }
+    }
+    window.addEventListener('DOMContentLoaded', endLoading);
+    loaderEl.addEventListener('click', endLoading);
+  </script>
+<div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
         </a>
-      </div>
-      <div class="header-info">
-        <p>按项目记录前置知识、物理结构、原理图 PCB、问题定位和焊接调试。</p>
-        <div class="top-social_v2">
-          <li id="bg-pre">
-            <img class="flipx" src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/next-b.svg">
-          </li>
-          
-            
-              
-                <li>
-                  <a href="https://github.com/alen9966" target="_blank" class="social-github" title="github">
-                    <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/social/github.png">
-                  </a>
-                </li>
-              
-            
-          
-          <li id="bg-next">
-            <img src="https://cdn.jsdelivr.net/gh/honjun/cdn@1.6/img/other/next-b.svg">
-          </li>
-        </div>
-      </div>
-    </div>
-  </figure>
-  <div id="video-container" style="">
-    <video style="object-fit: fill" id="bgvideo" class="video" video-name="" src="" width="auto" preload="auto">
-    </video>
-    <div id="video-btn" class="loadvideo videolive">
-    </div>
-    <div id="video-add">
-    </div>
-    <div class="video-stu">
-    </div>
-  </div>
-  <div class="headertop-down faa-float animated" onclick="headertop_down()">
-    <span>
-      <i class="fa fa-chevron-down" aria-hidden="true">
-      </i>
-    </span>
-  </div>
+        <a class="main-nav-link-wrap" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">问题</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
 </div>
-    <div id="page" class="site wrapper">
-      <header class="site-header no-select gizle sabit" role="banner">
-  <div class="site-top">
-    <div class="site-branding">
-      <span class="site-title">
-        <span class="logolink moe-mashiro">
-          <a href="/">
-            <span class="sakurasono">硬件</span>
-            <span class="shironeko">项目手记</span>
-          </a>
-        </span>
-      </span>
-    </div>
-    <div class="searchbox search-form-submit">
-      <i class="iconfont js-toggle-search iconsearch icon-search">
-      </i>
-    </div>
-    <div id="show-nav" class="showNav mobile-fit">
-      <div class="line line1">
-      </div>
-      <div class="line line2">
-      </div>
-      <div class="line line3">
-      </div>
-    </div>
-    <div class="lower-cantiner">
-      <div class="lower">
-        <nav class="mobile-fit-control hide">
-          <ul id="menu-new" class="menu">
-            
-              <li>
-                <a href="/">
-                  <span class="faa-parent animated-hover">
-                    <i class="fa  fa-home faa-tada" aria-hidden="true"></i>
-                    首页
-                  </span>
-                </a>
-                
-              </li>
-            
-              <li>
-                <a href="/projects/">
-                  <span class="faa-parent animated-hover">
-                    <i class="fa  fa-th-large faa-pulse" aria-hidden="true"></i>
-                    项目总览
-                  </span>
-                </a>
-                
-              </li>
-            
-              <li>
-                <a href="/archives/">
-                  <span class="faa-parent animated-hover">
-                    <i class="fa  fa-archive faa-float" aria-hidden="true"></i>
-                    归档
-                  </span>
-                </a>
-                
-              </li>
-            
-              <li>
-                <a href="/about/">
-                  <span class="faa-parent animated-hover">
-                    <i class="fa  fa-user-circle faa-passing" aria-hidden="true"></i>
-                    关于
-                  </span>
-                </a>
-                
-              </li>
-            
-              <li>
-                <a href="/atom.xml">
-                  <span class="faa-parent animated-hover">
-                    <i class="fa  fa-rss faa-pulse" aria-hidden="true"></i>
-                    RSS
-                  </span>
-                </a>
-                
-              </li>
-            
-          </ul>
-        </nav>
-      </div>
+<header id="header" aria-label="Site header">
+      <picture>
+      </picture>
+        <img  fetchpriority="high" src="/images/anime/hyouka-bg-index.jpg" alt="">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">硬件项目手记</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+              <span id="subtitle"><span></span></span>
+        </h2>
     </div>
   </div>
 </header>
 
-      <div class="blank" style="padding-top: 0;"></div>
-<div id="content" class="site-content">
-    
-        <div class="notice" style="margin-top:24px">
-            <i class="iconfont icon-notification">
-            </i>
-            <div class="notice-content">默认写法固定为四段：前置知识和物理结构、原理图与 PCB、遇到的问题、焊接与调试。后面你告诉我项目细节，我直接按这个结构帮你整理成博客。</div>
-        </div>
-    
-    <div class="top-feature-row">
-  <h1 class="fes-title" style="font-family: 'Ubuntu', sans-serif;">
-  <i class="fa fa-anchor" aria-hidden="true">
-  </i>
-  当前项目</h1>
-  
-  <div class="top-feature-v2">
-    <div class="the-feature square from_left_and_right">
-      <a href="/projects/">
-        <div class="img">
-          <img src="/images/projects/cover-framework.svg">
-        </div>
-        <div class="info">
-          <h3>写作框架</h3>
-          <p>固定拆成前置知识、原理图 PCB、问题记录和焊接调试四段。</p>
-        </div>
-      </a>
-    </div>
-  </div>
-  
-  <div class="top-feature-v2">
-    <div class="the-feature square from_left_and_right">
-      <a href="/2026/07/21/oscilloscope-calibrator-power/">
-        <div class="img">
-          <img src="/images/projects/cover-oscilloscope-power.svg">
-        </div>
-        <div class="info">
-          <h3>示波器校准仪电源</h3>
-          <p>先搭电源项目模板，后面补电源链路、关键器件和调试记录。</p>
-        </div>
-      </a>
-    </div>
-  </div>
-  
-  <div class="top-feature-v2">
-    <div class="the-feature square from_left_and_right">
-      <a href="/2026/07/21/ultrasonic-flaw-detector-panel/">
-        <div class="img">
-          <img src="/images/projects/cover-ultrasonic-panel.svg">
-        </div>
-        <div class="info">
-          <h3>超声波探伤仪面板</h3>
-          <p>先搭面板项目模板，后面补接口关系、板框结构和焊接调试过程。</p>
-        </div>
-      </a>
-    </div>
-  </div>
-  
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container ">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+        <div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
 </div>
-
-    <div id="primary" class="content-area">
-        <main id="main" class="site-main" role="main">
-            <h1 class="main-title" style="font-family: 'Ubuntu', sans-serif;">
-                <i class="fa fa-microchip" aria-hidden="true"></i>
-                项目记录</h1>
-            
-  <!-- 首页默认取最最新文章集 -->
-  
-    
-<article  class="post post-list-thumb post-list-thumb-left"  class="post post-list-thumb" itemscope="" itemtype="https://schema.org/BlogPosting">
-
-  <div class="post-thumb">
-    <a href="/2026/07/21/ultrasonic-flaw-detector-panel/">
-      <img class="lazyload" onerror="imgError(this,3)" src="/images/projects/cover-framework.svg" data-src="/images/projects/cover-ultrasonic-panel.svg">
-    </a>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">4</div>
   </div>
-  <div class="post-content-wrap">
-    <div class="post-content">
-      <div class="post-date">
-        <i class="iconfont icon-time">
-        </i>2026-7-21 10:07</div>
-      <a href="/2026/07/21/ultrasonic-flaw-detector-panel/" class="post-title">
-        <h3>超声波探伤仪的面板</h3>
-      </a>
-      <div class="post-meta">
-        <span><i class="fa fa-tags"></i>
-        
-            <a href="/tags/PCB/">PCB<em>·</em></a>
-          
-            <a href="/tags/%E8%B0%83%E8%AF%95/">调试<em>·</em></a>
-          
-            <a href="/tags/%E9%9D%A2%E6%9D%BF%E8%AE%BE%E8%AE%A1/">面板设计<em>·</em></a>
-          
-            <a href="/tags/%E6%8E%A5%E5%8F%A3/">接口<em>·</em></a>
-          
-        </span>
-        <span>
-          <i class="iconfont icon-file"></i>
-          
-            <a href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/">项目记录</a>
-          
-        </span>
-      </div>
-      <div class="float-content">
-        <p>先把超声波探伤仪面板项目的文章框架搭起来，后面补按键、显示、接口和调试过程。</p>
-        <div class="post-bottom">
-          <a href="/2026/07/21/ultrasonic-flaw-detector-panel/" class="button-normal">
-            <i class="iconfont icon-caidan"></i>
-          </a>
-        </div>
-      </div>
-    </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
   </div>
-</article>
-  
-    
-<article  class="post post-list-thumb" itemscope="" itemtype="https://schema.org/BlogPosting">
-
-  <div class="post-thumb">
-    <a href="/2026/07/21/oscilloscope-calibrator-power/">
-      <img class="lazyload" onerror="imgError(this,3)" src="/images/projects/cover-framework.svg" data-src="/images/projects/cover-oscilloscope-power.svg">
-    </a>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">12</div>
   </div>
-  <div class="post-content-wrap">
-    <div class="post-content">
-      <div class="post-date">
-        <i class="iconfont icon-time">
-        </i>2026-7-21 10:07</div>
-      <a href="/2026/07/21/oscilloscope-calibrator-power/" class="post-title">
-        <h3>示波器校准仪的电源</h3>
-      </a>
-      <div class="post-meta">
-        <span><i class="fa fa-tags"></i>
-        
-            <a href="/tags/%E7%94%B5%E6%BA%90%E8%AE%BE%E8%AE%A1/">电源设计<em>·</em></a>
-          
-            <a href="/tags/%E5%8E%9F%E7%90%86%E5%9B%BE/">原理图<em>·</em></a>
-          
-            <a href="/tags/PCB/">PCB<em>·</em></a>
-          
-            <a href="/tags/%E8%B0%83%E8%AF%95/">调试<em>·</em></a>
-          
-        </span>
-        <span>
-          <i class="iconfont icon-file"></i>
-          
-            <a href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/">项目记录</a>
-          
-        </span>
-      </div>
-      <div class="float-content">
-        <p>给高压运放做一块 ±300V 低纹波电源，前级建立 ±310V 母线，后级用分立 LDO 做最后一级净化。</p>
-        <div class="post-bottom">
-          <a href="/2026/07/21/oscilloscope-calibrator-power/" class="button-normal">
-            <i class="iconfont icon-caidan"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</article>
-  
-    
-<article  class="post post-list-thumb post-list-thumb-left"  class="post post-list-thumb" itemscope="" itemtype="https://schema.org/BlogPosting">
-
-  <div class="post-thumb">
-    <a href="/2026/07/21/project-writing-framework/">
-      <img class="lazyload" onerror="imgError(this,3)" src="/images/projects/cover-framework.svg" data-src="/images/projects/cover-framework.svg">
-    </a>
-  </div>
-  <div class="post-content-wrap">
-    <div class="post-content">
-      <div class="post-date">
-        <i class="iconfont icon-time">
-        </i>2026-7-21 10:07</div>
-      <a href="/2026/07/21/project-writing-framework/" class="post-title">
-        <h3>这个博客后面会按什么结构写项目</h3>
-      </a>
-      <div class="post-meta">
-        <span><i class="fa fa-tags"></i>
-        
-            <a href="/tags/%E5%86%99%E4%BD%9C%E6%A1%86%E6%9E%B6/">写作框架<em>·</em></a>
-          
-            <a href="/tags/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/">项目记录<em>·</em></a>
-          
-        </span>
-        <span>
-          <i class="iconfont icon-file"></i>
-          
-            <a href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/">项目记录</a>
-          
-        </span>
-      </div>
-      <div class="float-content">
-        <p>后面所有项目都按同一套结构写，先把框架立住，后面补项目内容会更顺。</p>
-        <div class="post-bottom">
-          <a href="/2026/07/21/project-writing-framework/" class="button-normal">
-            <i class="iconfont icon-caidan"></i>
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</article>
-  
-
-
-        </main>
-    </div>
-    
 </div>
-
-    </div>    
-    <div class="ins-search">
-    <div class="ins-search-mask"></div>
-    <div class="ins-search-container">
-        <div class="ins-input-wrapper">
-            <input type="text" class="ins-search-input" placeholder="Type something..."/>
-            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
-        </div>
-        <div class="ins-section-wrapper">
-            <div class="ins-section-container"></div>
-        </div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
     </div>
 </div>
-<script>
-(function (window) {
-    var INSIGHT_CONFIG = {
-        TRANSLATION: {
-            POSTS: 'Posts',
-            // PAGES: 'Pages',
-            CATEGORIES: 'Categories',
-            TAGS: 'Tags',
-        },
-        ROOT_URL: '/',
-        CONTENT_URL: '/content.json',
-    };
-    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
-})(window);
-</script>
-    <footer id="colophon" class="site-footer" role="contentinfo">
-  <div class="site-info">
-    <div class="footertext">
-      <div class="img-preload">
-        <img src="https://cdn.jsdelivr.net/gh/adk23333/cdn@1.7/img/other/wordpress-rotating-ball-o.svg">
-        <img src="https://cdn.jsdelivr.net/gh/adk23333/cdn@1.7/img/other/disqus-preloader.svg">
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
       </div>
-      <p style="color: #666666;">&copy 2023</p>
-    </div>
-    <div class="footer-device">
-    <p style="font-family: 'Ubuntu', sans-serif;">
-        <span style="color: #b9b9b9;">Theme <a href="https://github.com/adk23333/hexo-theme-sakura" target="_blank" style="color: #b9b9b9;;text-decoration: underline dotted rgba(0, 0, 0, .1);">Sakura</a> <i class="iconfont icon-sakura rotating" style="color: #ffc0cb;display:inline-block"></i> by <a href="https://2heng.xin/" target="_blank" style="color: #b9b9b9;;text-decoration: underline dotted rgba(0, 0, 0, .1);">Mashiro</a>&<a href="https://github.com/honjun" target="_blank" style="color: #b9b9b9;;text-decoration: underline dotted rgba(0, 0, 0, .1);">hojun</a>&<a href="https://github.com/adk23333" target="_blank" style="color: #b9b9b9;;text-decoration: underline dotted rgba(0, 0, 0, .1);">adk23333</a>, Powered by Hexo, Hosted by Coding Pages</a>
-        </span>
-      </p>
-    </div>
-  </div><!-- .site-info -->
-</footer>
-
-
-
-<!-- <script src="/js/tocbot.js"></script> -->
-<script type="text/javascript" src="/js/lib.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
-<script type="text/javascript" src="/js/InsightSearch.js"></script>
-<script type="text/javascript" src="/js/jquery.fancybox.min.js"></script>
-<script type="text/javascript" src="/js/zoom.min.js"></script>
-<script type="text/javascript" src="/js/sakura-app.js"></script>
-<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
-<script src='//unpkg.com/valine@1.3.4/dist/Valine.min.js'></script>
-<script src="/js/botui.js"></script>
-<!-- 不蒜子 网页计数器 -->
-<script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-<script type="text/javascript">
-/* <![CDATA[ */
-const Poi = /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent) ? {
-  "pjax": "1",
-  "movies": {"url": "https://cdn.jsdelivr.net/gh/honjun/hojun@1.2", "name": "Unbroken.mp4", "live": "close"},
-  "windowheight": "fixed",
-  "codelamp": "close",
-  "ajaxurl": "",
-  "order": "asc",
-  "formpostion": "bottom"
-} : {
-  "pjax": "1",
-  "movies": {"url": "https://cdn.jsdelivr.net/gh/honjun/hojun@1.2", "name": "Unbroken.mp4", "live": "open"},
-  "windowheight": "auto",
-  "codelamp": "close",
-  "ajaxurl": "",
-  "order": "asc",
-  "formpostion": "bottom"
-};
-/* ]]> */
-
-</script>
-<script>
-$(document).ready(function() {
-  if ($(".toc").length > 0 && document.body.clientWidth > 1200) {
-    if ($(".pattern-center").length > 0) { //有图的情况
-      tocbot.init({
-          // Where to render the table of contents.
-          tocSelector: '.toc', // 放置目录的容器
-          // Where to grab the headings to build the table of contents.
-          contentSelector: '.entry-content', // 正文内容所在
-          // Which headings to grab inside of the contentSelector element.
-          scrollSmooth: true,
-          headingSelector: 'h1, h2, h3, h4, h5', // 需要索引的标题级别
-          headingsOffset: -400,
-          scrollSmoothOffset: -85
-      });
-    } else {
-      tocbot.init({
-          // Where to render the table of contents.
-          tocSelector: '.toc', // 放置目录的容器
-          // Where to grab the headings to build the table of contents.
-          contentSelector: '.entry-content', // 正文内容所在
-          // Which headings to grab inside of the contentSelector element.
-          scrollSmooth: true,
-          headingSelector: 'h1, h2, h3, h4, h5', // 需要索引的标题级别
-          headingsOffset: -85,
-          scrollSmoothOffset: -85
-      });
-    }
-    var offsetTop = $('.toc').offset().top - 95;
-    window.onscroll = function() {
-      var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-      if (scrollTop >= offsetTop) {
-        $('.toc').addClass('toc-fixed');
-      } else {
-        $('.toc').removeClass('toc-fixed');
-      }
-    }
-  }
-});
-</script>
-
-    <div class="openNav no-select" style="height: 50px;">
-      <div class="iconflat no-select" style="width: 50px; height: 50px;">
-        <div class="icon"></div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
       </div>
-      <div class="site-branding search-form-submit">
-        <i class="iconfont js-toggle-search iconsearch icon-search"></i>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">问题</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+
+    </div>
+  </div>
+  <div class="sidebar-widget">
+        <div class="widget-wrapper">
+    <div class="widget-wrap" data-aos="fade-up">
+      <h3 class="widget-title">最新文章</h3>
+      <div class="widget">
+        <ul>
+            <li>
+              <a href="/2026/07/22/oscilloscope-time-interleaving-and-spectrum-slicing/" title="示波器如何突破 ADC 采样率：时间交织与频谱分片">示波器如何突破 ADC 采样率：时间交织与频谱分片</a>
+            </li>
+            <li>
+              <a href="/2026/07/21/ultrasonic-flaw-detector-panel/" title="超声波探伤仪的面板">超声波探伤仪的面板</a>
+            </li>
+            <li>
+              <a href="/2026/07/21/oscilloscope-calibrator-power/" title="示波器校准仪的电源">示波器校准仪的电源</a>
+            </li>
+            <li>
+              <a href="/2026/07/21/project-writing-framework/" title="硬件项目记录方法：从原理图到调试闭环">硬件项目记录方法：从原理图到调试闭环</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+        <div class="widget-wrapper">
+    <div class="widget-wrap" data-aos="fade-up">
+      <h3 class="widget-title">分类</h3>
+      <div class="widget">
+        <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录">学习记录</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/" title="项目记录">项目记录</a></li></ul>
+      </div>
+    </div>
+  </div>
+
+        <div class="widget-wrapper">
+    <div class="widget-wrap" data-aos="fade-up">
+      <h3 class="widget-title">归档</h3>
+      <div class="widget">
+        <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/07/">七月 2026</a></li></ul>
+      </div>
+    </div>
+  </div>
+
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content">    <div class="post-categories-wrapper" data-aos="fade-up">
+        <div class="post-categories-wrap">
+          <a class="post-link" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目记录" title="项目记录"></a>
+          <div class="post-categories-cover">
+              <img data-src="/images/anime/natsume-season5-visual.jpg" data-sizes="auto" alt="项目记录" class="lazyload">
+            <h2>项目记录</h2>
+            <h3>3 篇文章</h3>
+          </div>
+        </div>
+        <div class="post-categories-wrap">
+          <a class="post-link" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题排查" title="问题排查"></a>
+          <div class="post-categories-cover">
+              <img data-src="/images/anime/natsume-teaser-pv.jpg" data-sizes="auto" alt="问题排查" class="lazyload">
+            <h2>问题排查</h2>
+            <h3>0 篇文章</h3>
+          </div>
+        </div>
+        <div class="post-categories-wrap">
+          <a class="post-link" href="/categories/%E5%AE%9E%E4%B9%A0%E5%A4%8D%E7%9B%98" aria-label="实习复盘" title="实习复盘"></a>
+          <div class="post-categories-cover">
+              <img data-src="/images/anime/natsume-sound-theatre.png" data-sizes="auto" alt="实习复盘" class="lazyload">
+            <h2>实习复盘</h2>
+            <h3>0 篇文章</h3>
+          </div>
+        </div>
+    </div>
+  <section class="home-purpose" data-aos="fade-up">
+    <div class="home-purpose__grid">
+      <article class="home-purpose__summary">
+        <p class="home-purpose__eyebrow">Site Focus</p>
+        <h2>记录真实项目、问题排查和实习复盘</h2>
+        <p class="home-purpose__summary-text">
+          首页先按分类看内容，文章里再展开背景、方案、排查过程和最终结论。
+        </p>
+        <div class="home-purpose__chips">
+          <span>项目记录</span>
+          <span>问题排查</span>
+          <span>实习复盘</span>
+          <span>持续更新</span>
+        </div>
+      </article>
+      <article class="home-purpose__card">
+        <span class="home-purpose__badge">01</span>
+        <h3>需求到交付</h3>
+        <p>把背景、目标、方案选择和交付结果拆开写，避免只有结论没有上下文。</p>
+      </article>
+      <article class="home-purpose__card">
+        <span class="home-purpose__badge">02</span>
+        <h3>问题到结论</h3>
+        <p>记录现象、假设、验证和修复方式，让排查过程以后还能继续复用。</p>
+      </article>
+      <article class="home-purpose__card">
+        <span class="home-purpose__badge">03</span>
+        <h3>经验沉淀</h3>
+        <p>把实习里真正值得保留的方法、习惯和判断标准，一点点沉淀下来。</p>
+      </article>
+    </div>
+  </section>
+  <section class="home-notes" data-aos="fade-up">
+    <div class="home-notes__panel">
+      <p class="home-purpose__eyebrow">What To Expect</p>
+      <h2>更新时会尽量保留过程，而不是只贴最后答案</h2>
+      <ul>
+        <li>先交代场景，再写技术点，避免内容脱离上下文。</li>
+        <li>能说明为什么这样做，就不只写“最后用了什么方案”。</li>
+        <li>同一类问题后续再出现，会继续补充在原有思路基础上。</li>
+      </ul>
+    </div>
+    <div class="home-notes__aside">
+      <div class="home-notes__aside-card">
+        <span>01</span>
+        <h3>适合谁看</h3>
+        <p>适合对实习项目、问题排查和工作复盘感兴趣的人。</p>
+      </div>
+      <div class="home-notes__aside-card">
+        <span>02</span>
+        <h3>怎么阅读</h3>
+        <p>可以按分类浏览，也可以直接从最新文章进入具体项目或问题。</p>
+      </div>
+      <div class="home-notes__aside-card">
+        <span>03</span>
+        <h3>更新方式</h3>
+        <p>后面你把真实问题和解决过程告诉我，我会继续整理成适合公开阅读的版本。</p>
       </div>
     </div>
   </section>
-  <div id="mo-nav" class="">
-  <div class="m-avatar">
-    <img src="/images/projects/avatar-board.svg">
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/21/project-writing-framework/" aria-label="硬件项目记录方法：从原理图到调试闭环" title="硬件项目记录方法：从原理图到调试闭环"></a>
+      <div class="post-sticky">置顶</div>
+    <div class="post-cover left">
+        <img data-src="/images/projects/cover-framework.svg" data-sizes="auto" alt="硬件项目记录方法：从原理图到调试闭环" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-21</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-22</span>
+        <span><span class="icon-pencil"></span>403 字</span>
+        <span><span class="icon-clock"></span>2 分钟</span>
+      </div>
+      <h2 class="post-title">硬件项目记录方法：从原理图到调试闭环</h2>
+      <article class="post-article">
+          硬件项目很容易留下大量原理图、截图和零散结论，却很难在几个月后重新还原当时的判断过程。因此这里采用一套固定的项目记录方法，把设计依据、实现细节和验证结果串成闭环。
+统一结构并不是为了套模板，而是为了让不同项目可以横向比较，也让读者能迅速判断哪些是理论分析、哪些是设计选择、哪些已经得到实测验证。
+固定结构1. 前置知识和物理结构先交代项目目标、板卡在整机中的位置、与其他模块的关系，以及理解后续电路所需的背景知识。
+2. 原理图与 PCB集中记录电路方案、关键器件、接口关系、供电链路、布局布线和结构约束，并说明关键选择背后的依据。
+3. 遇到的问题记录设计、打板、上电和联调中的问题，尽量给出可复现
+      </article>
+    </div>
   </div>
-  <p style="text-align: center; color: #333; font-weight: 900; font-family: 'Ubuntu', sans-serif; letter-spacing: 1.5px">硬件项目手记</p>
-  <p style="text-align: center; word-spacing: 20px;">
-    
-      
-        <a href="https://github.com/alen9966" class="fa fa-github" target="_blank" style="color: #333333; margin-left:20px"></a>
-      
-    
-  </p>
-  <ul id="menu-new-1" class="menu">
-    
-      <li>
-        <a href="/">
-          <span class="faa-parent animated-hover">
-            <i class="fa  fa-home faa-tada" aria-hidden="true"></i>
-            首页
-          </span>
-        </a>
-        
-      </li>
-    
-      <li>
-        <a href="/projects/">
-          <span class="faa-parent animated-hover">
-            <i class="fa  fa-th-large faa-pulse" aria-hidden="true"></i>
-            项目总览
-          </span>
-        </a>
-        
-      </li>
-    
-      <li>
-        <a href="/archives/">
-          <span class="faa-parent animated-hover">
-            <i class="fa  fa-archive faa-float" aria-hidden="true"></i>
-            归档
-          </span>
-        </a>
-        
-      </li>
-    
-      <li>
-        <a href="/about/">
-          <span class="faa-parent animated-hover">
-            <i class="fa  fa-user-circle faa-passing" aria-hidden="true"></i>
-            关于
-          </span>
-        </a>
-        
-      </li>
-    
-      <li>
-        <a href="/atom.xml">
-          <span class="faa-parent animated-hover">
-            <i class="fa  fa-rss faa-pulse" aria-hidden="true"></i>
-            RSS
-          </span>
-        </a>
-        
-      </li>
-    
-  </ul>
-  <p style="text-align: center; font-size: 13px; color: #b9b9b9;">&copy 2019 hexo-sakura</p>
 </div>
-<button onclick="topFunction()" class="mobile-cd-top" id="moblieGoTop" title="Go to top" style="display: none;"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/22/oscilloscope-time-interleaving-and-spectrum-slicing/" aria-label="示波器如何突破 ADC 采样率：时间交织与频谱分片" title="示波器如何突破 ADC 采样率：时间交织与频谱分片"></a>
+    <div class="post-cover right">
+        <img data-src="/images/projects/cover-oscilloscope-sampling.svg" data-sizes="auto" alt="示波器如何突破 ADC 采样率：时间交织与频谱分片" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-22</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-22</span>
+        <span><span class="icon-pencil"></span>2.3k 字</span>
+        <span><span class="icon-clock"></span>9 分钟</span>
+      </div>
+      <h2 class="post-title">示波器如何突破 ADC 采样率：时间交织与频谱分片</h2>
+      <article class="post-article">
+          今天早上主要学习了高带宽示波器如何在单颗 ADC 采样率有限的情况下继续提高实时采样率和模拟带宽。目前常见的扩展方法可以归纳为两类：时间交织（time interleaving）和频谱分片（frequency interleaving &amp;#x2F; spectrum slicing）。
+前者把多个 ADC 错开时间采样，再把样点按时间顺序重排；后者把一个宽带信号拆成多个频段，各自下变频、采样，最后在数字域重新拼接。两者都不是简单地“多放几颗 ADC”，真正困难的地方都在多通道的一致性和校准。
+一、时间交织：在时间轴上轮流采样假设有 M 路 ADC，每路采样率为 Fs，只要相邻通道的采样时刻依次
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/21/ultrasonic-flaw-detector-panel/" aria-label="超声波探伤仪的面板" title="超声波探伤仪的面板"></a>
+    <div class="post-cover left">
+        <img data-src="/images/projects/cover-ultrasonic-panel.svg" data-sizes="auto" alt="超声波探伤仪的面板" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-21</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-22</span>
+        <span><span class="icon-pencil"></span>285 字</span>
+        <span><span class="icon-clock"></span>1 分钟</span>
+      </div>
+      <h2 class="post-title">超声波探伤仪的面板</h2>
+      <article class="post-article">
+          这篇先建立“超声波探伤仪面板”的项目记录，明确需要验证的结构、接口和调试项目。当前缺少实测数据的部分会保留为待验证项，后续随硬件进度更新。
+前置知识和物理结构
+面板在整机中的安装位置与空间边界
+面板承担的显示、输入和状态指示功能
+按键、显示、编码器与外部接口的物理分布
+面板与主控板、前端板及电源板之间的连接关系
+
+原理图与 PCB
+面板电路的功能分区
+显示、按键、指示灯和外部接口的连接方式
+排线、连接器和固定孔位约束
+PCB 布局、结构边界与装配注意点
+
+遇到的问题
+结构配合与装配公差
+接口定义或信号完整性异常
+焊接后发现的功能问题
+每个问题的定位过程与改动结果
+
+焊接与调试
+焊接顺序和装配过
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/21/oscilloscope-calibrator-power/" aria-label="示波器校准仪的电源" title="示波器校准仪的电源"></a>
+    <div class="post-cover right">
+        <img data-src="/images/projects/cover-oscilloscope-power.svg" data-sizes="auto" alt="示波器校准仪的电源" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-21</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-22</span>
+        <span><span class="icon-pencil"></span>2.5k 字</span>
+        <span><span class="icon-clock"></span>9 分钟</span>
+      </div>
+      <h2 class="post-title">示波器校准仪的电源</h2>
+      <article class="post-article">
+          这块板现在的目标比较明确：给高压运放提供一组更干净的 ±300V 电源。现有方案不是直接从 24V 线性跌落到高压输出，而是先建立 ±310V 母线，再通过分立 LDO 把输出收敛到 ±300V。按目前给出的目标，整板按 200W 级别考虑，重点不在极限效率，而在纹波、噪声和后级动态负载下的供电稳定性。
+目前资料包括原理图、PCB 截图和 .ms14 仿真文件。这一版先把已经确认的结构写清楚，把还没实测的部分明确标成待验证，后续再用仿真波形、打板结果和调试数据补齐。
+前置知识和物理结构这块电源板更像一块高压模拟供电板，而不是整机的主功率电源。它的任务是把系统已有的高压母线进一步净化，最后送给高
+      </article>
+    </div>
+  </div>
+</div>
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+      <div>
+        <span class="icon-brush"></span>
+        5.5k
+        &nbsp;|&nbsp;
+        <span class="icon-coffee"></span>
+        00:21
+      </div>
+      <div>
+        <span class="icon-eye"></span>
+        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
+        &nbsp;|&nbsp;
+        <span class="icon-user"></span>
+        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
+      </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+      <div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">4</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">问题</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+</div>
+
+  </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/anime/natsume-series7-main.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
   
-</body>
-</html>
+<script src="/js/aos.js"></script>
+
+  <script>
+    var aosInit = () => {
+      AOS.init({
+        duration: 1000,
+        easing: "ease",
+        once: true,
+        offset: 50,
+      });
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', aosInit);
+    } else {
+      aosInit();
+    }
+  </script>
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+<script src="https://npm.webcache.cn/typed.js@2.1.0/dist/typed.umd.js" integrity="sha384-cMrTlShXEGSdSFA359p+3aVUxK&#x2F;R+0TAfbRZMcTlAn8yqzxEDj05QsS65nTFMMj4" crossorigin="anonymous" defer onload="initSubtitleTyping()"></script>
+
+      <script data-pjax>
+        window.subtitleTypingConfig = {
+          strings: ["从原理图到实测波形，记录每一次验证","拆解硬件架构，也保留踩坑与修正","愿好奇心与电路一起保持通电"],
+          typeSpeed: 55,
+          backSpeed: 40,
+          backDelay: 2200,
+          startDelay: 200,
+          loop: true,
+          shuffle: false,
+          showCursor: true || true,
+          cursorChar: "_",
+          smartBackspace: false || false,
+        };
+
+        function initSubtitleTyping() {
+          const subtitleElement = document.querySelector('#subtitle');
+          if (!subtitleElement || !window.Typed || !window.subtitleTypingConfig) {
+            return;
+          }
+
+          if (window.__typedInstance) {
+            window.__typedInstance.destroy();
+          }
+
+          window.__typedInstance = new Typed('#subtitle span', window.subtitleTypingConfig);
+        }
+        
+        if (!window.__typedInitialized) {
+          window.__typedInitialized = true;
+          
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSubtitleTyping);
+          } else {
+            initSubtitleTyping();
+          }
+        } else {
+          initSubtitleTyping();
+        }
+      </script>
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+  
+<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>
