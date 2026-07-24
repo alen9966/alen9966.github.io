@@ -165,7 +165,7 @@
       <div class="widget">
         <ul>
             <li>
-              <a href="/2026/07/24/linear-regulator-and-ldo-basics/" title="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性">线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性</a>
+              <a href="/2026/07/24/linear-regulator-and-ldo-basics/" title="从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性">从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性</a>
             </li>
             <li>
               <a href="/2026/07/22/tida-01028-schematic-deep-dive/" title="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统">TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统</a>
@@ -271,23 +271,23 @@
   </section>
       <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/2026/07/24/linear-regulator-and-ldo-basics/" aria-label="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性" title="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性"></a>
+      <a class="post-link" href="/2026/07/24/linear-regulator-and-ldo-basics/" aria-label="从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性" title="从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性"></a>
     <div class="post-cover left">
-        <img data-src="/images/myimge/wallhaven-42r7yg.jpg" data-sizes="auto" alt="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性" class="lazyload">
+        <img data-src="/images/myimge/wallhaven-42r7yg.jpg" data-sizes="auto" alt="从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性" class="lazyload">
     </div>
     <div class="post-info">
       <div class="post-meta">
         <span><span class="icon-calendar"></span>2026-07-24</span>
           <span><span class="icon-calendar-plus"></span>2026-07-24</span>
-        <span><span class="icon-pencil"></span>2.7k 字</span>
-        <span><span class="icon-clock"></span>10 分钟</span>
+        <span><span class="icon-pencil"></span>3k 字</span>
+        <span><span class="icon-clock"></span>12 分钟</span>
       </div>
-      <h2 class="post-title">线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性</h2>
+      <h2 class="post-title">从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性</h2>
       <article class="post-article">
-          线性稳压器看起来只有三个引脚：输入、输出和地。真正决定它能否正常工作的，却是芯片内部的反馈环路、串联调整管，以及外部输出电容共同形成的动态系统。
-这篇文章以 TI《线性稳压器基础知识》为线索，不按课件目录逐页复述，而是围绕实际设计中最常遇到的几个问题展开：它如何把输出电压稳住，为什么输入输出必须留有压差，输出电容为什么既能改善瞬态又可能引起振荡，以及不同调整管架构应该怎样选择。
-一、线性稳压器到底在调什么可以先把线性稳压器想象成一个会自动改变阻值的串联元件。它位于输入电源与负载之间，通过改变自身压降，把输出维持在目标值。
-以 12 V 输入、5 V / 50 mA 输出为例，串联元件承担 7 
+          一、这次为什么重新学习 LDO示波器校准仪的电源部分需要把 +310 V 和 -310 V 分别稳压到 +300 V 和 -300 V，再给高压运放供电。这里的压差只有 10 V，但目标不是简单地把电压降下来，而是尽可能提高电源抑制比（PSRR）。
+这部分设计让我重新遇到一个以前只在《信号与系统》中见过的概念：零点和极点。以前我知道传递函数分子为零得到零点，分母为零得到极点，却没有真正把它们和电路的相位、增益以及稳定性联系起来。
+这篇文章先不讨论 PCB、散热和高压安全，只学习 LDO 作为一个反馈系统是怎样工作的，以及怎样用传递函数和 MATLAB 仿真判断环路是否有稳定余量。
+二、LDO 
       </article>
     </div>
   </div>
@@ -605,6 +605,13 @@
   }
 </script>
 
+
+    
+<script src="https://npm.webcache.cn/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6&#x2F;1Nxveei" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
 
 
 
