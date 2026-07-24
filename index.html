@@ -12,12 +12,7 @@
     硬件项目手记
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="preload" as="style" href="https://fontsapi.zeoseven.com/292/main/result.css" onload="this.rel='stylesheet'" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
     <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    
-<link rel="stylesheet" href="/css/loader.css">
-
     <meta name="description" content="从原理图到实测波形，记录硬件设计中的选择、失误与验证。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="硬件项目手记">
@@ -42,59 +37,11 @@
 <link rel="stylesheet" href="/css/style.css">
 
   <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
-    
-<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
-
-    
-<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
-
     <link rel="stylesheet" href="/css/site-home.css">
 </head>
 
   <body>
-      <div id='loader'>
-    <div class="loading-left-bg loading-bg"></div>
-    <div class="loading-right-bg loading-bg"></div>
-    <div class="spinner-box">
-      <div class="loading-taichi rotate">
-          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
-            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
-            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
-           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
-          </svg>
-      </div>
-      <div class="loading-word">页面整理中...</div>
-    </div>
-  </div>
-  <script>
-    var time = null;
-    var loaderEl = document.getElementById('loader');
-    var startLoading = () => {
-      time = Date.now();
-      loaderEl.classList.remove("loading");
-    }
-    var hideLoader = () => {
-      document.body.style.overflow = 'auto';
-      loader.classList.add('loading');
-    };
-
-    var endLoading = () => {
-      if (!time) {
-        hideLoader();
-      } else {
-        if (Date.now() - time > 500) {
-          time = null;
-          hideLoader();
-        } else {
-          setTimeout(endLoading, 500 - (Date.now() - time));
-          time = null;
-        }
-      }
-    }
-    window.addEventListener('DOMContentLoaded', endLoading);
-    loaderEl.addEventListener('click', endLoading);
-  </script>
-<div id="copy-tooltip"></div>
+    <div id="copy-tooltip"></div>
 <div id="heatmap-tooltip"></div>
 
 
@@ -108,23 +55,23 @@
             </div>
           <span class="main-nav-link">首页</span>
         </a>
-        <a class="main-nav-link-wrap" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95">
+        <a class="main-nav-link-wrap" href="/projects/">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">项目</span>
-        </a>
-        <a class="main-nav-link-wrap" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5">
-            <div class="main-nav-icon icon rotate">
-                &#xe62b;
-            </div>
-          <span class="main-nav-link">问题</span>
         </a>
         <a class="main-nav-link-wrap" href="/about">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
         </a>
     <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
   </nav>
@@ -136,7 +83,7 @@
 <header id="header" aria-label="Site header">
       <picture>
       </picture>
-        <img  fetchpriority="high" src="/images/myimge/xm2.png" alt="">
+        <img  fetchpriority="high" src="/images/myimge/wallhaven-3ze1v3.jpg" alt="">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
@@ -162,7 +109,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">6</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -187,18 +134,11 @@
         <div class="sidebar-menu-link">首页</div>
       </div>
       <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
           <div class="sidebar-menu-icon icon rotate">
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">项目</div>
-      </div>
-      <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
-          <div class="sidebar-menu-icon icon rotate">
-              &#xe62b;
-          </div>
-        <div class="sidebar-menu-link">问题</div>
       </div>
       <div class="sidebar-menu-link-wrap">
         <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
@@ -206,6 +146,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
       </div>
 </div>
 
@@ -217,6 +164,9 @@
       <h3 class="widget-title">最新文章</h3>
       <div class="widget">
         <ul>
+            <li>
+              <a href="/2026/07/24/linear-regulator-and-ldo-basics/" title="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性">线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性</a>
+            </li>
             <li>
               <a href="/2026/07/22/tida-01028-schematic-deep-dive/" title="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统">TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统</a>
             </li>
@@ -259,33 +209,7 @@
   </div>
 </aside>
 
-          <section id="main" aria-label="Main content">    <div class="post-categories-wrapper" data-aos="fade-up">
-        <div class="post-categories-wrap">
-          <a class="post-link" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目记录" title="项目记录"></a>
-          <div class="post-categories-cover">
-              <img data-src="/images/anime/natsume-season5-visual.jpg" data-sizes="auto" alt="项目记录" class="lazyload">
-            <h2>项目记录</h2>
-            <h3>3 篇文章</h3>
-          </div>
-        </div>
-        <div class="post-categories-wrap">
-          <a class="post-link" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题排查" title="问题排查"></a>
-          <div class="post-categories-cover">
-              <img data-src="/images/anime/natsume-teaser-pv.jpg" data-sizes="auto" alt="问题排查" class="lazyload">
-            <h2>问题排查</h2>
-            <h3>0 篇文章</h3>
-          </div>
-        </div>
-        <div class="post-categories-wrap">
-          <a class="post-link" href="/categories/%E5%AE%9E%E4%B9%A0%E5%A4%8D%E7%9B%98" aria-label="实习复盘" title="实习复盘"></a>
-          <div class="post-categories-cover">
-              <img data-src="/images/anime/natsume-sound-theatre.png" data-sizes="auto" alt="实习复盘" class="lazyload">
-            <h2>实习复盘</h2>
-            <h3>0 篇文章</h3>
-          </div>
-        </div>
-    </div>
-  <section class="home-purpose" data-aos="fade-up">
+          <section id="main" aria-label="Main content">  <section class="home-purpose" data-aos="fade-up">
     <div class="home-purpose__grid">
       <article class="home-purpose__summary">
         <p class="home-purpose__eyebrow">Site Focus</p>
@@ -347,25 +271,23 @@
   </section>
       <div class="post-wrapper">
   <div class="post-wrap left" data-aos="fade-up">
-      <a class="post-link" href="/2026/07/21/project-writing-framework/" aria-label="硬件项目记录方法：从原理图到调试闭环" title="硬件项目记录方法：从原理图到调试闭环"></a>
-      <div class="post-sticky">置顶</div>
+      <a class="post-link" href="/2026/07/24/linear-regulator-and-ldo-basics/" aria-label="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性" title="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性"></a>
     <div class="post-cover left">
-        <img data-src="/images/myimge/xm1.png" data-sizes="auto" alt="硬件项目记录方法：从原理图到调试闭环" class="lazyload">
+        <img data-src="/images/myimge/wallhaven-42r7yg.jpg" data-sizes="auto" alt="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性" class="lazyload">
     </div>
     <div class="post-info">
       <div class="post-meta">
-        <span><span class="icon-calendar"></span>2026-07-21</span>
-          <span><span class="icon-calendar-plus"></span>2026-07-23</span>
-        <span><span class="icon-pencil"></span>403 字</span>
-        <span><span class="icon-clock"></span>2 分钟</span>
+        <span><span class="icon-calendar"></span>2026-07-24</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-24</span>
+        <span><span class="icon-pencil"></span>2.7k 字</span>
+        <span><span class="icon-clock"></span>10 分钟</span>
       </div>
-      <h2 class="post-title">硬件项目记录方法：从原理图到调试闭环</h2>
+      <h2 class="post-title">线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性</h2>
       <article class="post-article">
-          硬件项目很容易留下大量原理图、截图和零散结论，却很难在几个月后重新还原当时的判断过程。因此这里采用一套固定的项目记录方法，把设计依据、实现细节和验证结果串成闭环。
-统一结构并不是为了套模板，而是为了让不同项目可以横向比较，也让读者能迅速判断哪些是理论分析、哪些是设计选择、哪些已经得到实测验证。
-固定结构1. 前置知识和物理结构先交代项目目标、板卡在整机中的位置、与其他模块的关系，以及理解后续电路所需的背景知识。
-2. 原理图与 PCB集中记录电路方案、关键器件、接口关系、供电链路、布局布线和结构约束，并说明关键选择背后的依据。
-3. 遇到的问题记录设计、打板、上电和联调中的问题，尽量给出可复现
+          线性稳压器看起来只有三个引脚：输入、输出和地。真正决定它能否正常工作的，却是芯片内部的反馈环路、串联调整管，以及外部输出电容共同形成的动态系统。
+这篇文章以 TI《线性稳压器基础知识》为线索，不按课件目录逐页复述，而是围绕实际设计中最常遇到的几个问题展开：它如何把输出电压稳住，为什么输入输出必须留有压差，输出电容为什么既能改善瞬态又可能引起振荡，以及不同调整管架构应该怎样选择。
+一、线性稳压器到底在调什么可以先把线性稳压器想象成一个会自动改变阻值的串联元件。它位于输入电源与负载之间，通过改变自身压降，把输出维持在目标值。
+以 12 V 输入、5 V / 50 mA 输出为例，串联元件承担 7 
       </article>
     </div>
   </div>
@@ -374,12 +296,12 @@
   <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/2026/07/22/tida-01028-schematic-deep-dive/" aria-label="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" title="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统"></a>
     <div class="post-cover right">
-        <img data-src="/images/myimge/xm1.png" data-sizes="auto" alt="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" class="lazyload">
+        <img data-src="/images/myimge/sn2.png" data-sizes="auto" alt="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" class="lazyload">
     </div>
     <div class="post-info">
       <div class="post-meta">
         <span><span class="icon-calendar"></span>2026-07-22</span>
-          <span><span class="icon-calendar-plus"></span>2026-07-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-24</span>
         <span><span class="icon-pencil"></span>2.3k 字</span>
         <span><span class="icon-clock"></span>9 分钟</span>
       </div>
@@ -387,10 +309,9 @@
       <article class="post-article">
           TIDRZ70 是 TI 参考设计 TIDA-01028 的完整原理图。它不是一张“高速 ADC 最小系统”，而是一套可以直接用来学习宽带采集平台分区方法的工程样本：四路模拟输入、两颗 ADC12DJ3200、两套射频采样时钟、一个系统级时钟清理器、JESD204B 高速串行链路、FMC+ 接口，以及为这些模块服务的多路低噪声电源。
 这篇文章不逐个抄元件参数，而是回答五个更重要的问题：信号怎样走、时钟怎样保证同步、数据怎样进入 FPGA、电源为什么要拆成这么多路，以及看类似原理图时应该先检查什么。
-
 一、先建立整机视角整套系统可以沿数据流划分为五个区域：
 
-四路模拟输入：每路都预留变压器直通和
+四路模拟输入：每路都预留变压器直通和 
       </article>
     </div>
   </div>
@@ -399,12 +320,12 @@
   <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/2026/07/22/oscilloscope-time-interleaving-and-spectrum-slicing/" aria-label="示波器如何突破 ADC 采样率：时间交织与频谱分片" title="示波器如何突破 ADC 采样率：时间交织与频谱分片"></a>
     <div class="post-cover left">
-        <img data-src="/images/myimge/xm1.png" data-sizes="auto" alt="示波器如何突破 ADC 采样率：时间交织与频谱分片" class="lazyload">
+        <img data-src="/images/myimge/xm3.png" data-sizes="auto" alt="示波器如何突破 ADC 采样率：时间交织与频谱分片" class="lazyload">
     </div>
     <div class="post-info">
       <div class="post-meta">
         <span><span class="icon-calendar"></span>2026-07-22</span>
-          <span><span class="icon-calendar-plus"></span>2026-07-23</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-24</span>
         <span><span class="icon-pencil"></span>2.3k 字</span>
         <span><span class="icon-clock"></span>9 分钟</span>
       </div>
@@ -421,38 +342,20 @@
   <div class="post-wrap right" data-aos="fade-up">
       <a class="post-link" href="/2026/07/21/ultrasonic-flaw-detector-panel/" aria-label="超声波探伤仪的面板" title="超声波探伤仪的面板"></a>
     <div class="post-cover right">
-        <img data-src="/images/myimge/xm1.png" data-sizes="auto" alt="超声波探伤仪的面板" class="lazyload">
+        <img data-src="/images/myimge/sn1.png" data-sizes="auto" alt="超声波探伤仪的面板" class="lazyload">
     </div>
     <div class="post-info">
       <div class="post-meta">
         <span><span class="icon-calendar"></span>2026-07-21</span>
-          <span><span class="icon-calendar-plus"></span>2026-07-23</span>
-        <span><span class="icon-pencil"></span>285 字</span>
-        <span><span class="icon-clock"></span>1 分钟</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-24</span>
+        <span><span class="icon-pencil"></span>482 字</span>
+        <span><span class="icon-clock"></span>2 分钟</span>
       </div>
       <h2 class="post-title">超声波探伤仪的面板</h2>
       <article class="post-article">
-          这篇先建立“超声波探伤仪面板”的项目记录，明确需要验证的结构、接口和调试项目。当前缺少实测数据的部分会保留为待验证项，后续随硬件进度更新。
-前置知识和物理结构
-面板在整机中的安装位置与空间边界
-面板承担的显示、输入和状态指示功能
-按键、显示、编码器与外部接口的物理分布
-面板与主控板、前端板及电源板之间的连接关系
-
-原理图与 PCB
-面板电路的功能分区
-显示、按键、指示灯和外部接口的连接方式
-排线、连接器和固定孔位约束
-PCB 布局、结构边界与装配注意点
-
-遇到的问题
-结构配合与装配公差
-接口定义或信号完整性异常
-焊接后发现的功能问题
-每个问题的定位过程与改动结果
-
-焊接与调试
-焊接顺序和装配过
+          这个项目是超声波探伤仪的人机交互面板，负责承载显示、按键、编码器和状态指示，并通过连接器与主控板、模拟前端和电源部分连接。目前还没有完整的原理图说明、接口定义和实测数据，因此这篇文章只记录项目范围和当前状态，不提前补写尚未确认的设计结论。
+当前需要确定的内容面板设计需要同时满足电气和结构要求。显示器、按键和编码器的位置会直接影响 PCB 外形与固定孔位；连接器的位置则由整机内部的板卡关系和排线方向决定。开始布局前，需要先确定面板尺寸、安装位置、显示器型号、输入器件数量和各连接器定义。
+原理图和 PCB原理图需要把显示、按键、指示灯、编码器和外部接口分区整理。PCB 布局首先服从面板开孔和装配尺
       </article>
     </div>
   </div>
@@ -461,20 +364,44 @@ PCB 布局、结构边界与装配注意点
   <div class="post-wrap left" data-aos="fade-up">
       <a class="post-link" href="/2026/07/21/oscilloscope-calibrator-power/" aria-label="示波器校准仪的电源" title="示波器校准仪的电源"></a>
     <div class="post-cover left">
-        <img data-src="/images/myimge/xm1.png" data-sizes="auto" alt="示波器校准仪的电源" class="lazyload">
+        <img data-src="/images/myimge/wallhaven-1qgvgg.jpg" data-sizes="auto" alt="示波器校准仪的电源" class="lazyload">
     </div>
     <div class="post-info">
       <div class="post-meta">
         <span><span class="icon-calendar"></span>2026-07-21</span>
-          <span><span class="icon-calendar-plus"></span>2026-07-23</span>
-        <span><span class="icon-pencil"></span>2.5k 字</span>
-        <span><span class="icon-clock"></span>9 分钟</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-24</span>
+        <span><span class="icon-pencil"></span>1.4k 字</span>
+        <span><span class="icon-clock"></span>6 分钟</span>
       </div>
       <h2 class="post-title">示波器校准仪的电源</h2>
       <article class="post-article">
-          这块板现在的目标比较明确：给高压运放提供一组更干净的 ±300V 电源。现有方案不是直接从 24V 线性跌落到高压输出，而是先建立 ±310V 母线，再通过分立 LDO 把输出收敛到 ±300V。按目前给出的目标，整板按 200W 级别考虑，重点不在极限效率，而在纹波、噪声和后级动态负载下的供电稳定性。
-目前资料包括原理图、PCB 截图和 .ms14 仿真文件。这一版先把已经确认的结构写清楚，把还没实测的部分明确标成待验证，后续再用仿真波形、打板结果和调试数据补齐。
-前置知识和物理结构这块电源板更像一块高压模拟供电板，而不是整机的主功率电源。它的任务是把系统已有的高压母线进一步净化，最后送给高
+          这块板用于给高压运放提供 ±300V 电源。系统先把 24V 升压为 ±310V，再通过正负两路分立 LDO 得到 ±300V。后级线性稳压器只承担约 10V 压差，目的是进一步抑制前级开关纹波，同时避免直接线性降压带来的巨大损耗。整板按 200W 级别设计。
+目前已经完成原理图、PCB 和 .ms14 仿真文件，暂时还没有完整的实测数据。这一版先记录电源结构和调试计划，输出纹波、负载瞬态、温升和环路稳定性等结果会在板子调通后补充。
+项目目标和总体方案这不是单纯的升压板。高压运放对电源纹波、基准漂移和正负电源一致性比较敏感，因此电源分成前级升压和后级线性净化两部分。±310V 母线给 LDO 
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/21/project-writing-framework/" aria-label="硬件项目记录方法：从原理图到调试闭环" title="硬件项目记录方法：从原理图到调试闭环"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/xm1.png" data-sizes="auto" alt="硬件项目记录方法：从原理图到调试闭环" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-21</span>
+          <span><span class="icon-calendar-plus"></span>2026-07-24</span>
+        <span><span class="icon-pencil"></span>403 字</span>
+        <span><span class="icon-clock"></span>2 分钟</span>
+      </div>
+      <h2 class="post-title">硬件项目记录方法：从原理图到调试闭环</h2>
+      <article class="post-article">
+          硬件项目很容易留下大量原理图、截图和零散结论，却很难在几个月后重新还原当时的判断过程。因此这里采用一套固定的项目记录方法，把设计依据、实现细节和验证结果串成闭环。
+统一结构并不是为了套模板，而是为了让不同项目可以横向比较，也让读者能迅速判断哪些是理论分析、哪些是设计选择、哪些已经得到实测验证。
+固定结构1. 前置知识和物理结构先交代项目目标、板卡在整机中的位置、与其他模块的关系，以及理解后续电路所需的背景知识。
+2. 原理图与 PCB集中记录电路方案、关键器件、接口关系、供电链路、布局布线和结构约束，并说明关键选择背后的依据。
+3. 遇到的问题记录设计、打板、上电和联调中的问题，尽量给出可复现
       </article>
     </div>
   </div>
@@ -493,20 +420,6 @@ PCB 布局、结构边界与装配注意点
         <span class="footer-info-sep rotate"></span>
       Alen
     </div>
-      <div>
-        <span class="icon-brush"></span>
-        7.8k
-        &nbsp;|&nbsp;
-        <span class="icon-coffee"></span>
-        00:30
-      </div>
-      <div>
-        <span class="icon-eye"></span>
-        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
-        &nbsp;|&nbsp;
-        <span class="icon-user"></span>
-        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
-      </div>
   </div>
 </footer>
 
@@ -526,7 +439,7 @@ PCB 布局、结构边界与装配注意点
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">6</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -551,18 +464,11 @@ PCB 布局、结构边界与装配注意点
         <div class="sidebar-menu-link">首页</div>
       </div>
       <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
           <div class="sidebar-menu-icon icon rotate">
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">项目</div>
-      </div>
-      <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
-          <div class="sidebar-menu-icon icon rotate">
-              &#xe62b;
-          </div>
-        <div class="sidebar-menu-link">问题</div>
       </div>
       <div class="sidebar-menu-link-wrap">
         <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
@@ -570,6 +476,13 @@ PCB 布局、结构边界与装配注意点
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
       </div>
 </div>
 
@@ -589,7 +502,7 @@ PCB 布局、结构边界与装配注意点
             <div id="reimu-hits"></div>
             <div id="reimu-pagination" class="reimu-pagination"></div>
           </div>
-          <img class="reimu-bg" src="/images/anime/natsume-series7-main.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
         </div>
       </div>
     
@@ -604,24 +517,6 @@ PCB 布局、结构边界与装配注意点
 <script src="/js/script.js"></script>
 
 
-  
-<script src="/js/aos.js"></script>
-
-  <script>
-    var aosInit = () => {
-      AOS.init({
-        duration: 1000,
-        easing: "ease",
-        once: true,
-        offset: 50,
-      });
-    };
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', aosInit);
-    } else {
-      aosInit();
-    }
-  </script>
 
 
 <script src="/js/pjax_script.js" data-pjax></script>
@@ -698,9 +593,6 @@ PCB 布局、结构边界与装配注意点
   </script>
   
 
-
-  
-<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
 
 
 <script>

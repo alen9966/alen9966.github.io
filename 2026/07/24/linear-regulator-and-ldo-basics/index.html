@@ -1,0 +1,523 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性 | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="从串联调整管和反馈环路出发，理解线性稳压器如何稳压、压差与功耗怎样计算、输出电容 ESR 为什么可能让 LDO 振荡，以及 NPN、PNP、NMOS、PMOS 架构的取舍。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性">
+<meta property="og:url" content="https://alen9966.github.io/2026/07/24/linear-regulator-and-ldo-basics/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="从串联调整管和反馈环路出发，理解线性稳压器如何稳压、压差与功耗怎样计算、输出电容 ESR 为什么可能让 LDO 振荡，以及 NPN、PNP、NMOS、PMOS 架构的取舍。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-24T06:30:00.000Z">
+<meta property="article:modified_time" content="2026-07-24T06:30:30.061Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="电源设计">
+<meta property="article:tag" content="LDO">
+<meta property="article:tag" content="环路稳定性">
+<meta name="twitter:card" content="summary">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/myimge/%E4%B8%8B%E8%BD%BD.webp" alt="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E7%BA%BF%E6%80%A7%E7%A8%B3%E5%8E%8B%E5%99%A8%E5%88%B0%E5%BA%95%E5%9C%A8%E8%B0%83%E4%BB%80%E4%B9%88"><span class="toc-number">1.</span> <span class="toc-text">一、线性稳压器到底在调什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%9B%9B%E4%B8%AA%E5%9F%BA%E6%9C%AC%E6%A8%A1%E5%9D%97%E6%9E%84%E6%88%90%E9%97%AD%E7%8E%AF"><span class="toc-number">2.</span> <span class="toc-text">二、四个基本模块构成闭环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%8E%8B%E5%B7%AE%E3%80%81%E5%8A%9F%E8%80%97%E4%B8%8E%E7%83%AD%E8%AE%BE%E8%AE%A1"><span class="toc-number">3.</span> <span class="toc-text">三、压差、功耗与热设计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E8%BE%93%E5%87%BA%E7%94%B5%E5%AE%B9%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E5%BD%B1%E5%93%8D%E7%A8%B3%E5%AE%9A%E6%80%A7"><span class="toc-number">4.</span> <span class="toc-text">四、输出电容为什么会影响稳定性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ESR-%E5%A4%AA%E4%BD%8E"><span class="toc-number">4.1.</span> <span class="toc-text">ESR 太低</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESR-%E5%A4%AA%E9%AB%98"><span class="toc-number">4.2.</span> <span class="toc-text">ESR 太高</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%89%8D%E9%A6%88%E7%94%B5%E5%AE%B9%E7%9A%84%E4%BD%9C%E7%94%A8%E4%B8%8E%E8%BE%B9%E7%95%8C"><span class="toc-number">5.</span> <span class="toc-text">五、前馈电容的作用与边界</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E5%9B%9B%E7%B1%BB%E8%B0%83%E6%95%B4%E7%AE%A1%E6%9E%B6%E6%9E%84%E7%9A%84%E5%B7%AE%E5%BC%82"><span class="toc-number">6.</span> <span class="toc-text">六、四类调整管架构的差异</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E9%80%89-LDO-%E6%97%B6%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E6%A0%B8%E5%AF%B9%E4%BB%80%E4%B9%88"><span class="toc-number">7.</span> <span class="toc-text">七、选 LDO 时真正需要核对什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E9%81%87%E5%88%B0-LDO-%E6%8C%AF%E8%8D%A1%E6%97%B6%E6%80%8E%E6%A0%B7%E6%8E%92%E6%9F%A5"><span class="toc-number">8.</span> <span class="toc-text">八、遇到 LDO 振荡时怎样排查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D%E3%80%81%E6%9C%80%E5%90%8E%E5%BB%BA%E7%AB%8B%E4%B8%80%E4%B8%AA%E5%AE%8C%E6%95%B4%E8%AE%A4%E8%AF%86"><span class="toc-number">9.</span> <span class="toc-text">九、最后建立一个完整认识</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">14</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-linear-regulator-and-ldo-basics" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-07-24T06:30:00.000Z" itemprop="datePublished">2026-07-24</time>
+    <time style="display: none;" id="post-update-time">2026-07-24</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-07-24T06:30:30.061Z" itemprop="dateModified">2026-07-24</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>线性稳压器看起来只有三个引脚：输入、输出和地。真正决定它能否正常工作的，却是芯片内部的反馈环路、串联调整管，以及外部输出电容共同形成的动态系统。</p>
+<p>这篇文章以 TI《线性稳压器基础知识》为线索，不按课件目录逐页复述，而是围绕实际设计中最常遇到的几个问题展开：它如何把输出电压稳住，为什么输入输出必须留有压差，输出电容为什么既能改善瞬态又可能引起振荡，以及不同调整管架构应该怎样选择。</p>
+<h2 id="一、线性稳压器到底在调什么"><a href="#一、线性稳压器到底在调什么" class="headerlink" title="一、线性稳压器到底在调什么"></a>一、线性稳压器到底在调什么</h2><p>可以先把线性稳压器想象成一个会自动改变阻值的串联元件。它位于输入电源与负载之间，通过改变自身压降，把输出维持在目标值。</p>
+<p>以 <code>12 V</code> 输入、<code>5 V / 50 mA</code> 输出为例，串联元件承担 <code>7 V</code> 压降。若把它暂时等效成电阻，其阻值为：</p>
+<p><code>Rpass = (Vin - Vout) / Iload = 7 V / 50 mA = 140 Ω</code></p>
+<p>当负载增加到 <code>500 mA</code>，为了仍然输出 <code>5 V</code>，等效阻值必须降到：</p>
+<p><code>Rpass = 7 V / 500 mA = 14 Ω</code></p>
+<p>如果负载保持 <code>50 mA</code>，输入却从 <code>12 V</code> 升至 <code>22 V</code>，等效阻值又必须增至：</p>
+<p><code>Rpass = 17 V / 50 mA = 340 Ω</code></p>
+<p>真实电路当然不会用机械可变电阻。线性稳压器使用晶体管或 MOSFET 作为串联调整管，由控制环路连续改变它的导通程度。</p>
+<h2 id="二、四个基本模块构成闭环"><a href="#二、四个基本模块构成闭环" class="headerlink" title="二、四个基本模块构成闭环"></a>二、四个基本模块构成闭环</h2><p>不论内部调整管采用哪一种器件，典型线性稳压器都可以拆成四个部分：</p>
+<ol>
+<li>基准电压提供稳定的比较标准；</li>
+<li>采样网络按比例取得输出电压；</li>
+<li>误差放大器比较反馈电压与基准电压；</li>
+<li>串联调整管控制从输入流向负载的电流。</li>
+</ol>
+<p>当负载突然增大时，输出电压会先出现下跌。误差放大器检测到反馈电压降低，随后增强调整管的导通，把输出拉回设定值。输入电压变化时，控制环路也会做出相应修正。</p>
+<p>这里有一个经常被忽略的事实：反馈不可能瞬间完成。误差被检测、放大并传递到功率器件都需要时间，因此负载跳变后一定会产生短暂偏差。数据手册中的负载瞬态响应，描述的正是环路恢复输出所需的时间和偏差幅度。</p>
+<h2 id="三、压差、功耗与热设计"><a href="#三、压差、功耗与热设计" class="headerlink" title="三、压差、功耗与热设计"></a>三、压差、功耗与热设计</h2><p>线性稳压器不能凭空降压，输入电压必须比输出电压高出一定余量。这个最低余量就是压差 <code>Vdropout</code>。当 <code>Vin - Vout</code> 低于所需压差时，调整管已经完全导通，反馈环路失去继续调节的能力，输出会随输入下降。</p>
+<p>稳压器自身的主要耗散可近似写成：</p>
+<p><code>P loss ≈ (Vin - Vout) × Iout + Vin × Iq</code></p>
+<p>其中 <code>Iq</code> 是芯片自身消耗的静态电流。在大负载下，第一项通常占主导；在电池供电、待机或微功耗系统中，第二项也不能忽略。</p>
+<p>例如用 <code>12 V</code> 产生 <code>5 V / 500 mA</code>：</p>
+<p><code>P loss ≈ (12 V - 5 V) × 0.5 A = 3.5 W</code></p>
+<p>理想化转换效率只有：</p>
+<p><code>η ≈ Vout / Vin = 5 / 12 ≈ 41.7%</code></p>
+<p>这已经不是“小芯片随便焊一下”的热量。设计时至少要结合封装热阻、铜皮面积、环境温度和器件允许结温估算温升，并检查安全工作区。输入输出压差较大时，先用开关电源预降压，再用 LDO 做低噪声净化，通常更合理。</p>
+<h2 id="四、输出电容为什么会影响稳定性"><a href="#四、输出电容为什么会影响稳定性" class="headerlink" title="四、输出电容为什么会影响稳定性"></a>四、输出电容为什么会影响稳定性</h2><p>输出电容有三项直接作用：为负载突变提供瞬时电流、降低输出噪声与纹波，以及参与控制环路的频率补偿。第三项也意味着选错电容可能让稳压器振荡。</p>
+<p>真实电容包含等效串联电阻 <code>ESR</code>。输出电容与 ESR 会在环路中形成一个零点：</p>
+<p><code>fzero = 1 / (2π × Cout × ESR)</code></p>
+<p>这个零点能够提供正相位，使环路在增益降到 <code>0 dB</code> 之前保留足够的相位裕量。对依靠这一零点补偿的传统 LDO 来说，ESR 既不能太高，也不能太低。</p>
+<h3 id="ESR-太低"><a href="#ESR-太低" class="headerlink" title="ESR 太低"></a>ESR 太低</h3><p>ESR 太低会把零点推向更高频率。如果零点来不及在环路交越频率附近提供正相位，多个极点累积的相移可能接近 <code>-180°</code>，负反馈就可能表现成正反馈。低 ESR 陶瓷电容因此并不天然适用于所有老式 LDO。</p>
+<h3 id="ESR-太高"><a href="#ESR-太高" class="headerlink" title="ESR 太高"></a>ESR 太高</h3><p>ESR 太高又会把零点拉向低频，改变环路带宽和交越位置，使高频极点在交越前贡献更多相移，同样可能降低相位裕量。铝电解电容在低温下 ESR 明显上升，是需要特别留意的工况。</p>
+<p>因此，不能只按“容量越大越好”选择输出电容。应直接查看具体器件数据手册对电容量、ESR、介质、偏压降容和温度范围的要求。现代很多 LDO 已针对陶瓷电容进行内部补偿，但这不代表所有型号都能任意更换输出电容。</p>
+<h2 id="五、前馈电容的作用与边界"><a href="#五、前馈电容的作用与边界" class="headerlink" title="五、前馈电容的作用与边界"></a>五、前馈电容的作用与边界</h2><p>可调输出 LDO 常在反馈上臂电阻两端并联前馈电容 <code>Cf</code>。它与上臂电阻形成零点：</p>
+<p><code>fz = 1 / (2π × R1 × Cf)</code></p>
+<p>同时也会与反馈网络形成一个更高频的极点：</p>
+<p><code>fp = 1 / (2π × (R1 || R2) × Cf)</code></p>
+<p>在合适的位置加入零点，可以提高相位裕量、改善瞬态响应或降低部分频段的输出噪声。但 <code>Cf</code> 不是通用补丁：零极点位置取决于反馈电阻、输出电压与芯片内部环路。除非数据手册给出推荐值或有环路仿真与实测支持，否则不应仅凭经验添加。</p>
+<h2 id="六、四类调整管架构的差异"><a href="#六、四类调整管架构的差异" class="headerlink" title="六、四类调整管架构的差异"></a>六、四类调整管架构的差异</h2><p>线性稳压器常按串联调整管分为 NPN、PNP、NMOS 和 PMOS。它们的差别最终会体现在压差、静态电流、驱动难度、输出阻抗、稳定性和芯片面积上。</p>
+<table>
+<thead>
+<tr>
+<th>架构</th>
+<th>主要特点</th>
+<th>主要代价</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NPN 准 LDO</td>
+<td>输出阻抗较低，接地电流通常小于 PNP 架构</td>
+<td>常需约 <code>0.9～1.5 V</code> 输入输出余量，基极驱动电流随负载增加</td>
+</tr>
+<tr>
+<td>PNP LDO</td>
+<td>压差可降至约 <code>100～700 mV</code>，驱动结构直接</td>
+<td>基极电流导致接地电流较大，输出电容与 ESR 往往有明确限制</td>
+</tr>
+<tr>
+<td>NMOS LDO</td>
+<td>导通电阻低，接地电流基本不随负载增加，带宽潜力较好</td>
+<td>栅极需要高于源极的驱动电压，通常要电荷泵或额外偏置</td>
+</tr>
+<tr>
+<td>PMOS LDO</td>
+<td>栅极向下拉即可驱动，容易实现低压差与低静态电流</td>
+<td>同等导通电阻需要更大晶片面积，输出极点与电容选择仍需关注</td>
+</tr>
+</tbody></table>
+<p>这张表适合建立直觉，却不能代替具体型号的数据手册。例如不同工艺、内部电荷泵、动态偏置和补偿方式都会改变器件表现。工程选型时，应该比较实际规格，而不是仅凭“PMOS”或“NMOS”标签下结论。</p>
+<h2 id="七、选-LDO-时真正需要核对什么"><a href="#七、选-LDO-时真正需要核对什么" class="headerlink" title="七、选 LDO 时真正需要核对什么"></a>七、选 LDO 时真正需要核对什么</h2><p>实际选型可以沿下面的顺序进行：</p>
+<ol>
+<li>检查最差输入电压下是否仍满足 <code>Vin ≥ Vout + Vdropout</code>；</li>
+<li>用最高输入电压和最大负载计算耗散与结温；</li>
+<li>核对输出电流能力以及限流、短路和过温保护；</li>
+<li>查看静态电流、关断电流，确认轻载效率是否满足系统需求；</li>
+<li>按目标频率查看 PSRR，而不是只看低频峰值；</li>
+<li>根据负载敏感度检查输出噪声、基准噪声和启动行为；</li>
+<li>严格核对输入、输出电容的容量、ESR、介质和布局要求；</li>
+<li>检查启动时间、软启动、使能门限、反向电流与放电功能；</li>
+<li>对快速负载做瞬态测试，必要时同时测输出和关键电源轨。</li>
+</ol>
+<p>电容的有效容量也要按实际工作条件计算。高介电常数陶瓷电容在直流偏压下可能大幅降容，一个标称 <code>10 μF</code> 的器件装到板上后未必还剩 <code>10 μF</code>。</p>
+<h2 id="八、遇到-LDO-振荡时怎样排查"><a href="#八、遇到-LDO-振荡时怎样排查" class="headerlink" title="八、遇到 LDO 振荡时怎样排查"></a>八、遇到 LDO 振荡时怎样排查</h2><p>如果输出出现周期性纹波、负载跳变后长时间振铃，或者不同探头接法得到截然不同的结果，可以按以下顺序排查：</p>
+<ol>
+<li>先用短地弹簧或同轴方式复测，排除探头长地线拾取的假振铃；</li>
+<li>核对输出电容的实际型号、容量、ESR 和直流偏压降容；</li>
+<li>检查电容是否紧贴稳压器引脚，地回路是否短而连续；</li>
+<li>查看输入端是否因线缆电感、限流电源或输入电容不足而振荡；</li>
+<li>在空载、轻载和最大负载下分别测试，因为环路特性可能随负载变化；</li>
+<li>检查是否存在长走线、后级大电容、理想二极管或其他稳压器反向灌电；</li>
+<li>对照数据手册的稳定区域调整电容与 ESR，不要盲目并联更多陶瓷电容。</li>
+</ol>
+<p>示波器上“输出很干净”也不一定代表稳定。负载恒定时，一些相位裕量不足的电路可能暂时看不出问题。更可靠的验证方法是施加边沿足够快的负载阶跃，观察过冲、下冲、振铃频率与恢复时间；条件允许时，再进行环路增益测试。</p>
+<h2 id="九、最后建立一个完整认识"><a href="#九、最后建立一个完整认识" class="headerlink" title="九、最后建立一个完整认识"></a>九、最后建立一个完整认识</h2><p>线性稳压器并不是一只精密的可变电阻，而是一个持续工作的闭环系统。基准和采样网络决定它想得到什么电压，误差放大器和调整管决定它能以多快的速度纠正偏差，输入输出压差决定它是否还有调节余量，输出电容及 ESR 则会直接改变动态响应与稳定性。</p>
+<p>所以，LDO 设计不能只完成“输入电压、输出电压、最大电流”三项匹配。把压差、功耗、热、PSRR、噪声、瞬态和电容稳定范围一起核对，才算完成了一次可靠的电源设计。</p>
+<blockquote>
+<p>资料来源：Texas Instruments &#x2F; 电源网，《线性稳压器基础知识》，文献编号 ZHCA563，2013 年 7 月。本文依据资料内容重新组织并加入工程化说明；具体器件设计应以对应型号的最新数据手册和实测结果为准。</p>
+</blockquote>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录" data-aos="zoom-in">学习记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/LDO/" rel="tag" title="LDO">LDO</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E7%8E%AF%E8%B7%AF%E7%A8%B3%E5%AE%9A%E6%80%A7/" rel="tag" title="环路稳定性">环路稳定性</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E7%94%B5%E6%BA%90%E8%AE%BE%E8%AE%A1/" rel="tag" title="电源设计">电源设计</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/myimge/sn2.png" data-sizes="auto" alt="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" class="lazyload">
+      <a href="/2026/07/22/tida-01028-schematic-deep-dive/" aria-label="后一篇: TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统"  title="后一篇: TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E7%BA%BF%E6%80%A7%E7%A8%B3%E5%8E%8B%E5%99%A8%E5%88%B0%E5%BA%95%E5%9C%A8%E8%B0%83%E4%BB%80%E4%B9%88"><span class="toc-number">1.</span> <span class="toc-text">一、线性稳压器到底在调什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%9B%9B%E4%B8%AA%E5%9F%BA%E6%9C%AC%E6%A8%A1%E5%9D%97%E6%9E%84%E6%88%90%E9%97%AD%E7%8E%AF"><span class="toc-number">2.</span> <span class="toc-text">二、四个基本模块构成闭环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%8E%8B%E5%B7%AE%E3%80%81%E5%8A%9F%E8%80%97%E4%B8%8E%E7%83%AD%E8%AE%BE%E8%AE%A1"><span class="toc-number">3.</span> <span class="toc-text">三、压差、功耗与热设计</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E8%BE%93%E5%87%BA%E7%94%B5%E5%AE%B9%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E5%BD%B1%E5%93%8D%E7%A8%B3%E5%AE%9A%E6%80%A7"><span class="toc-number">4.</span> <span class="toc-text">四、输出电容为什么会影响稳定性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#ESR-%E5%A4%AA%E4%BD%8E"><span class="toc-number">4.1.</span> <span class="toc-text">ESR 太低</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ESR-%E5%A4%AA%E9%AB%98"><span class="toc-number">4.2.</span> <span class="toc-text">ESR 太高</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E5%89%8D%E9%A6%88%E7%94%B5%E5%AE%B9%E7%9A%84%E4%BD%9C%E7%94%A8%E4%B8%8E%E8%BE%B9%E7%95%8C"><span class="toc-number">5.</span> <span class="toc-text">五、前馈电容的作用与边界</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E5%9B%9B%E7%B1%BB%E8%B0%83%E6%95%B4%E7%AE%A1%E6%9E%B6%E6%9E%84%E7%9A%84%E5%B7%AE%E5%BC%82"><span class="toc-number">6.</span> <span class="toc-text">六、四类调整管架构的差异</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E9%80%89-LDO-%E6%97%B6%E7%9C%9F%E6%AD%A3%E9%9C%80%E8%A6%81%E6%A0%B8%E5%AF%B9%E4%BB%80%E4%B9%88"><span class="toc-number">7.</span> <span class="toc-text">七、选 LDO 时真正需要核对什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E9%81%87%E5%88%B0-LDO-%E6%8C%AF%E8%8D%A1%E6%97%B6%E6%80%8E%E6%A0%B7%E6%8E%92%E6%9F%A5"><span class="toc-number">8.</span> <span class="toc-text">八、遇到 LDO 振荡时怎样排查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D%E3%80%81%E6%9C%80%E5%90%8E%E5%BB%BA%E7%AB%8B%E4%B8%80%E4%B8%AA%E5%AE%8C%E6%95%B4%E8%AE%A4%E8%AF%86"><span class="toc-number">9.</span> <span class="toc-text">九、最后建立一个完整认识</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">6</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">14</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性",
+          url: "https://alen9966.github.io/2026/07/24/linear-regulator-and-ldo-basics/",
+          excerpt: "",
+          description: "从串联调整管和反馈环路出发，理解线性稳压器如何稳压、压差与功耗怎样计算、输出电容 ESR 为什么可能让 LDO 振荡，以及 NPN、PNP、NMOS、PMOS 架构的取舍。",
+          stripContent: "线性稳压器看起来只有三个引脚：输入、输出和地。真正决定它能否正常工作的，却是芯片内部的反馈环路、串联调整管，以及外部输出电容共同形成的动态系统。 这篇文章以 TI《线性稳压器基础知识》为线索，不按课件目录逐页复述，而是围绕实际设计中最常遇到的几个问题展开：它如何把输出电压稳住，为什么输入输出必须留有压差，输出电容为什么既能改善瞬态又可能引起振荡，以及不同调整管架构应该怎样选择。 一、线性稳压器到底在调什么可以先把线性稳压器想象成一个会自动改变阻值的串联元件。它位于输入电源与负载之间，通过改变自身",
+          date: "Fri Jul 24 2026 14:30:00 GMT+0800",
+          updated: "Fri Jul 24 2026 14:30:30 GMT+0800",
+          cover: "/images/myimge/wallhaven-42r7yg.jpg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+
+
+  </body>
+  </html>

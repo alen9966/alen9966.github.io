@@ -12,12 +12,7 @@
     示波器如何突破 ADC 采样率：时间交织与频谱分片 | 硬件项目手记
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="preload" as="style" href="https://fontsapi.zeoseven.com/292/main/result.css" onload="this.rel='stylesheet'" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
     <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    
-<link rel="stylesheet" href="/css/loader.css">
-
     <meta name="description" content="从 TI TIDA-01028 参考设计出发，梳理时间交织采样的时钟链、误差来源与校准方法，并进一步理解高带宽仪器中的频谱分片架构。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="示波器如何突破 ADC 采样率：时间交织与频谱分片">
@@ -25,17 +20,14 @@
 <meta property="og:site_name" content="硬件项目手记">
 <meta property="og:description" content="从 TI TIDA-01028 参考设计出发，梳理时间交织采样的时钟链、误差来源与校准方法，并进一步理解高带宽仪器中的频谱分片架构。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://alen9966.github.io/images/projects/oscilloscope-time-interleaving.svg">
-<meta property="og:image" content="https://alen9966.github.io/images/projects/oscilloscope-spectrum-slicing.svg">
 <meta property="article:published_time" content="2026-07-22T02:30:00.000Z">
-<meta property="article:modified_time" content="2026-07-23T10:22:18.963Z">
+<meta property="article:modified_time" content="2026-07-24T06:30:30.063Z">
 <meta property="article:author" content="Alen">
-<meta property="article:tag" content="示波器">
+<meta property="article:tag" content="高速采集">
 <meta property="article:tag" content="ADC">
 <meta property="article:tag" content="时间交织">
 <meta property="article:tag" content="频谱分片">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://alen9966.github.io/images/projects/oscilloscope-time-interleaving.svg">
       <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
     <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
     <link rel="shortcut icon" href="/images/favicon.ico">
@@ -43,59 +35,11 @@
 <link rel="stylesheet" href="/css/style.css">
 
   <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
-    
-<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
-
-    
-<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
-
     <link rel="stylesheet" href="/css/site-home.css">
 </head>
 
   <body>
-      <div id='loader'>
-    <div class="loading-left-bg loading-bg"></div>
-    <div class="loading-right-bg loading-bg"></div>
-    <div class="spinner-box">
-      <div class="loading-taichi rotate">
-          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
-            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
-            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
-           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
-          </svg>
-      </div>
-      <div class="loading-word">页面整理中...</div>
-    </div>
-  </div>
-  <script>
-    var time = null;
-    var loaderEl = document.getElementById('loader');
-    var startLoading = () => {
-      time = Date.now();
-      loaderEl.classList.remove("loading");
-    }
-    var hideLoader = () => {
-      document.body.style.overflow = 'auto';
-      loader.classList.add('loading');
-    };
-
-    var endLoading = () => {
-      if (!time) {
-        hideLoader();
-      } else {
-        if (Date.now() - time > 500) {
-          time = null;
-          hideLoader();
-        } else {
-          setTimeout(endLoading, 500 - (Date.now() - time));
-          time = null;
-        }
-      }
-    }
-    window.addEventListener('DOMContentLoaded', endLoading);
-    loaderEl.addEventListener('click', endLoading);
-  </script>
-<div id="copy-tooltip"></div>
+    <div id="copy-tooltip"></div>
 <div id="heatmap-tooltip"></div>
 
 
@@ -109,23 +53,23 @@
             </div>
           <span class="main-nav-link">首页</span>
         </a>
-        <a class="main-nav-link-wrap" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95">
+        <a class="main-nav-link-wrap" href="/projects/">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">项目</span>
-        </a>
-        <a class="main-nav-link-wrap" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5">
-            <div class="main-nav-icon icon rotate">
-                &#xe62b;
-            </div>
-          <span class="main-nav-link">问题</span>
         </a>
         <a class="main-nav-link-wrap" href="/about">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
         </a>
     <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
   </nav>
@@ -136,7 +80,7 @@
 </div>
 <header id="header" aria-label="Site header">
     <picture></picture>
-    <img  fetchpriority="high" src="/images/myimge/xm1.png" alt="示波器如何突破 ADC 采样率：时间交织与频谱分片">
+    <img  fetchpriority="high" src="/images/myimge/wallhaven-yq2mll.jpg" alt="示波器如何突破 ADC 采样率：时间交织与频谱分片">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
@@ -166,7 +110,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">6</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -191,18 +135,11 @@
         <div class="sidebar-menu-link">首页</div>
       </div>
       <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
           <div class="sidebar-menu-icon icon rotate">
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">项目</div>
-      </div>
-      <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
-          <div class="sidebar-menu-icon icon rotate">
-              &#xe62b;
-          </div>
-        <div class="sidebar-menu-link">问题</div>
       </div>
       <div class="sidebar-menu-link-wrap">
         <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
@@ -210,6 +147,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
       </div>
 </div>
 </div>
@@ -230,10 +174,10 @@
       <div class="article-date">
   <span class="article-date-link icon-calendar" data-aos="zoom-in">
     <time datetime="2026-07-22T02:30:00.000Z" itemprop="datePublished">2026-07-22</time>
-    <time style="display: none;" id="post-update-time">2026-07-23</time>
+    <time style="display: none;" id="post-update-time">2026-07-24</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-07-23T10:22:18.963Z" itemprop="dateModified">2026-07-23</time>
+      <time datetime="2026-07-24T06:30:30.063Z" itemprop="dateModified">2026-07-24</time>
     </span>
 </div>
 
@@ -246,7 +190,6 @@
 <p>前者把多个 ADC 错开时间采样，再把样点按时间顺序重排；后者把一个宽带信号拆成多个频段，各自下变频、采样，最后在数字域重新拼接。两者都不是简单地“多放几颗 ADC”，真正困难的地方都在多通道的一致性和校准。</p>
 <h2 id="一、时间交织：在时间轴上轮流采样"><a href="#一、时间交织：在时间轴上轮流采样" class="headerlink" title="一、时间交织：在时间轴上轮流采样"></a>一、时间交织：在时间轴上轮流采样</h2><p>假设有 <code>M</code> 路 ADC，每路采样率为 <code>Fs</code>，只要相邻通道的采样时刻依次错开 <code>Ts/M</code>，理论上的等效采样率就是：</p>
 <p><code>Fs,total = M × Fs</code></p>
-<p><img src="/images/projects/oscilloscope-time-interleaving.svg" alt="时间交织结构"></p>
 <p>TI 的 TIDA-01028 是一个很具体的例子。它使用两颗 <code>ADC12DJ3200</code>，每颗 ADC 在单通道模式下内部已经由两个 ADC 核以 <code>0°</code> 和 <code>180°</code> 工作，得到 <code>6.4 GSPS</code>。板上再让第二颗器件相对第一颗偏移 <code>90°</code>，于是四组采样相位成为 <code>0°、90°、180°、270°</code>，合并后得到单通道 <code>12.8 GSPS</code>。</p>
 <p>这里的基准器件时钟是 <code>3.2 GHz</code>，周期为 <code>312.5 ps</code>，因此 <code>90°</code> 对应：</p>
 <p><code>312.5 ps ÷ 4 = 78.125 ps</code></p>
@@ -278,7 +221,6 @@
 </ol>
 <p>变压器输入使用 <code>BAL-0006SMG</code>，覆盖约 <code>500 kHz～6 GHz</code>；有源放大路径的带宽约为 <code>DC～1.5 GHz</code>。这让我更直观地认识到：所谓 <code>12.8 GSPS</code> 只是采样时间轴的能力，实际可用带宽仍取决于输入网络、器件带宽、噪声和动态范围。</p>
 <h2 id="三、频谱分片：在频率轴上拆开再重组"><a href="#三、频谱分片：在频率轴上拆开再重组" class="headerlink" title="三、频谱分片：在频率轴上拆开再重组"></a>三、频谱分片：在频率轴上拆开再重组</h2><p>当目标模拟带宽继续提高，仅增加时间交织路数会让超高速时钟、输入分配和皮秒级通道匹配变得非常困难。另一条路线是频谱分片：不让每颗 ADC 都直接处理完整带宽，而是让它们各自处理一段频谱。</p>
-<p><img src="/images/projects/oscilloscope-spectrum-slicing.svg" alt="频谱分片结构"></p>
 <p>一个便于理解的处理流程是：</p>
 <ol>
 <li>宽带输入经过功分或频率选择网络，进入多条支路；</li>
@@ -288,7 +230,7 @@
 <li>数字域完成数字下变频、幅度归一、相位和群时延校准；</li>
 <li>在相邻子带的重叠区域估计误差并平滑拼接，恢复宽带时域波形或频谱。</li>
 </ol>
-<p>我的初步理解大体正确，不过“最后通过数字下变频进行输出”的顺序可以再严谨一点：<strong>数字下变频通常发生在各子带内部，频谱平移到正确位置并完成幅相校准后，才进行最终合成。</strong>如果目标是实时示波器，还要通过逆变换得到连续的时域波形；如果只是频谱分析仪，则可以直接保留频域结果。</p>
+<p>数字下变频通常发生在各子带内部。各子带平移到正确的频率位置并完成幅相校准后，才能进行最终合成。如果目标是实时示波器，还需要通过逆变换恢复连续的时域波形；如果只做频谱分析，则可以直接保留频域结果。</p>
 <h3 id="频谱为什么不能直接硬拼"><a href="#频谱为什么不能直接硬拼" class="headerlink" title="频谱为什么不能直接硬拼"></a>频谱为什么不能直接硬拼</h3><p>每条模拟支路的滤波器、混频器、本振相位、ADC 增益和群时延都不同。若直接把频谱首尾相接，交界处会出现台阶、凹口或相位突变，回到时域后就会变成振铃和波形失真。因此实际系统通常需要：</p>
 <ul>
 <li>给相邻子带保留重叠区域，而不是在一个频点生硬切换；</li>
@@ -351,13 +293,13 @@
     <footer class="article-footer">
         <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录" data-aos="zoom-in">学习记录</a>
 
-        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/ADC/" rel="tag" title="ADC">ADC</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%97%B6%E9%97%B4%E4%BA%A4%E7%BB%87/" rel="tag" title="时间交织">时间交织</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E7%A4%BA%E6%B3%A2%E5%99%A8/" rel="tag" title="示波器">示波器</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E9%A2%91%E8%B0%B1%E5%88%86%E7%89%87/" rel="tag" title="频谱分片">频谱分片</a></li></ul>
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/ADC/" rel="tag" title="ADC">ADC</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%97%B6%E9%97%B4%E4%BA%A4%E7%BB%87/" rel="tag" title="时间交织">时间交织</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E9%A2%91%E8%B0%B1%E5%88%86%E7%89%87/" rel="tag" title="频谱分片">频谱分片</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E9%AB%98%E9%80%9F%E9%87%87%E9%9B%86/" rel="tag" title="高速采集">高速采集</a></li></ul>
 
     </footer>
   </div>
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
       <div class="article-nav-link-wrap left">
-          <img data-src="/images/myimge/xm1.png" data-sizes="auto" alt="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" class="lazyload">
+          <img data-src="/images/myimge/sn2.png" data-sizes="auto" alt="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" class="lazyload">
         <a href="/2026/07/22/tida-01028-schematic-deep-dive/" aria-label="前一篇: TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" title="前一篇: TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统"></a>
         <div class="article-nav-caption">前一篇</div>
         <h3 class="article-nav-title">
@@ -365,7 +307,7 @@
         </h3>
       </div>
     <div class="article-nav-link-wrap right">
-        <img data-src="/images/myimge/xm1.png" data-sizes="auto" alt="超声波探伤仪的面板" class="lazyload">
+        <img data-src="/images/myimge/sn1.png" data-sizes="auto" alt="超声波探伤仪的面板" class="lazyload">
       <a href="/2026/07/21/ultrasonic-flaw-detector-panel/" aria-label="后一篇: 超声波探伤仪的面板"  title="后一篇: 超声波探伤仪的面板"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
@@ -390,20 +332,6 @@
         <span class="footer-info-sep rotate"></span>
       Alen
     </div>
-      <div>
-        <span class="icon-brush"></span>
-        7.8k
-        &nbsp;|&nbsp;
-        <span class="icon-coffee"></span>
-        00:30
-      </div>
-      <div>
-        <span class="icon-eye"></span>
-        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
-        &nbsp;|&nbsp;
-        <span class="icon-user"></span>
-        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
-      </div>
   </div>
 </footer>
 
@@ -428,7 +356,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">6</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -453,18 +381,11 @@
         <div class="sidebar-menu-link">首页</div>
       </div>
       <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
           <div class="sidebar-menu-icon icon rotate">
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">项目</div>
-      </div>
-      <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
-          <div class="sidebar-menu-icon icon rotate">
-              &#xe62b;
-          </div>
-        <div class="sidebar-menu-link">问题</div>
       </div>
       <div class="sidebar-menu-link-wrap">
         <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
@@ -472,6 +393,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
       </div>
 </div>
 </div>
@@ -495,7 +423,7 @@
             <div id="reimu-hits"></div>
             <div id="reimu-pagination" class="reimu-pagination"></div>
           </div>
-          <img class="reimu-bg" src="/images/anime/natsume-series7-main.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
         </div>
       </div>
     
@@ -510,24 +438,6 @@
 <script src="/js/script.js"></script>
 
 
-  
-<script src="/js/aos.js"></script>
-
-  <script>
-    var aosInit = () => {
-      AOS.init({
-        duration: 1000,
-        easing: "ease",
-        once: true,
-        offset: 50,
-      });
-    };
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', aosInit);
-    } else {
-      aosInit();
-    }
-  </script>
 
 
 <script src="/js/pjax_script.js" data-pjax></script>
@@ -556,8 +466,8 @@
           description: "从 TI TIDA-01028 参考设计出发，梳理时间交织采样的时钟链、误差来源与校准方法，并进一步理解高带宽仪器中的频谱分片架构。",
           stripContent: "今天早上主要学习了高带宽示波器如何在单颗 ADC 采样率有限的情况下继续提高实时采样率和模拟带宽。目前常见的扩展方法可以归纳为两类：时间交织（time interleaving）和频谱分片（frequency interleaving &amp;#x2F; spectrum slicing）。 前者把多个 ADC 错开时间采样，再把样点按时间顺序重排；后者把一个宽带信号拆成多个频段，各自下变频、采样，最后在数字域重新拼接。两者都不是简单地“多放几颗 ADC”，真正困难的地方都在多通道的一致性和校准。 一",
           date: "Wed Jul 22 2026 10:30:00 GMT+0800",
-          updated: "Thu Jul 23 2026 18:22:18 GMT+0800",
-          cover: "/images/myimge/xm1.png",
+          updated: "Fri Jul 24 2026 14:30:30 GMT+0800",
+          cover: "/images/myimge/xm3.png",
         };
       </script>
         
@@ -605,9 +515,6 @@
   </script>
   
 
-
-  
-<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
 
 
 <script>

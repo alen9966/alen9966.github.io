@@ -12,25 +12,19 @@
     超声波探伤仪的面板 | 硬件项目手记
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="preload" as="style" href="https://fontsapi.zeoseven.com/292/main/result.css" onload="this.rel='stylesheet'" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
     <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    
-<link rel="stylesheet" href="/css/loader.css">
-
-    <meta name="description" content="梳理超声波探伤仪面板的功能边界，后续持续补充按键、显示、接口与整机联调结果。">
+    <meta name="description" content="记录超声波探伤仪面板的项目范围和当前进度，后续补充按键、显示、接口与整机联调结果。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="超声波探伤仪的面板">
 <meta property="og:url" content="https://alen9966.github.io/2026/07/21/ultrasonic-flaw-detector-panel/index.html">
 <meta property="og:site_name" content="硬件项目手记">
-<meta property="og:description" content="梳理超声波探伤仪面板的功能边界，后续持续补充按键、显示、接口与整机联调结果。">
+<meta property="og:description" content="记录超声波探伤仪面板的项目范围和当前进度，后续补充按键、显示、接口与整机联调结果。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-07-21T02:50:00.000Z">
-<meta property="article:modified_time" content="2026-07-23T10:22:09.692Z">
+<meta property="article:modified_time" content="2026-07-24T06:30:30.064Z">
 <meta property="article:author" content="Alen">
 <meta property="article:tag" content="PCB">
 <meta property="article:tag" content="调试">
-<meta property="article:tag" content="面板设计">
 <meta property="article:tag" content="接口">
 <meta name="twitter:card" content="summary">
       <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
@@ -40,59 +34,11 @@
 <link rel="stylesheet" href="/css/style.css">
 
   <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
-    
-<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
-
-    
-<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
-
     <link rel="stylesheet" href="/css/site-home.css">
 </head>
 
   <body>
-      <div id='loader'>
-    <div class="loading-left-bg loading-bg"></div>
-    <div class="loading-right-bg loading-bg"></div>
-    <div class="spinner-box">
-      <div class="loading-taichi rotate">
-          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
-            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
-            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
-           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
-          </svg>
-      </div>
-      <div class="loading-word">页面整理中...</div>
-    </div>
-  </div>
-  <script>
-    var time = null;
-    var loaderEl = document.getElementById('loader');
-    var startLoading = () => {
-      time = Date.now();
-      loaderEl.classList.remove("loading");
-    }
-    var hideLoader = () => {
-      document.body.style.overflow = 'auto';
-      loader.classList.add('loading');
-    };
-
-    var endLoading = () => {
-      if (!time) {
-        hideLoader();
-      } else {
-        if (Date.now() - time > 500) {
-          time = null;
-          hideLoader();
-        } else {
-          setTimeout(endLoading, 500 - (Date.now() - time));
-          time = null;
-        }
-      }
-    }
-    window.addEventListener('DOMContentLoaded', endLoading);
-    loaderEl.addEventListener('click', endLoading);
-  </script>
-<div id="copy-tooltip"></div>
+    <div id="copy-tooltip"></div>
 <div id="heatmap-tooltip"></div>
 
 
@@ -106,23 +52,23 @@
             </div>
           <span class="main-nav-link">首页</span>
         </a>
-        <a class="main-nav-link-wrap" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95">
+        <a class="main-nav-link-wrap" href="/projects/">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">项目</span>
-        </a>
-        <a class="main-nav-link-wrap" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5">
-            <div class="main-nav-icon icon rotate">
-                &#xe62b;
-            </div>
-          <span class="main-nav-link">问题</span>
         </a>
         <a class="main-nav-link-wrap" href="/about">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
         </a>
     <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
   </nav>
@@ -133,7 +79,7 @@
 </div>
 <header id="header" aria-label="Site header">
     <picture></picture>
-    <img  fetchpriority="high" src="/images/myimge/xm1.png" alt="超声波探伤仪的面板">
+    <img  fetchpriority="high" src="/images/myimge/OIP.webp" alt="超声波探伤仪的面板">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
@@ -152,7 +98,7 @@
     <div class="sidebar-wrap" data-aos="fade-up">
           <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
 <div class="sidebar-toc-wrapper toc-div-class" >
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86%E5%92%8C%E7%89%A9%E7%90%86%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">前置知识和物理结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E5%9B%BE%E4%B8%8E-PCB"><span class="toc-number">2.</span> <span class="toc-text">原理图与 PCB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">遇到的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%84%8A%E6%8E%A5%E4%B8%8E%E8%B0%83%E8%AF%95"><span class="toc-number">4.</span> <span class="toc-text">焊接与调试</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E5%89%8D%E9%9C%80%E8%A6%81%E7%A1%AE%E5%AE%9A%E7%9A%84%E5%86%85%E5%AE%B9"><span class="toc-number">1.</span> <span class="toc-text">当前需要确定的内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E5%9B%BE%E5%92%8C-PCB"><span class="toc-number">2.</span> <span class="toc-text">原理图和 PCB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E5%89%8D%E7%8A%B6%E6%80%81"><span class="toc-number">3.</span> <span class="toc-text">当前状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%A1%E5%88%92%E9%AA%8C%E8%AF%81%E7%9A%84%E9%A1%B9%E7%9B%AE"><span class="toc-number">4.</span> <span class="toc-text">计划验证的项目</span></a></li></ol>
 </div>
 </div>
           <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
@@ -163,7 +109,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">6</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -188,18 +134,11 @@
         <div class="sidebar-menu-link">首页</div>
       </div>
       <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
           <div class="sidebar-menu-icon icon rotate">
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">项目</div>
-      </div>
-      <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
-          <div class="sidebar-menu-icon icon rotate">
-              &#xe62b;
-          </div>
-        <div class="sidebar-menu-link">问题</div>
       </div>
       <div class="sidebar-menu-link-wrap">
         <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
@@ -207,6 +146,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
       </div>
 </div>
 </div>
@@ -227,10 +173,10 @@
       <div class="article-date">
   <span class="article-date-link icon-calendar" data-aos="zoom-in">
     <time datetime="2026-07-21T02:50:00.000Z" itemprop="datePublished">2026-07-21</time>
-    <time style="display: none;" id="post-update-time">2026-07-23</time>
+    <time style="display: none;" id="post-update-time">2026-07-24</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-07-23T10:22:09.692Z" itemprop="dateModified">2026-07-23</time>
+      <time datetime="2026-07-24T06:30:30.064Z" itemprop="dateModified">2026-07-24</time>
     </span>
 </div>
 
@@ -239,43 +185,29 @@
     <div class="hr-line"></div>
     
     <div class="e-content article-entry" itemprop="articleBody">
-        <p>这篇先建立“超声波探伤仪面板”的项目记录，明确需要验证的结构、接口和调试项目。当前缺少实测数据的部分会保留为待验证项，后续随硬件进度更新。</p>
-<h2 id="前置知识和物理结构"><a href="#前置知识和物理结构" class="headerlink" title="前置知识和物理结构"></a>前置知识和物理结构</h2><ul>
-<li>面板在整机中的安装位置与空间边界</li>
-<li>面板承担的显示、输入和状态指示功能</li>
-<li>按键、显示、编码器与外部接口的物理分布</li>
-<li>面板与主控板、前端板及电源板之间的连接关系</li>
-</ul>
-<h2 id="原理图与-PCB"><a href="#原理图与-PCB" class="headerlink" title="原理图与 PCB"></a>原理图与 PCB</h2><ul>
-<li>面板电路的功能分区</li>
-<li>显示、按键、指示灯和外部接口的连接方式</li>
-<li>排线、连接器和固定孔位约束</li>
-<li>PCB 布局、结构边界与装配注意点</li>
-</ul>
-<h2 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h2><ul>
-<li>结构配合与装配公差</li>
-<li>接口定义或信号完整性异常</li>
-<li>焊接后发现的功能问题</li>
-<li>每个问题的定位过程与改动结果</li>
-</ul>
-<h2 id="焊接与调试"><a href="#焊接与调试" class="headerlink" title="焊接与调试"></a>焊接与调试</h2><ul>
-<li>焊接顺序和装配过程</li>
-<li>面板单板测试内容</li>
-<li>整机联调步骤</li>
-<li>当前状态与后续待确认项</li>
+        <p>这个项目是超声波探伤仪的人机交互面板，负责承载显示、按键、编码器和状态指示，并通过连接器与主控板、模拟前端和电源部分连接。目前还没有完整的原理图说明、接口定义和实测数据，因此这篇文章只记录项目范围和当前状态，不提前补写尚未确认的设计结论。</p>
+<h2 id="当前需要确定的内容"><a href="#当前需要确定的内容" class="headerlink" title="当前需要确定的内容"></a>当前需要确定的内容</h2><p>面板设计需要同时满足电气和结构要求。显示器、按键和编码器的位置会直接影响 PCB 外形与固定孔位；连接器的位置则由整机内部的板卡关系和排线方向决定。开始布局前，需要先确定面板尺寸、安装位置、显示器型号、输入器件数量和各连接器定义。</p>
+<h2 id="原理图和-PCB"><a href="#原理图和-PCB" class="headerlink" title="原理图和 PCB"></a>原理图和 PCB</h2><p>原理图需要把显示、按键、指示灯、编码器和外部接口分区整理。PCB 布局首先服从面板开孔和装配尺寸，再处理排线方向、器件高度和操作间距。按键信号是否需要硬件消抖、显示接口的信号类型以及连接器是否需要保护，目前都还没有足够资料确认。</p>
+<h2 id="当前状态"><a href="#当前状态" class="headerlink" title="当前状态"></a>当前状态</h2><p>项目还没有进入完整的单板测试和整机联调阶段，暂时没有可以记录的故障结论。后续会补充结构配合、接口定义、焊接问题和修改结果，并区分设计值与实测值。</p>
+<h2 id="计划验证的项目"><a href="#计划验证的项目" class="headerlink" title="计划验证的项目"></a>计划验证的项目</h2><ul>
+<li>上电前检查电源与地之间是否存在短路；</li>
+<li>分别验证显示、按键、编码器和指示灯；</li>
+<li>检查排线方向和接口电平；</li>
+<li>装入整机后确认开孔、按键行程和连接器位置；</li>
+<li>记录整机联调中出现的问题和修改结果。</li>
 </ul>
 
     </div>
     <footer class="article-footer">
         <a class="article-category-link" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/" title="项目记录" data-aos="zoom-in">项目记录</a>
 
-        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/PCB/" rel="tag" title="PCB">PCB</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%8E%A5%E5%8F%A3/" rel="tag" title="接口">接口</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E8%B0%83%E8%AF%95/" rel="tag" title="调试">调试</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E9%9D%A2%E6%9D%BF%E8%AE%BE%E8%AE%A1/" rel="tag" title="面板设计">面板设计</a></li></ul>
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/PCB/" rel="tag" title="PCB">PCB</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%8E%A5%E5%8F%A3/" rel="tag" title="接口">接口</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E8%B0%83%E8%AF%95/" rel="tag" title="调试">调试</a></li></ul>
 
     </footer>
   </div>
     <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
       <div class="article-nav-link-wrap left">
-          <img data-src="/images/myimge/xm1.png" data-sizes="auto" alt="示波器如何突破 ADC 采样率：时间交织与频谱分片" class="lazyload">
+          <img data-src="/images/myimge/xm3.png" data-sizes="auto" alt="示波器如何突破 ADC 采样率：时间交织与频谱分片" class="lazyload">
         <a href="/2026/07/22/oscilloscope-time-interleaving-and-spectrum-slicing/" aria-label="前一篇: 示波器如何突破 ADC 采样率：时间交织与频谱分片" title="前一篇: 示波器如何突破 ADC 采样率：时间交织与频谱分片"></a>
         <div class="article-nav-caption">前一篇</div>
         <h3 class="article-nav-title">
@@ -283,7 +215,7 @@
         </h3>
       </div>
     <div class="article-nav-link-wrap right">
-        <img data-src="/images/myimge/xm1.png" data-sizes="auto" alt="示波器校准仪的电源" class="lazyload">
+        <img data-src="/images/myimge/wallhaven-1qgvgg.jpg" data-sizes="auto" alt="示波器校准仪的电源" class="lazyload">
       <a href="/2026/07/21/oscilloscope-calibrator-power/" aria-label="后一篇: 示波器校准仪的电源"  title="后一篇: 示波器校准仪的电源"></a>
       <div class="article-nav-caption">后一篇</div>
       <h3 class="article-nav-title">
@@ -308,20 +240,6 @@
         <span class="footer-info-sep rotate"></span>
       Alen
     </div>
-      <div>
-        <span class="icon-brush"></span>
-        7.8k
-        &nbsp;|&nbsp;
-        <span class="icon-coffee"></span>
-        00:30
-      </div>
-      <div>
-        <span class="icon-eye"></span>
-        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
-        &nbsp;|&nbsp;
-        <span class="icon-user"></span>
-        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
-      </div>
   </div>
 </footer>
 
@@ -335,7 +253,7 @@
   <div class="sidebar-wrap">
         <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
 <div class="sidebar-toc-wrapper toc-div-class" >
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86%E5%92%8C%E7%89%A9%E7%90%86%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">前置知识和物理结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E5%9B%BE%E4%B8%8E-PCB"><span class="toc-number">2.</span> <span class="toc-text">原理图与 PCB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">3.</span> <span class="toc-text">遇到的问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%84%8A%E6%8E%A5%E4%B8%8E%E8%B0%83%E8%AF%95"><span class="toc-number">4.</span> <span class="toc-text">焊接与调试</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E5%89%8D%E9%9C%80%E8%A6%81%E7%A1%AE%E5%AE%9A%E7%9A%84%E5%86%85%E5%AE%B9"><span class="toc-number">1.</span> <span class="toc-text">当前需要确定的内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E5%9B%BE%E5%92%8C-PCB"><span class="toc-number">2.</span> <span class="toc-text">原理图和 PCB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E5%89%8D%E7%8A%B6%E6%80%81"><span class="toc-number">3.</span> <span class="toc-text">当前状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%A1%E5%88%92%E9%AA%8C%E8%AF%81%E7%9A%84%E9%A1%B9%E7%9B%AE"><span class="toc-number">4.</span> <span class="toc-text">计划验证的项目</span></a></li></ol>
 </div>
 </div>
         <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
@@ -346,7 +264,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">6</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -371,18 +289,11 @@
         <div class="sidebar-menu-link">首页</div>
       </div>
       <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
           <div class="sidebar-menu-icon icon rotate">
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">项目</div>
-      </div>
-      <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
-          <div class="sidebar-menu-icon icon rotate">
-              &#xe62b;
-          </div>
-        <div class="sidebar-menu-link">问题</div>
       </div>
       <div class="sidebar-menu-link-wrap">
         <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
@@ -390,6 +301,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
       </div>
 </div>
 </div>
@@ -413,7 +331,7 @@
             <div id="reimu-hits"></div>
             <div id="reimu-pagination" class="reimu-pagination"></div>
           </div>
-          <img class="reimu-bg" src="/images/anime/natsume-series7-main.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
         </div>
       </div>
     
@@ -428,24 +346,6 @@
 <script src="/js/script.js"></script>
 
 
-  
-<script src="/js/aos.js"></script>
-
-  <script>
-    var aosInit = () => {
-      AOS.init({
-        duration: 1000,
-        easing: "ease",
-        once: true,
-        offset: 50,
-      });
-    };
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', aosInit);
-    } else {
-      aosInit();
-    }
-  </script>
 
 
 <script src="/js/pjax_script.js" data-pjax></script>
@@ -471,11 +371,11 @@
           title: "超声波探伤仪的面板",
           url: "https://alen9966.github.io/2026/07/21/ultrasonic-flaw-detector-panel/",
           excerpt: "",
-          description: "梳理超声波探伤仪面板的功能边界，后续持续补充按键、显示、接口与整机联调结果。",
-          stripContent: "这篇先建立“超声波探伤仪面板”的项目记录，明确需要验证的结构、接口和调试项目。当前缺少实测数据的部分会保留为待验证项，后续随硬件进度更新。 前置知识和物理结构 面板在整机中的安装位置与空间边界 面板承担的显示、输入和状态指示功能 按键、显示、编码器与外部接口的物理分布 面板与主控板、前端板及电源板之间的连接关系  原理图与 PCB 面板电路的功能分区 显示、按键、指示灯和外部接口的连接方式 排线、连接器和固定孔位约束 PCB 布局、结构边界与装配注意点  遇到的问题 结构配合与装配公差 接口定义",
+          description: "记录超声波探伤仪面板的项目范围和当前进度，后续补充按键、显示、接口与整机联调结果。",
+          stripContent: "这个项目是超声波探伤仪的人机交互面板，负责承载显示、按键、编码器和状态指示，并通过连接器与主控板、模拟前端和电源部分连接。目前还没有完整的原理图说明、接口定义和实测数据，因此这篇文章只记录项目范围和当前状态，不提前补写尚未确认的设计结论。 当前需要确定的内容面板设计需要同时满足电气和结构要求。显示器、按键和编码器的位置会直接影响 PCB 外形与固定孔位；连接器的位置则由整机内部的板卡关系和排线方向决定。开始布局前，需要先确定面板尺寸、安装位置、显示器型号、输入器件数量和各连接器定义。 原理图和 ",
           date: "Tue Jul 21 2026 10:50:00 GMT+0800",
-          updated: "Thu Jul 23 2026 18:22:09 GMT+0800",
-          cover: "/images/myimge/xm1.png",
+          updated: "Fri Jul 24 2026 14:30:30 GMT+0800",
+          cover: "/images/myimge/sn1.png",
         };
       </script>
         
@@ -523,9 +423,6 @@
   </script>
   
 
-
-  
-<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
 
 
 <script>

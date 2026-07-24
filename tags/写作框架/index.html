@@ -12,12 +12,7 @@
     标签: 写作框架 | 硬件项目手记
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="preload" as="style" href="https://fontsapi.zeoseven.com/292/main/result.css" onload="this.rel='stylesheet'" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
     <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    
-<link rel="stylesheet" href="/css/loader.css">
-
     <meta name="description" content="从原理图到实测波形，记录硬件设计中的选择、失误与验证。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="硬件项目手记">
@@ -42,59 +37,11 @@
 <link rel="stylesheet" href="/css/style.css">
 
   <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
-    
-<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
-
-    
-<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
-
     <link rel="stylesheet" href="/css/site-home.css">
 </head>
 
   <body>
-      <div id='loader'>
-    <div class="loading-left-bg loading-bg"></div>
-    <div class="loading-right-bg loading-bg"></div>
-    <div class="spinner-box">
-      <div class="loading-taichi rotate">
-          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
-            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
-            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
-           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
-          </svg>
-      </div>
-      <div class="loading-word">页面整理中...</div>
-    </div>
-  </div>
-  <script>
-    var time = null;
-    var loaderEl = document.getElementById('loader');
-    var startLoading = () => {
-      time = Date.now();
-      loaderEl.classList.remove("loading");
-    }
-    var hideLoader = () => {
-      document.body.style.overflow = 'auto';
-      loader.classList.add('loading');
-    };
-
-    var endLoading = () => {
-      if (!time) {
-        hideLoader();
-      } else {
-        if (Date.now() - time > 500) {
-          time = null;
-          hideLoader();
-        } else {
-          setTimeout(endLoading, 500 - (Date.now() - time));
-          time = null;
-        }
-      }
-    }
-    window.addEventListener('DOMContentLoaded', endLoading);
-    loaderEl.addEventListener('click', endLoading);
-  </script>
-<div id="copy-tooltip"></div>
+    <div id="copy-tooltip"></div>
 <div id="heatmap-tooltip"></div>
 
 
@@ -108,23 +55,23 @@
             </div>
           <span class="main-nav-link">首页</span>
         </a>
-        <a class="main-nav-link-wrap" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95">
+        <a class="main-nav-link-wrap" href="/projects/">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">项目</span>
-        </a>
-        <a class="main-nav-link-wrap" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5">
-            <div class="main-nav-icon icon rotate">
-                &#xe62b;
-            </div>
-          <span class="main-nav-link">问题</span>
         </a>
         <a class="main-nav-link-wrap" href="/about">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
         </a>
     <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
   </nav>
@@ -136,7 +83,7 @@
 <header id="header" aria-label="Site header">
       <picture>
       </picture>
-        <img  fetchpriority="high" src="/images/myimge/xm2.png" alt="">
+        <img  fetchpriority="high" src="/images/myimge/wallhaven-3ze1v3.jpg" alt="">
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
@@ -162,7 +109,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">6</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -187,18 +134,11 @@
         <div class="sidebar-menu-link">首页</div>
       </div>
       <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
           <div class="sidebar-menu-icon icon rotate">
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">项目</div>
-      </div>
-      <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
-          <div class="sidebar-menu-icon icon rotate">
-              &#xe62b;
-          </div>
-        <div class="sidebar-menu-link">问题</div>
       </div>
       <div class="sidebar-menu-link-wrap">
         <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
@@ -206,6 +146,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
       </div>
 </div>
 
@@ -217,6 +164,9 @@
       <h3 class="widget-title">最新文章</h3>
       <div class="widget">
         <ul>
+            <li>
+              <a href="/2026/07/24/linear-regulator-and-ldo-basics/" title="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性">线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性</a>
+            </li>
             <li>
               <a href="/2026/07/22/tida-01028-schematic-deep-dive/" title="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统">TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统</a>
             </li>
@@ -265,25 +215,28 @@
       <a class="archives-tag-list-link" href="/tags/%E7%94%B5%E6%BA%90%E8%AE%BE%E8%AE%A1/">电源设计</a>
     </div>
     <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/tags/%E5%8E%9F%E7%90%86%E5%9B%BE/">原理图</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
       <a class="archives-tag-list-link" href="/tags/PCB/">PCB</a>
     </div>
     <div class="archives-tag-list-item" data-aos="zoom-in">
       <a class="archives-tag-list-link" href="/tags/%E8%B0%83%E8%AF%95/">调试</a>
     </div>
     <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/tags/%E7%A4%BA%E6%B3%A2%E5%99%A8/">示波器</a>
+      <a class="archives-tag-list-link" href="/tags/LDO/">LDO</a>
+    </div>
+    <div class="archives-tag-list-item" data-aos="zoom-in">
+      <a class="archives-tag-list-link" href="/tags/%E7%8E%AF%E8%B7%AF%E7%A8%B3%E5%AE%9A%E6%80%A7/">环路稳定性</a>
+    </div>
+    <div class="archives-tag-list-item" data-aos="zoom-in">
+      <a class="archives-tag-list-link" href="/tags/%E5%86%99%E4%BD%9C%E6%A1%86%E6%9E%B6/">写作框架</a>
+    </div>
+    <div class="archives-tag-list-item" data-aos="zoom-in">
+      <a class="archives-tag-list-link" href="/tags/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/">项目记录</a>
+    </div>
+    <div class="archives-tag-list-item" data-aos="zoom-in">
+      <a class="archives-tag-list-link" href="/tags/%E9%AB%98%E9%80%9F%E9%87%87%E9%9B%86/">高速采集</a>
     </div>
     <div class="archives-tag-list-item" data-aos="zoom-in">
       <a class="archives-tag-list-link" href="/tags/ADC/">ADC</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/tags/%E6%97%B6%E9%97%B4%E4%BA%A4%E7%BB%87/">时间交织</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/tags/%E9%A2%91%E8%B0%B1%E5%88%86%E7%89%87/">频谱分片</a>
     </div>
     <div class="archives-tag-list-item" data-aos="zoom-in">
       <a class="archives-tag-list-link" href="/tags/JESD204B/">JESD204B</a>
@@ -292,16 +245,13 @@
       <a class="archives-tag-list-link" href="/tags/%E6%97%B6%E9%92%9F%E8%AE%BE%E8%AE%A1/">时钟设计</a>
     </div>
     <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/tags/%E9%9D%A2%E6%9D%BF%E8%AE%BE%E8%AE%A1/">面板设计</a>
+      <a class="archives-tag-list-link" href="/tags/%E6%97%B6%E9%97%B4%E4%BA%A4%E7%BB%87/">时间交织</a>
+    </div>
+    <div class="archives-tag-list-item" data-aos="zoom-in">
+      <a class="archives-tag-list-link" href="/tags/%E9%A2%91%E8%B0%B1%E5%88%86%E7%89%87/">频谱分片</a>
     </div>
     <div class="archives-tag-list-item" data-aos="zoom-in">
       <a class="archives-tag-list-link" href="/tags/%E6%8E%A5%E5%8F%A3/">接口</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/tags/%E5%86%99%E4%BD%9C%E6%A1%86%E6%9E%B6/">写作框架</a>
-    </div>
-    <div class="archives-tag-list-item" data-aos="zoom-in">
-      <a class="archives-tag-list-link" href="/tags/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/">项目记录</a>
     </div>
 </div>
 <div class="category-wrap">
@@ -343,20 +293,6 @@
         <span class="footer-info-sep rotate"></span>
       Alen
     </div>
-      <div>
-        <span class="icon-brush"></span>
-        7.8k
-        &nbsp;|&nbsp;
-        <span class="icon-coffee"></span>
-        00:30
-      </div>
-      <div>
-        <span class="icon-eye"></span>
-        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
-        &nbsp;|&nbsp;
-        <span class="icon-user"></span>
-        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
-      </div>
   </div>
 </footer>
 
@@ -376,7 +312,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">6</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -401,18 +337,11 @@
         <div class="sidebar-menu-link">首页</div>
       </div>
       <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
           <div class="sidebar-menu-icon icon rotate">
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">项目</div>
-      </div>
-      <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
-          <div class="sidebar-menu-icon icon rotate">
-              &#xe62b;
-          </div>
-        <div class="sidebar-menu-link">问题</div>
       </div>
       <div class="sidebar-menu-link-wrap">
         <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
@@ -420,6 +349,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
       </div>
 </div>
 
@@ -439,7 +375,7 @@
             <div id="reimu-hits"></div>
             <div id="reimu-pagination" class="reimu-pagination"></div>
           </div>
-          <img class="reimu-bg" src="/images/anime/natsume-series7-main.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
         </div>
       </div>
     
@@ -454,24 +390,6 @@
 <script src="/js/script.js"></script>
 
 
-  
-<script src="/js/aos.js"></script>
-
-  <script>
-    var aosInit = () => {
-      AOS.init({
-        duration: 1000,
-        easing: "ease",
-        once: true,
-        offset: 50,
-      });
-    };
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', aosInit);
-    } else {
-      aosInit();
-    }
-  </script>
 
 
 <script src="/js/pjax_script.js" data-pjax></script>
@@ -506,9 +424,6 @@
   </script>
   
 
-
-  
-<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
 
 
 <script>

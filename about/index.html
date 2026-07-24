@@ -12,22 +12,17 @@
     关于 | 硬件项目手记
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="preload" as="style" href="https://fontsapi.zeoseven.com/292/main/result.css" onload="this.rel='stylesheet'" crossorigin>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" as="style" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic|Noto Serif SC:400,400italic,700,700italic&display=swap" media="print" onload="this.media='all'">
     <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
-    
-<link rel="stylesheet" href="/css/loader.css">
-
-    <meta name="description" content="关于本站这里记录硬件项目从想法到实物的完整过程。内容不只展示最后的电路，也尽量解释为什么这样选、哪里曾经出错，以及怎样用测量结果确认判断。 主要内容 模拟与混合信号电路的工作原理 原理图、关键器件和 PCB 布局分析 上电、焊接和联调过程 故障现象、排查路径与最终结论 数据手册、参考设计和实测结果之间的对照  写作方式每篇文章尽量从必要的背景知识开始，再进入电路实现和实际验证。对于尚未完成的项目，">
+    <meta name="description" content="关于本站这里记录硬件项目从方案到实物的过程，重点保留设计依据、测试条件、问题定位和修改结果。 主要内容 模拟与混合信号电路的工作原理 原理图、关键器件和 PCB 布局分析 上电、焊接和联调过程 故障现象、排查路径与最终结论 数据手册、参考设计和实测结果之间的对照  尚未完成的项目会明确区分设计目标、仿真结果和实测结论。希望这些记录既能保留项目过程，也能为遇到相同问题的读者提供可复查的排查思路。 关">
 <meta property="og:type" content="website">
 <meta property="og:title" content="关于">
 <meta property="og:url" content="https://alen9966.github.io/about/index.html">
 <meta property="og:site_name" content="硬件项目手记">
-<meta property="og:description" content="关于本站这里记录硬件项目从想法到实物的完整过程。内容不只展示最后的电路，也尽量解释为什么这样选、哪里曾经出错，以及怎样用测量结果确认判断。 主要内容 模拟与混合信号电路的工作原理 原理图、关键器件和 PCB 布局分析 上电、焊接和联调过程 故障现象、排查路径与最终结论 数据手册、参考设计和实测结果之间的对照  写作方式每篇文章尽量从必要的背景知识开始，再进入电路实现和实际验证。对于尚未完成的项目，">
+<meta property="og:description" content="关于本站这里记录硬件项目从方案到实物的过程，重点保留设计依据、测试条件、问题定位和修改结果。 主要内容 模拟与混合信号电路的工作原理 原理图、关键器件和 PCB 布局分析 上电、焊接和联调过程 故障现象、排查路径与最终结论 数据手册、参考设计和实测结果之间的对照  尚未完成的项目会明确区分设计目标、仿真结果和实测结论。希望这些记录既能保留项目过程，也能为遇到相同问题的读者提供可复查的排查思路。 关">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://alen9966.github.io/images/banner.webp">
 <meta property="article:published_time" content="2026-07-21T02:20:00.000Z">
-<meta property="article:modified_time" content="2026-07-22T03:42:39.705Z">
+<meta property="article:modified_time" content="2026-07-24T06:30:30.060Z">
 <meta property="article:author" content="Alen">
 <meta property="article:tag" content="硬件项目">
 <meta property="article:tag" content="原理图">
@@ -44,59 +39,11 @@
 <link rel="stylesheet" href="/css/style.css">
 
   <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
-    
-<script src="https://npm.webcache.cn/pace-js@1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous"></script>
-
-    
-<link rel="stylesheet" href="https://npm.webcache.cn/@reimujs/aos@0.1.2/dist/aos.css" integrity="sha384-GMRP93c6Hkz9JVKGAuRR3nTS7M07RwPgTFenXiosjq2VbVgvdDNcz1g6Mkj8AONa" crossorigin="anonymous">
-
     <link rel="stylesheet" href="/css/site-home.css">
 </head>
 
   <body>
-      <div id='loader'>
-    <div class="loading-left-bg loading-bg"></div>
-    <div class="loading-right-bg loading-bg"></div>
-    <div class="spinner-box">
-      <div class="loading-taichi rotate">
-          <svg width="150" height="150" viewBox="0 0 1024 1024" class="icon" version="1.1" xmlns="https://www.w3.org/2000/svg" shape-rendering="geometricPrecision">
-            <path d="M303.5 432A80 80 0 0 1 291.5 592A80 80 0 0 1 303.5 432z" fill="var(--red-1, #ff5252)" />
-            <path d="M512 65A447 447 0 0 1 512 959L512 929A417 417 0 0 0 512 95A417 417 0 0 0 512 929L512 959A447 447 0 0 1 512 65z 
-           M512 95A417 417 0 0 1 929 512A208.5 208.5 0 0 1 720.5 720.5L720.5 592A80 80 0 0 0 720.5 432A80 80 0 0 0 720.5 592L720.5 720.5A208.5 208.5 0 0 1 512 512A208.5 208.5 0 0 0 303.5 303.5A208.5 208.5 0 0 0 95 512A417 417 0 0 1 512 95z" fill="var(--red-1, #ff5252)" />
-          </svg>
-      </div>
-      <div class="loading-word">页面整理中...</div>
-    </div>
-  </div>
-  <script>
-    var time = null;
-    var loaderEl = document.getElementById('loader');
-    var startLoading = () => {
-      time = Date.now();
-      loaderEl.classList.remove("loading");
-    }
-    var hideLoader = () => {
-      document.body.style.overflow = 'auto';
-      loader.classList.add('loading');
-    };
-
-    var endLoading = () => {
-      if (!time) {
-        hideLoader();
-      } else {
-        if (Date.now() - time > 500) {
-          time = null;
-          hideLoader();
-        } else {
-          setTimeout(endLoading, 500 - (Date.now() - time));
-          time = null;
-        }
-      }
-    }
-    window.addEventListener('DOMContentLoaded', endLoading);
-    loaderEl.addEventListener('click', endLoading);
-  </script>
-<div id="copy-tooltip"></div>
+    <div id="copy-tooltip"></div>
 <div id="heatmap-tooltip"></div>
 
 
@@ -110,23 +57,23 @@
             </div>
           <span class="main-nav-link">首页</span>
         </a>
-        <a class="main-nav-link-wrap" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95">
+        <a class="main-nav-link-wrap" href="/projects/">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">项目</span>
-        </a>
-        <a class="main-nav-link-wrap" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5">
-            <div class="main-nav-icon icon rotate">
-                &#xe62b;
-            </div>
-          <span class="main-nav-link">问题</span>
         </a>
         <a class="main-nav-link-wrap" href="/about">
             <div class="main-nav-icon icon rotate">
                 &#xe62b;
             </div>
           <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
         </a>
     <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
   </nav>
@@ -137,7 +84,7 @@
 </div>
 <header id="header" aria-label="Site header">
     <picture></picture>
-    <img  fetchpriority="high" src="/images/anime/hyouka-bg-index.jpg" alt="关于">
+    <img style="visibility:hidden"></img>
   <div id="header-outer">
     <div id="header-title">
           <span id="logo">
@@ -162,7 +109,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">6</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -187,18 +134,11 @@
         <div class="sidebar-menu-link">首页</div>
       </div>
       <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
           <div class="sidebar-menu-icon icon rotate">
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">项目</div>
-      </div>
-      <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
-          <div class="sidebar-menu-icon icon rotate">
-              &#xe62b;
-          </div>
-        <div class="sidebar-menu-link">问题</div>
       </div>
       <div class="sidebar-menu-link-wrap">
         <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
@@ -206,6 +146,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
       </div>
 </div>
 
@@ -217,6 +164,9 @@
       <h3 class="widget-title">最新文章</h3>
       <div class="widget">
         <ul>
+            <li>
+              <a href="/2026/07/24/linear-regulator-and-ldo-basics/" title="线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性">线性稳压器与 LDO：从反馈环路、压差到输出电容稳定性</a>
+            </li>
             <li>
               <a href="/2026/07/22/tida-01028-schematic-deep-dive/" title="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统">TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统</a>
             </li>
@@ -265,10 +215,10 @@
       <div class="article-date">
   <span class="article-date-link icon-calendar" data-aos="zoom-in">
     <time datetime="2026-07-21T02:20:00.000Z" itemprop="datePublished">2026-07-21</time>
-    <time style="display: none;" id="post-update-time">2026-07-22</time>
+    <time style="display: none;" id="post-update-time">2026-07-24</time>
   </span>
     <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
-      <time datetime="2026-07-22T03:42:39.705Z" itemprop="dateModified">2026-07-22</time>
+      <time datetime="2026-07-24T06:30:30.060Z" itemprop="dateModified">2026-07-24</time>
     </span>
 </div>
 
@@ -277,7 +227,7 @@
     <div class="hr-line"></div>
     
     <div class="e-content article-entry" itemprop="articleBody">
-        <h2 id="关于本站"><a href="#关于本站" class="headerlink" title="关于本站"></a>关于本站</h2><p>这里记录硬件项目从想法到实物的完整过程。内容不只展示最后的电路，也尽量解释为什么这样选、哪里曾经出错，以及怎样用测量结果确认判断。</p>
+        <h2 id="关于本站"><a href="#关于本站" class="headerlink" title="关于本站"></a>关于本站</h2><p>这里记录硬件项目从方案到实物的过程，重点保留设计依据、测试条件、问题定位和修改结果。</p>
 <h2 id="主要内容"><a href="#主要内容" class="headerlink" title="主要内容"></a>主要内容</h2><ul>
 <li>模拟与混合信号电路的工作原理</li>
 <li>原理图、关键器件和 PCB 布局分析</li>
@@ -285,8 +235,7 @@
 <li>故障现象、排查路径与最终结论</li>
 <li>数据手册、参考设计和实测结果之间的对照</li>
 </ul>
-<h2 id="写作方式"><a href="#写作方式" class="headerlink" title="写作方式"></a>写作方式</h2><p>每篇文章尽量从必要的背景知识开始，再进入电路实现和实际验证。对于尚未完成的项目，会明确区分设计推测、仿真结果和实测结论，避免把待验证内容写成确定事实。</p>
-<p>希望这些记录不只是项目备忘，也能让正在学习硬件设计的人少走一点弯路。</p>
+<p>尚未完成的项目会明确区分设计目标、仿真结果和实测结论。希望这些记录既能保留项目过程，也能为遇到相同问题的读者提供可复查的排查思路。</p>
 <h2 id="关于作者"><a href="#关于作者" class="headerlink" title="关于作者"></a>关于作者</h2><p>Alen，持续学习模拟电路、测量仪器、电源与 PCB 设计。这个站点会随着项目推进不断补充原理、波形和调试结果。</p>
 
     </div>
@@ -312,20 +261,6 @@
         <span class="footer-info-sep rotate"></span>
       Alen
     </div>
-      <div>
-        <span class="icon-brush"></span>
-        7.8k
-        &nbsp;|&nbsp;
-        <span class="icon-coffee"></span>
-        00:30
-      </div>
-      <div>
-        <span class="icon-eye"></span>
-        <span id="busuanzi_container_site_pv">总访问量&nbsp;<span id="busuanzi_value_site_pv"></span></span>
-        &nbsp;|&nbsp;
-        <span class="icon-user"></span>
-        <span id="busuanzi_container_site_uv">总访客量&nbsp;<span id="busuanzi_value_site_uv"></span></span>
-      </div>
   </div>
 </footer>
 
@@ -345,7 +280,7 @@
 <div class="sidebar-state">
   <div class="sidebar-state-article">
     <div>文章</div>
-    <div class="sidebar-state-number">5</div>
+    <div class="sidebar-state-number">6</div>
   </div>
   <div class="sidebar-state-category">
     <div>分类</div>
@@ -370,18 +305,11 @@
         <div class="sidebar-menu-link">首页</div>
       </div>
       <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95" aria-label="项目"></a>
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
           <div class="sidebar-menu-icon icon rotate">
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">项目</div>
-      </div>
-      <div class="sidebar-menu-link-wrap">
-        <a class="sidebar-menu-link-dummy" href="/categories/%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5" aria-label="问题"></a>
-          <div class="sidebar-menu-icon icon rotate">
-              &#xe62b;
-          </div>
-        <div class="sidebar-menu-link">问题</div>
       </div>
       <div class="sidebar-menu-link-wrap">
         <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
@@ -389,6 +317,13 @@
               &#xe62b;
           </div>
         <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
       </div>
 </div>
 
@@ -408,7 +343,7 @@
             <div id="reimu-hits"></div>
             <div id="reimu-pagination" class="reimu-pagination"></div>
           </div>
-          <img class="reimu-bg" src="/images/anime/natsume-series7-main.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
         </div>
       </div>
     
@@ -423,24 +358,6 @@
 <script src="/js/script.js"></script>
 
 
-  
-<script src="/js/aos.js"></script>
-
-  <script>
-    var aosInit = () => {
-      AOS.init({
-        duration: 1000,
-        easing: "ease",
-        once: true,
-        offset: 50,
-      });
-    };
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', aosInit);
-    } else {
-      aosInit();
-    }
-  </script>
 
 
 <script src="/js/pjax_script.js" data-pjax></script>
@@ -467,10 +384,10 @@
           url: "https://alen9966.github.io/about/index.html",
           excerpt: "",
           description: "",
-          stripContent: "关于本站这里记录硬件项目从想法到实物的完整过程。内容不只展示最后的电路，也尽量解释为什么这样选、哪里曾经出错，以及怎样用测量结果确认判断。 主要内容 模拟与混合信号电路的工作原理 原理图、关键器件和 PCB 布局分析 上电、焊接和联调过程 故障现象、排查路径与最终结论 数据手册、参考设计和实测结果之间的对照  写作方式每篇文章尽量从必要的背景知识开始，再进入电路实现和实际验证。对于尚未完成的项目，会明确区分设计推测、仿真结果和实测结论，避免把待验证内容写成确定事实。 希望这些记录不只是项目备忘，",
+          stripContent: "关于本站这里记录硬件项目从方案到实物的过程，重点保留设计依据、测试条件、问题定位和修改结果。 主要内容 模拟与混合信号电路的工作原理 原理图、关键器件和 PCB 布局分析 上电、焊接和联调过程 故障现象、排查路径与最终结论 数据手册、参考设计和实测结果之间的对照  尚未完成的项目会明确区分设计目标、仿真结果和实测结论。希望这些记录既能保留项目过程，也能为遇到相同问题的读者提供可复查的排查思路。 关于作者Alen，持续学习模拟电路、测量仪器、电源与 PCB 设计。这个站点会随着项目推进不断补充原理",
           date: "Tue Jul 21 2026 10:20:00 GMT+0800",
-          updated: "Wed Jul 22 2026 11:42:39 GMT+0800",
-          cover: "/images/myimge/xm2.png",
+          updated: "Fri Jul 24 2026 14:30:30 GMT+0800",
+          cover: "/images/myimge/wallhaven-3ze1v3.jpg",
         };
       </script>
         
@@ -515,9 +432,6 @@
   </script>
   
 
-
-  
-<script src="https://npm.webcache.cn/busuanzi@2.3.0/bsz.pure.mini.js" integrity="sha384-0M75wtSkhjIInv4coYlaJU83+OypaRCIq2SukQVQX04eGTCBXJDuWAbJet56id+S" crossorigin="anonymous" async></script>
 
 
 <script>
