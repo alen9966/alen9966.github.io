@@ -1,0 +1,545 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片 | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="以 TI TIDA-01028 的 12.8 GSPS 实测链路为例，理解时间交织怎样增加采样率、失配为什么产生杂散，并区分时间交织与频谱分片各自解决的问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片">
+<meta property="og:url" content="https://alen9966.github.io/2026/07/22/oscilloscope-time-interleaving-and-spectrum-slicing/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="以 TI TIDA-01028 的 12.8 GSPS 实测链路为例，理解时间交织怎样增加采样率、失配为什么产生杂散，并区分时间交织与频谱分片各自解决的问题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/tida-01028/time-interleaving/system-block-diagram-guide-page-5.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/tida-01028/time-interleaving/four-phase-clock-architecture-guide-page-10.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/tida-01028/time-interleaving/interleave-error-model-guide-page-7.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/tida-01028/time-interleaving/enob-with-without-spur-guide-page-25.png">
+<meta property="article:published_time" content="2026-07-22T02:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-03T10:05:14.104Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="高速采集">
+<meta property="article:tag" content="ADC">
+<meta property="article:tag" content="时间交织">
+<meta property="article:tag" content="频谱分片">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/myimge/tida-01028/time-interleaving/system-block-diagram-guide-page-5.png">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/myimge/wallhaven-pink/wallhaven-x8movl.jpg" alt="示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E9%87%87%E6%A0%B7%E7%8E%87%E5%92%8C%E6%A8%A1%E6%8B%9F%E5%B8%A6%E5%AE%BD%E4%B8%8D%E6%98%AF%E4%B8%80%E4%B8%AA%E5%8F%82%E6%95%B0"><span class="toc-number">1.</span> <span class="toc-text"> 一、采样率和模拟带宽不是一个参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E4%B8%A4%E9%A2%97-64-gsps-adc-%E6%80%8E%E6%A0%B7%E5%BE%97%E5%88%B0-128-gsps"><span class="toc-number">2.</span> <span class="toc-text"> 二、两颗 6.4 GSPS ADC 怎样得到 12.8 GSPS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%97%B6%E9%92%9F%E9%93%BE%E9%9C%80%E8%A6%81%E8%BF%99%E4%B9%88%E5%A4%9A%E5%99%A8%E4%BB%B6"><span class="toc-number">3.</span> <span class="toc-text"> 三、为什么时钟链需要这么多器件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E4%BA%A4%E7%BB%87%E7%9C%9F%E6%AD%A3%E5%9B%B0%E9%9A%BE%E7%9A%84%E6%98%AF%E9%80%9A%E9%81%93%E4%B8%8D%E4%B8%80%E8%87%B4"><span class="toc-number">4.</span> <span class="toc-text"> 四、交织真正困难的是通道不一致</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-ti-%E5%AE%9E%E9%99%85%E6%80%8E%E6%A0%B7%E5%AE%8C%E6%88%90-128-gsps-%E6%B5%8B%E8%AF%95"><span class="toc-number">5.</span> <span class="toc-text"> 五、TI 实际怎样完成 12.8 GSPS 测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E9%A2%91%E8%B0%B1%E5%88%86%E7%89%87%E8%A7%A3%E5%86%B3%E7%9A%84%E6%98%AF%E5%8F%A6%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98"><span class="toc-number">6.</span> <span class="toc-text"> 六、频谱分片解决的是另一个问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E8%BF%99%E6%AC%A1%E9%87%8D%E6%96%B0%E9%98%85%E8%AF%BB%E5%90%8E%E7%9A%84%E7%BB%93%E8%AE%BA"><span class="toc-number">7.</span> <span class="toc-text"> 七、这次重新阅读后的结论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">8.</span> <span class="toc-text"> 参考资料</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">40</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-oscilloscope-time-interleaving-and-spectrum-slicing" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-07-22T02:30:00.000Z" itemprop="datePublished">2026-07-22</time>
+    <time style="display: none;" id="post-update-time">2026-08-03</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-03T10:05:14.104Z" itemprop="dateModified">2026-08-03</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>我刚开始了解高速示波器时，有一个地方一直没分清：提高 ADC 采样率和提高示波器模拟带宽是不是同一件事？如果一颗 ADC 只能采 6.4 GSPS，多放一颗是不是就能直接变成 12.8 GSPS？</p>
+<p>TI 的 TIDA-01028 正好给出了一个可以落到硬件上的例子。它使用两颗 <code>ADC12DJ3200</code> 做板级时间交织，最终得到单通道 <code>12.8 GSPS</code>。设计指南不仅给了框图，还给出了时钟配置、测试步骤和交织前后的频谱结果。</p>
+<p>这里先说明资料边界：这两份 PDF 详细介绍的是<strong>时间交织</strong>，并没有实现频谱分片。文章后半部分会把频谱分片作为另一种扩展带宽的方法单独解释，不能把它写成 TIDA-01028 的功能。</p>
+<h2 id="一-采样率和模拟带宽不是一个参数"><a class="markdownIt-Anchor" href="#一-采样率和模拟带宽不是一个参数"></a> 一、采样率和模拟带宽不是一个参数</h2>
+<p>采样率决定一秒钟取得多少个样点，模拟带宽决定前端能把多高频率的信号送到 ADC。两者互相影响，但不能互相替代。</p>
+<p>TIDA-01028 的设计指标很有代表性：变压器输入路径的 <code>-3 dB</code> 带宽可到 <code>6 GHz</code>；两颗 ADC 各自工作时是两路 <code>6.4 GSPS</code>，板级交织后则成为一路 <code>12.8 GSPS</code>。这说明时间交织主要解决“样点不够密”的问题，输入端的巴伦、放大器、滤波器和 ADC 模拟输入带宽仍然决定信号能不能进入系统。</p>
+<p><img src="/images/myimge/tida-01028/time-interleaving/system-block-diagram-guide-page-5.png" alt="TIDA-01028 系统框图" /></p>
+<p><em>资料：TI《TIDA-01028 Design Guide》TIDUEI2，第 5 页。图中同时给出了四路模拟输入、两颗 ADC、时钟树、FMC+ 和电源模块。</em></p>
+<p>图里的四路输入也容易引起误解。每颗 <code>ADC12DJ3200</code> 有两个输入通道，整板因此有 CH1 到 CH4 四条物理输入链路；但 TI 的板级 <code>12.8 GSPS</code> 测试使用的是 CH1 和 CH3，把两颗器件各自的单通道数据交织成一路结果，并不是四个输入通道同时以 <code>12.8 GSPS</code> 采样。</p>
+<h2 id="二-两颗-64-gsps-adc-怎样得到-128-gsps"><a class="markdownIt-Anchor" href="#二-两颗-64-gsps-adc-怎样得到-128-gsps"></a> 二、两颗 6.4 GSPS ADC 怎样得到 12.8 GSPS</h2>
+<p>时间交织的定义很简单：多路 ADC 观察同一个输入，但采样时刻依次错开。如果有 <code>M</code> 路 ADC，每路采样率为 <code>Fs</code>，理想情况下总采样率为：</p>
+<p><code>Fs,total = M × Fs</code></p>
+<p>真正需要理解的是 TIDA-01028 里存在两层交织。</p>
+<p><code>ADC12DJ3200</code> 在单通道模式下，内部两个 ADC 核已经以 <code>0°</code> 和 <code>180°</code> 交替采样，因此一颗器件可以从 <code>3.2 GHz</code> 器件时钟得到 <code>6.4 GSPS</code>。板上再把第二颗器件的采样相位相对第一颗移动 <code>90°</code>，四个 ADC 核最终形成：</p>
+<p><code>0°、90°、180°、270°</code></p>
+<p>3.2 GHz 时钟的周期为：</p>
+<p><code>Tclk = 1 / 3.2 GHz = 312.5 ps</code></p>
+<p>四相采样的相邻间隔为：</p>
+<p><code>312.5 ps / 4 = 78.125 ps</code></p>
+<p>而 <code>1 / 78.125 ps</code> 正好等于 <code>12.8 GSPS</code>。所以这里要建立的目标相位差是约 <code>78.1 ps</code>，不是几十飞秒。</p>
+<p><img src="/images/myimge/tida-01028/time-interleaving/four-phase-clock-architecture-guide-page-10.png" alt="TIDA-01028 四相交织时钟架构" /></p>
+<p><em>资料：TIDUEI2，第 10 页。红、黑、蓝采样点对应 ADC1-A、ADC1-B、ADC2-A、ADC2-B 的四个采样相位。</em></p>
+<h2 id="三-为什么时钟链需要这么多器件"><a class="markdownIt-Anchor" href="#三-为什么时钟链需要这么多器件"></a> 三、为什么时钟链需要这么多器件</h2>
+<p>只用两根长度不同的时钟线不能稳定地产生 <code>78.1 ps</code> 相位差。温度、工艺、供电和 PCB 都会让固定延时漂移，因此这套设计把频率生成、系统同步和采样时刻微调分成了几层：</p>
+<ul>
+<li><code>LMK61E2</code> 提供低抖动参考；</li>
+<li><code>LMK04828</code> 完成时钟分配，并给采集 FPGA 产生 <code>320 MHz</code> 参考/核心时钟和 <code>40 MHz SYSREF</code>；</li>
+<li>两颗 <code>LMX2594</code> 分别给两颗 ADC 产生 <code>3.2 GHz DEVCLK</code> 和 <code>40 MHz SYSREF</code>；</li>
+<li><code>ADC12DJ3200</code> 内部的 <code>tAD Adjust</code> 最后微调采样孔径位置。</li>
+</ul>
+<p>设计指南给出的 <code>tAD</code> 微调步进为 <code>19 fs</code>，最大调整范围约 <code>293 ps</code>。这里的 <code>19 fs</code> 是<strong>调节分辨率</strong>，<code>78.1 ps</code> 是<strong>目标相位差</strong>，约 <code>70 fs</code> 则是资料给出的低孔径抖动量级。这三个数字描述的不是同一件事。</p>
+<p>时钟抖动为什么会直接限制高频性能？只考虑采样时刻抖动时，信噪比上限可以近似写成：</p>
+<p><code>SNRjitter = -20 log10(2π × fin × tj)</code></p>
+<p>输入频率 <code>fin</code> 越高，相同的 RMS 抖动 <code>tj</code> 带来的电压误差越大。因此到了 GHz 输入，参考源、PLL、缓冲器、走线和 ADC 孔径抖动都必须进入总预算。</p>
+<h2 id="四-交织真正困难的是通道不一致"><a class="markdownIt-Anchor" href="#四-交织真正困难的是通道不一致"></a> 四、交织真正困难的是通道不一致</h2>
+<p>如果两条采样链完全相同，只要把样点按时间重排就可以得到更高采样率。现实中做不到完全一致，主要误差有三类：</p>
+<ul>
+<li>失调不一致：即使没有输入，两路输出基线也不同；</li>
+<li>增益不一致：同一个输入在两路上得到的幅度不同；</li>
+<li>时间不一致：实际采样时刻偏离理想位置。</li>
+</ul>
+<p><img src="/images/myimge/tida-01028/time-interleaving/interleave-error-model-guide-page-7.png" alt="双 ADC 交织的误差模型" /></p>
+<p><em>资料：TIDUEI2，第 7 页。图中的 <code>VOFFSET</code>、<code>GERR</code> 和 <code>ΦERR</code> 分别表示失调、增益与相位/时间误差。</em></p>
+<p>这些误差不会只让噪声底稍微变高，而会在频谱中形成有规律的交织杂散。TI 的资料列出了 <code>Fs/4</code>、<code>Fs/2</code> 以及围绕输入频率搬移后的多个杂散位置。时间偏差最难处理，因为它产生的误差会随输入频率上升而增大。</p>
+<p>校准通常也按这三项分开进行：先估计并扣除直流失调，再统一各路增益，最后通过 <code>tAD</code> 或数字分数延时滤波器校正剩余时间差。模拟前端的幅频、相频和群时延不一致还需要更完整的频响校准，不能只调一个采样延时寄存器。</p>
+<h2 id="五-ti-实际怎样完成-128-gsps-测试"><a class="markdownIt-Anchor" href="#五-ti-实际怎样完成-128-gsps-测试"></a> 五、TI 实际怎样完成 12.8 GSPS 测试</h2>
+<p>设计指南第 22 至 25 页给出了测试过程。两颗 ADC 都设置为单通道 <code>JMODE0</code>，各自以 <code>6.4 GSPS</code> 采样。信号通过带通滤波器和二分功分器同时送入 CH1 与 CH3，两块 <code>TSW14J57</code> 分别作为主、从采集卡，触发线和输入电缆需要长度匹配。</p>
+<p>建立 JESD204B 链路后，先导出两颗 ADC 的数据，用 MATLAB 比较相位，再调整 <code>tAD</code>，让两路采样时刻相差约 <code>78.1 ps</code>。最后把两组样点交替合并，才得到 <code>12.8 GSPS</code> 数据。</p>
+<p><img src="/images/myimge/tida-01028/time-interleaving/enob-with-without-spur-guide-page-25.png" alt="保留和去除交织杂散时的 ENOB 对比" /></p>
+<p><em>资料：TIDUEI2，第 25 页。左图保留交织杂散，右图在分析中去除了交织杂散。</em></p>
+<p>这组结果需要谨慎描述。TI 给出的结论是：保留交织杂散时，约 <code>2 GHz</code> 输入带宽内仍可达到高于 <code>7.5 bit</code> 的 ENOB；去除交织杂散后，ENOB 可提高到 <code>8.5 bit</code> 以上。资料总结还给出了大于 <code>2.5 GHz</code> 的可用带宽和高于 <code>7.5 bit</code> 的 ENOB。</p>
+<p>“去除交织杂散”是分析或校准后的结果，不等于原始硬件天然没有这些杂散。写示波器指标时，必须说明数据是否经过交织校准、杂散剔除或数字后处理。</p>
+<h2 id="六-频谱分片解决的是另一个问题"><a class="markdownIt-Anchor" href="#六-频谱分片解决的是另一个问题"></a> 六、频谱分片解决的是另一个问题</h2>
+<p>时间交织是在<strong>时间轴</strong>上拆分：每颗 ADC 都看到完整带宽，只是采样时刻不同。频谱分片是在<strong>频率轴</strong>上拆分：先把宽带输入分成若干子带，再让不同 ADC 分别处理。</p>
+<p>一个典型的频谱分片链路包括带通滤波、混频器、本振、ADC 和数字重建。每条支路只接收自己的频段，经过下变频后落入 ADC 能处理的带宽，最后在数字域恢复到原来的频率位置。</p>
+<p>它的难点不再是样点间隔，而是各子带的复数频率响应是否一致。滤波器幅度、群时延、本振相位、混频杂散和 ADC 增益都会让子带交界处出现台阶或相位突变。为了重新得到连续波形，通常需要保留重叠带，并对每条支路进行幅度、相位和群时延校准。</p>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>时间交织</th>
+<th>频谱分片</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>拆分维度</td>
+<td>时间</td>
+<td>频率</td>
+</tr>
+<tr>
+<td>每路看到的内容</td>
+<td>完整输入带宽</td>
+<td>一个子频带</td>
+</tr>
+<tr>
+<td>主要目标</td>
+<td>增加等效实时采样率</td>
+<td>扩展总模拟带宽</td>
+</tr>
+<tr>
+<td>主要误差</td>
+<td>失调、增益、采样时间差</td>
+<td>子带幅相、群时延、镜像与本振杂散</td>
+</tr>
+<tr>
+<td>关键校准</td>
+<td>样点级时间对齐</td>
+<td>复数频响校准与重叠带拼接</td>
+</tr>
+</tbody>
+</table>
+<p>两种方法可以同时使用。例如每个频谱子带内部仍然采用时间交织 ADC，再在数字域拼接多个子带。但这会叠加两套误差，不能把“ADC 数量更多”简单等同于“示波器性能更高”。</p>
+<h2 id="七-这次重新阅读后的结论"><a class="markdownIt-Anchor" href="#七-这次重新阅读后的结论"></a> 七、这次重新阅读后的结论</h2>
+<p>TIDA-01028 最有价值的地方，不是证明两颗 ADC 的采样率可以直接相加，而是展示了相加之前需要解决什么：两套低抖动时钟、确定的同步关系、可调采样孔径、长度匹配的输入与触发链路，以及交织后的数字校准。</p>
+<p>时间交织提高采样率，频谱分片扩展带宽。前者最敏感的是采样时刻，后者最敏感的是各子带的幅相连续性。真正的高速示波器往往同时受到模拟前端、时钟、电源、数据接口和校准算法限制，ADC 标称采样率只是其中一个起点。</p>
+<h2 id="参考资料"><a class="markdownIt-Anchor" href="#参考资料"></a> 参考资料</h2>
+<ul>
+<li>Texas Instruments, <em>12.8-GSPS Analog Front End Reference Design for High-Speed Oscilloscope and Wide-Band Digitizer</em>, TIDUEI2, March 2019，重点参考第 5～25 页。</li>
+<li>Texas Instruments, <em>TIDA-01028 Schematic and Block Diagram</em>, TIDRZ70, March 2019，重点参考原理图第 1、7、9、11～15 页。</li>
+</ul>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录" data-aos="zoom-in">学习记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/ADC/" rel="tag" title="ADC">ADC</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%97%B6%E9%97%B4%E4%BA%A4%E7%BB%87/" rel="tag" title="时间交织">时间交织</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E9%A2%91%E8%B0%B1%E5%88%86%E7%89%87/" rel="tag" title="频谱分片">频谱分片</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E9%AB%98%E9%80%9F%E9%87%87%E9%9B%86/" rel="tag" title="高速采集">高速采集</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+          <img data-src="/images/myimge/wallhaven-pink/wallhaven-57eey1.jpg" data-sizes="auto" alt="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" class="lazyload">
+        <a href="/2026/07/22/tida-01028-schematic-deep-dive/" aria-label="前一篇: TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" title="前一篇: TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-werdv6.jpg" data-sizes="auto" alt="超声波探伤仪的面板" class="lazyload">
+      <a href="/2026/07/21/ultrasonic-flaw-detector-panel/" aria-label="后一篇: 超声波探伤仪的面板"  title="后一篇: 超声波探伤仪的面板"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          超声波探伤仪的面板
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E9%87%87%E6%A0%B7%E7%8E%87%E5%92%8C%E6%A8%A1%E6%8B%9F%E5%B8%A6%E5%AE%BD%E4%B8%8D%E6%98%AF%E4%B8%80%E4%B8%AA%E5%8F%82%E6%95%B0"><span class="toc-number">1.</span> <span class="toc-text"> 一、采样率和模拟带宽不是一个参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E4%B8%A4%E9%A2%97-64-gsps-adc-%E6%80%8E%E6%A0%B7%E5%BE%97%E5%88%B0-128-gsps"><span class="toc-number">2.</span> <span class="toc-text"> 二、两颗 6.4 GSPS ADC 怎样得到 12.8 GSPS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-%E4%B8%BA%E4%BB%80%E4%B9%88%E6%97%B6%E9%92%9F%E9%93%BE%E9%9C%80%E8%A6%81%E8%BF%99%E4%B9%88%E5%A4%9A%E5%99%A8%E4%BB%B6"><span class="toc-number">3.</span> <span class="toc-text"> 三、为什么时钟链需要这么多器件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E4%BA%A4%E7%BB%87%E7%9C%9F%E6%AD%A3%E5%9B%B0%E9%9A%BE%E7%9A%84%E6%98%AF%E9%80%9A%E9%81%93%E4%B8%8D%E4%B8%80%E8%87%B4"><span class="toc-number">4.</span> <span class="toc-text"> 四、交织真正困难的是通道不一致</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-ti-%E5%AE%9E%E9%99%85%E6%80%8E%E6%A0%B7%E5%AE%8C%E6%88%90-128-gsps-%E6%B5%8B%E8%AF%95"><span class="toc-number">5.</span> <span class="toc-text"> 五、TI 实际怎样完成 12.8 GSPS 测试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E9%A2%91%E8%B0%B1%E5%88%86%E7%89%87%E8%A7%A3%E5%86%B3%E7%9A%84%E6%98%AF%E5%8F%A6%E4%B8%80%E4%B8%AA%E9%97%AE%E9%A2%98"><span class="toc-number">6.</span> <span class="toc-text"> 六、频谱分片解决的是另一个问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E8%BF%99%E6%AC%A1%E9%87%8D%E6%96%B0%E9%98%85%E8%AF%BB%E5%90%8E%E7%9A%84%E7%BB%93%E8%AE%BA"><span class="toc-number">7.</span> <span class="toc-text"> 七、这次重新阅读后的结论</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">8.</span> <span class="toc-text"> 参考资料</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">40</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片",
+          url: "https://alen9966.github.io/2026/07/22/oscilloscope-time-interleaving-and-spectrum-slicing/",
+          excerpt: "",
+          description: "以 TI TIDA-01028 的 12.8 GSPS 实测链路为例，理解时间交织怎样增加采样率、失配为什么产生杂散，并区分时间交织与频谱分片各自解决的问题。",
+          stripContent: "我刚开始了解高速示波器时，有一个地方一直没分清：提高 ADC 采样率和提高示波器模拟带宽是不是同一件事？如果一颗 ADC 只能采 6.4 GSPS，多放一颗是不是就能直接变成 12.8 GSPS？ TI 的 TIDA-01028 正好给出了一个可以落到硬件上的例子。它使用两颗 ADC12DJ3200 做板级时间交织，最终得到单通道 12.8 GSPS。设计指南不仅给了框图，还给出了时钟配置、测试步骤和交织前后的频谱结果。 这里先说明资料边界：这两份 PDF 详细介绍的是时间交织，并没有实现频谱分",
+          date: "Wed Jul 22 2026 10:30:00 GMT+0800",
+          updated: "Mon Aug 03 2026 18:05:14 GMT+0800",
+          cover: "/images/myimge/wallhaven-pink/wallhaven-3l5z63.jpg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://npm.webcache.cn/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6&#x2F;1Nxveei" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+  </body>
+  </html>

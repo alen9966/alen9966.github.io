@@ -1,0 +1,648 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="从原理图到实测波形，记录硬件设计中的选择、失误与验证。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="硬件项目手记">
+<meta property="og:url" content="https://alen9966.github.io/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="从原理图到实测波形，记录硬件设计中的选择、失误与验证。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/banner.webp">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="硬件项目">
+<meta property="article:tag" content="原理图">
+<meta property="article:tag" content="PCB">
+<meta property="article:tag" content="电源设计">
+<meta property="article:tag" content="调试记录">
+<meta property="article:tag" content="Blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/banner.webp">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+      <picture>
+      </picture>
+        <img  fetchpriority="high" src="/images/myimge/wallhaven-3ze1v3.jpg" alt="">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">硬件项目手记</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+              <span id="subtitle"><span></span></span>
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container ">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+        <div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">40</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+
+    </div>
+  </div>
+  <div class="sidebar-widget">
+        <div class="widget-wrapper">
+    <div class="widget-wrap" data-aos="fade-up">
+      <h3 class="widget-title">最新文章</h3>
+      <div class="widget">
+        <ul>
+            <li>
+              <a href="/2026/08/03/time-synchronization-and-100mhz-clock-test-learning-log/" title="从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录">从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录</a>
+            </li>
+            <li>
+              <a href="/2026/07/29/llc-resonant-half-bridge-from-specs-to-parameters/" title="第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数">第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数</a>
+            </li>
+            <li>
+              <a href="/2026/07/28/power-topologies-selection-from-buck-to-psfb/" title="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥">开关电源拓扑怎么选：从 Buck、Boost 到移相全桥</a>
+            </li>
+            <li>
+              <a href="/2026/07/27/verilog-from-module-to-always/" title="从一个多路选择器开始学 Verilog：module、assign 和 always">从一个多路选择器开始学 Verilog：module、assign 和 always</a>
+            </li>
+            <li>
+              <a href="/2026/07/27/transfer-function-from-differential-equation/" title="从微分方程到波特图：我怎样理解传递函数">从微分方程到波特图：我怎样理解传递函数</a>
+            </li>
+            <li>
+              <a href="/2026/07/25/am-modulation-demodulation-basics/" title="从一段声音到无线电波：AM 调制与解调入门">从一段声音到无线电波：AM 调制与解调入门</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+        <div class="widget-wrapper">
+    <div class="widget-wrap" data-aos="fade-up">
+      <h3 class="widget-title">分类</h3>
+      <div class="widget">
+        <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录">学习记录</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/" title="项目记录">项目记录</a></li></ul>
+      </div>
+    </div>
+  </div>
+
+        <div class="widget-wrapper">
+    <div class="widget-wrap" data-aos="fade-up">
+      <h3 class="widget-title">归档</h3>
+      <div class="widget">
+        <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/08/">八月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/07/">七月 2026</a></li></ul>
+      </div>
+    </div>
+  </div>
+
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content">      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/08/03/time-synchronization-and-100mhz-clock-test-learning-log/" aria-label="从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录" title="从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录"></a>
+    <div class="post-cover left">
+        <img data-src="/images/myimge/time-sync-learning-log/time-sync-test-cover.svg" data-sizes="auto" alt="从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-08-03</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-03</span>
+        <span><span class="icon-pencil"></span>4.1k 字</span>
+        <span><span class="icon-clock"></span>15 分钟</span>
+      </div>
+      <h2 class="post-title">从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录</h2>
+      <article class="post-article">
+          今天第一次把时间同步系统中的信号、硬件和测试仪器放在一起学习。以前看到 1PPS、TOD、相位噪声和阿伦方差时，我知道它们都与“时间准不准”有关，但不清楚每个指标究竟在描述什么，也不知道一条 100 MHz 参考时钟应该怎样测。
+这次学习从最基础的幅度测量开始，依次使用示波器、频谱仪和相噪仪理解时钟信号的时域与频域指标，再把 1PPS + TOD、IRIG-B、NTP、PTP 和本地高稳定时钟放到同一套系统架构中。最后，我按器件功能梳理了 JL-BD 北斗模块中与 100 MHz 参考时钟有关的电路。
+目前完成的是方法学习和电路功能梳理，还没有形成一组可公开的实测数据。文中列出的测试项目是后续
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/29/llc-resonant-half-bridge-from-specs-to-parameters/" aria-label="第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数" title="第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/llc-resonant-half-bridge/llc-resonant-half-bridge-cover-gj9krd.jpg" data-sizes="auto" alt="第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-29</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-03</span>
+        <span><span class="icon-pencil"></span>4.2k 字</span>
+        <span><span class="icon-clock"></span>17 分钟</span>
+      </div>
+      <h2 class="post-title">第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数</h2>
+      <article class="post-article">
+          刚开始接触 LLC 时，我知道它有两个电感和一个电容，也知道它可以实现软开关，但真正拿到一组输入输出指标后，还是不知道该先算什么。Lm、Lr、Cr 之间是什么关系？开关频率为什么有时低于谐振点，有时又高于谐振点？增益曲线能覆盖输入范围以后，是不是就已经保证了 ZVS？
+这篇文章以 TI《Designing an LLC Resonant Half-Bridge Power Converter》（SLUP263）中的例子为主线，重新走一遍 375～405 VDC → 12 V / 25 A / 300 W 的第一轮设计。重点不是把 LLC 的知识点全部列出来，而是回答一个更实际的问题：拿到这些指
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/28/power-topologies-selection-from-buck-to-psfb/" aria-label="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥" title="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥"></a>
+    <div class="post-cover left">
+        <img data-src="/images/myimge/power-topologies/power-topologies-handbook-card.jpg" data-sizes="auto" alt="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-28</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-03</span>
+        <span><span class="icon-pencil"></span>4.3k 字</span>
+        <span><span class="icon-clock"></span>17 分钟</span>
+      </div>
+      <h2 class="post-title">开关电源拓扑怎么选：从 Buck、Boost 到移相全桥</h2>
+      <article class="post-article">
+          刚开始接触开关电源时，我很容易把拓扑选择理解成“降压用 Buck，升压用 Boost”。真正开始看器件应力和关键节点波形后才发现，升降压关系只是第一层：输入会不会跨过输出、是否隔离、能量在哪个开关状态送到负载、磁芯怎样复位、功率器件承受多大的峰值和 RMS 电流，都会改变最终选择。
+这篇文章以 TI《Power Topologies Handbook》为主线，把文中出现的拓扑逐一展开。重点不是罗列名称，而是把每一种电路的功率路径、关键公式和电压电流波形对应起来。文中的波形来自手册，是理想化的理论波形，不是硬件实测；公式默认理想器件、稳态和连续导通模式（CCM），实际设计还要加入器件压降、死区、
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/27/verilog-from-module-to-always/" aria-label="从一个多路选择器开始学 Verilog：module、assign 和 always" title="从一个多路选择器开始学 Verilog：module、assign 和 always"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-vq95d8.jpg" data-sizes="auto" alt="从一个多路选择器开始学 Verilog：module、assign 和 always" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-27</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-03</span>
+        <span><span class="icon-pencil"></span>2.8k 字</span>
+        <span><span class="icon-clock"></span>11 分钟</span>
+      </div>
+      <h2 class="post-title">从一个多路选择器开始学 Verilog：module、assign 和 always</h2>
+      <article class="post-article">
+          我刚开始学 Verilog 时，最容易犯的错误是把它当成 C 语言：代码从上往下执行，写几行判断和赋值，就能得到想要的结果。可真正开始写 FPGA 程序后会发现，同样是一个等号，放在 assign 里和放在 always 里含义不同；同样是 always，敏感列表写信号变化和写时钟上升沿，最后得到的电路也完全不同。
+Verilog 不是在告诉处理器“下一步做什么”，而是在描述一块数字电路“由什么组成、信号怎样连接、什么时候更新”。这篇文章从最简单的多路选择器开始，把 module、assign、always、阻塞赋值和非阻塞赋值串起来。资料采用传统 Verilog-2001 的 wire、re
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/27/transfer-function-from-differential-equation/" aria-label="从微分方程到波特图：我怎样理解传递函数" title="从微分方程到波特图：我怎样理解传递函数"></a>
+    <div class="post-cover left">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-7p3we9.jpg" data-sizes="auto" alt="从微分方程到波特图：我怎样理解传递函数" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-27</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-03</span>
+        <span><span class="icon-pencil"></span>2.8k 字</span>
+        <span><span class="icon-clock"></span>11 分钟</span>
+      </div>
+      <h2 class="post-title">从微分方程到波特图：我怎样理解传递函数</h2>
+      <article class="post-article">
+          我以前学传递函数时，记住的是“输出除以输入”，极点就是让分母等于零的点。公式会算，但看到一个电路还是不知道该从哪里下手：为什么微分方程做一次拉普拉斯变换就成了分式？同一个分式为什么既能算阶跃响应，又能画波特图？
+这篇文章就按我当时弄明白这个问题的顺序来写。先从冲激响应和卷积开始，再用串联 RLC 电路把微分方程一步步变成传递函数，最后看时域、频域和极点之间到底是什么关系。文中的曲线都是 MATLAB 理论仿真，不是硬件实测结果。
+ 一、传递函数解决的是什么问题
+先不急着写 $H(s)$，首先得知道线性时不变系统是怎样处理输入的。一个系统接收到 $u(t)$ 后产生输出 $x(t)$。只要它满足
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/25/am-modulation-demodulation-basics/" aria-label="从一段声音到无线电波：AM 调制与解调入门" title="从一段声音到无线电波：AM 调制与解调入门"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-qz655l.jpg" data-sizes="auto" alt="从一段声音到无线电波：AM 调制与解调入门" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-25</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-03</span>
+        <span><span class="icon-pencil"></span>8.3k 字</span>
+        <span><span class="icon-clock"></span>31 分钟</span>
+      </div>
+      <h2 class="post-title">从一段声音到无线电波：AM 调制与解调入门</h2>
+      <article class="post-article">
+          我把这份寒假培训材料整理成博客时，想保留当时的讲解顺序。AM 的公式当然重要，但如果一开始就写乘法和边带，很容易只记住形式，却不知道为什么需要它们。培训里先从一条最普通的波形讲起，再慢慢走到调制和解调，这个顺序不变。
+本文中的公式和图都用于原理学习，暂时没有对应的硬件实测数据。后续如果补充 MATLAB 图，会明确标注为理论示意或软件仿真。
+ 一、调制与解调
+我刚开始接触这部分内容时，总觉得调制和解调只是两个相反的名词：发射端“调一下”，接收端再“解一下”。可真正的问题是，语音、视频或传感器输出本来就带着信息，为什么发送前还要处理一次？
+通信系统需要让信息适合在无线电波、导线或其他传输介质中传
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/24/linear-regulator-and-ldo-basics/" aria-label="从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性" title="从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性"></a>
+    <div class="post-cover left">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-0wg366.jpg" data-sizes="auto" alt="从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-24</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-03</span>
+        <span><span class="icon-pencil"></span>3k 字</span>
+        <span><span class="icon-clock"></span>12 分钟</span>
+      </div>
+      <h2 class="post-title">从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性</h2>
+      <article class="post-article">
+           一、这次为什么重新学习 LDO
+示波器校准仪的电源部分需要把 +310 V 和 -310 V 分别稳压到 +300 V 和 -300 V，再给高压运放供电。这里的压差只有 10 V，但目标不是简单地把电压降下来，而是尽可能提高电源抑制比（PSRR）。
+这部分设计让我重新遇到一个以前只在《信号与系统》中见过的概念：零点和极点。以前我知道传递函数分子为零得到零点，分母为零得到极点，却没有真正把它们和电路的相位、增益以及稳定性联系起来。
+这篇文章先不讨论 PCB、散热和高压安全，只学习 LDO 作为一个反馈系统是怎样工作的，以及怎样用传递函数和 MATLAB 仿真判断环路是否有稳定余量。
+ 二、L
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/22/tida-01028-schematic-deep-dive/" aria-label="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" title="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-57eey1.jpg" data-sizes="auto" alt="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-22</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-03</span>
+        <span><span class="icon-pencil"></span>2.6k 字</span>
+        <span><span class="icon-clock"></span>10 分钟</span>
+      </div>
+      <h2 class="post-title">TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统</h2>
+      <article class="post-article">
+          第一次打开 TIDA-01028 的原理图时，我注意力全在两颗 ADC12DJ3200 上，总觉得找到 ADC 就算抓住了系统核心。重新对照设计指南后才发现，这块板真正难的部分并不是 ADC 本身，而是模拟输入、时钟、JESD204B、电源和配置接口怎样一起工作。
+TIDRZ70 这份 PDF 一共 28 页，其中前 26 页是框图和正式电路页，后两页是说明与法律信息。原理图标题栏还写明：它建立在 TIDA-01022-E3 PCB 上，并使用 TIDA-01027 的电源方案。因此它不是从零开始画的一张“12.8 GSPS 最小系统”，而是把已经验证过的模拟采集平台和电源模块组合起来，再完成
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/22/oscilloscope-time-interleaving-and-spectrum-slicing/" aria-label="示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片" title="示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片"></a>
+    <div class="post-cover left">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-3l5z63.jpg" data-sizes="auto" alt="示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-22</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-03</span>
+        <span><span class="icon-pencil"></span>2.4k 字</span>
+        <span><span class="icon-clock"></span>9 分钟</span>
+      </div>
+      <h2 class="post-title">示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片</h2>
+      <article class="post-article">
+          我刚开始了解高速示波器时，有一个地方一直没分清：提高 ADC 采样率和提高示波器模拟带宽是不是同一件事？如果一颗 ADC 只能采 6.4 GSPS，多放一颗是不是就能直接变成 12.8 GSPS？
+TI 的 TIDA-01028 正好给出了一个可以落到硬件上的例子。它使用两颗 ADC12DJ3200 做板级时间交织，最终得到单通道 12.8 GSPS。设计指南不仅给了框图，还给出了时钟配置、测试步骤和交织前后的频谱结果。
+这里先说明资料边界：这两份 PDF 详细介绍的是时间交织，并没有实现频谱分片。文章后半部分会把频谱分片作为另一种扩展带宽的方法单独解释，不能把它写成 TIDA-01028 的
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/21/ultrasonic-flaw-detector-panel/" aria-label="超声波探伤仪的面板" title="超声波探伤仪的面板"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-werdv6.jpg" data-sizes="auto" alt="超声波探伤仪的面板" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-21</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-03</span>
+        <span><span class="icon-pencil"></span>482 字</span>
+        <span><span class="icon-clock"></span>2 分钟</span>
+      </div>
+      <h2 class="post-title">超声波探伤仪的面板</h2>
+      <article class="post-article">
+          这个项目是超声波探伤仪的人机交互面板，负责承载显示、按键、编码器和状态指示，并通过连接器与主控板、模拟前端和电源部分连接。目前还没有完整的原理图说明、接口定义和实测数据，因此这篇文章只记录项目范围和当前状态，不提前补写尚未确认的设计结论。
+ 当前需要确定的内容
+面板设计需要同时满足电气和结构要求。显示器、按键和编码器的位置会直接影响 PCB 外形与固定孔位；连接器的位置则由整机内部的板卡关系和排线方向决定。开始布局前，需要先确定面板尺寸、安装位置、显示器型号、输入器件数量和各连接器定义。
+ 原理图和 PCB
+原理图需要把显示、按键、指示灯、编码器和外部接口分区整理。PCB 布局首先服从面板开孔
+      </article>
+    </div>
+  </div>
+</div>
+  <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
+  </nav>
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+      <div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">40</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+
+  </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+<script src="https://npm.webcache.cn/typed.js@2.1.0/dist/typed.umd.js" integrity="sha384-cMrTlShXEGSdSFA359p+3aVUxK&#x2F;R+0TAfbRZMcTlAn8yqzxEDj05QsS65nTFMMj4" crossorigin="anonymous" defer onload="initSubtitleTyping()"></script>
+
+      <script data-pjax>
+        window.subtitleTypingConfig = {
+          strings: ["从原理图到实测波形，记录每一次验证","拆解硬件架构，也保留踩坑与修正","愿好奇心与电路一起保持通电"],
+          typeSpeed: 55,
+          backSpeed: 40,
+          backDelay: 2200,
+          startDelay: 200,
+          loop: true,
+          shuffle: false,
+          showCursor: true || true,
+          cursorChar: "_",
+          smartBackspace: false || false,
+        };
+
+        function initSubtitleTyping() {
+          const subtitleElement = document.querySelector('#subtitle');
+          if (!subtitleElement || !window.Typed || !window.subtitleTypingConfig) {
+            return;
+          }
+
+          if (window.__typedInstance) {
+            window.__typedInstance.destroy();
+          }
+
+          window.__typedInstance = new Typed('#subtitle span', window.subtitleTypingConfig);
+        }
+        
+        if (!window.__typedInitialized) {
+          window.__typedInitialized = true;
+          
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSubtitleTyping);
+          } else {
+            initSubtitleTyping();
+          }
+        } else {
+          initSubtitleTyping();
+        }
+      </script>
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://npm.webcache.cn/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6&#x2F;1Nxveei" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+  </body>
+  </html>

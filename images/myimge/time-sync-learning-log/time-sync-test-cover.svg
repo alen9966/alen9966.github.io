@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">时间同步系统与仪器测试学习记录</title>
+  <desc id="desc">由示波器波形、频谱、时钟和卫星组成的技术封面</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff5f8"/>
+      <stop offset="0.55" stop-color="#edf6ff"/>
+      <stop offset="1" stop-color="#f4efff"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f06c8d"/>
+      <stop offset="1" stop-color="#6d9cff"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#657399" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g opacity="0.35" stroke="#9db5d0" stroke-width="1">
+    <path d="M0 90H1200M0 180H1200M0 270H1200M0 360H1200M0 450H1200M0 540H1200"/>
+    <path d="M100 0V630M200 0V630M300 0V630M400 0V630M500 0V630M600 0V630M700 0V630M800 0V630M900 0V630M1000 0V630M1100 0V630"/>
+  </g>
+  <rect x="84" y="78" width="1032" height="474" rx="34" fill="#ffffff" fill-opacity="0.9" filter="url(#shadow)"/>
+  <g transform="translate(760 145)">
+    <rect width="270" height="210" rx="22" fill="#192b46"/>
+    <path d="M18 120H48L62 93L80 158L101 72L121 139L145 104L165 120H252" fill="none" stroke="#71e0b6" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M20 178H250" stroke="#62738b" stroke-width="2"/>
+    <g fill="#f6c56f">
+      <rect x="30" y="158" width="10" height="20" rx="2"/>
+      <rect x="58" y="143" width="10" height="35" rx="2"/>
+      <rect x="86" y="126" width="10" height="52" rx="2"/>
+      <rect x="114" y="151" width="10" height="27" rx="2"/>
+      <rect x="142" y="110" width="10" height="68" rx="2"/>
+      <rect x="170" y="147" width="10" height="31" rx="2"/>
+      <rect x="198" y="133" width="10" height="45" rx="2"/>
+      <rect x="226" y="161" width="10" height="17" rx="2"/>
+    </g>
+  </g>
+  <g transform="translate(908 390)">
+    <circle cx="74" cy="74" r="70" fill="#fff" stroke="#8a73d9" stroke-width="8"/>
+    <path d="M74 25V74L112 94" fill="none" stroke="#526786" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="74" cy="74" r="7" fill="#f06c8d"/>
+  </g>
+  <g transform="translate(700 382)" fill="none" stroke="#6d9cff" stroke-width="5" stroke-linecap="round">
+    <path d="M22 72C70 24 138 24 186 72"/>
+    <path d="M52 101C84 69 124 69 156 101"/>
+    <path d="M88 127C99 116 109 116 120 127"/>
+    <circle cx="104" cy="142" r="6" fill="#f06c8d" stroke="none"/>
+  </g>
+  <text x="145" y="210" fill="#243a5a" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="32" font-weight="700">TIME &amp; FREQUENCY</text>
+  <text x="145" y="288" fill="#172d4a" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="54" font-weight="700">时间同步系统</text>
+  <text x="145" y="355" fill="#172d4a" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="54" font-weight="700">与仪器测试学习记录</text>
+  <rect x="145" y="405" width="475" height="8" rx="4" fill="url(#line)"/>
+  <text x="145" y="470" fill="#687b96" font-family="Segoe UI, Microsoft YaHei, sans-serif" font-size="26">1 MΩ / 50 Ω · 频谱 · 相噪 · Allan Deviation · 100 MHz</text>
+</svg>

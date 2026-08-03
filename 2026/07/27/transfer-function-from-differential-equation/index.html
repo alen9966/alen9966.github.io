@@ -1,0 +1,534 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    从微分方程到波特图：我怎样理解传递函数 | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="从串联 RLC 电路的微分方程出发，理解传递函数、卷积、零极点、频率响应和闭环稳定性之间的关系，并用 MATLAB 验证 RL 一阶系统与反馈系统的响应。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从微分方程到波特图：我怎样理解传递函数">
+<meta property="og:url" content="https://alen9966.github.io/2026/07/27/transfer-function-from-differential-equation/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="从串联 RLC 电路的微分方程出发，理解传递函数、卷积、零极点、频率响应和闭环稳定性之间的关系，并用 MATLAB 验证 RL 一阶系统与反馈系统的响应。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/transfer-function/lti-impulse-and-convolution.svg">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/transfer-function/handwritten-rlc-model-page-7.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/transfer-function/rl-step-response.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/transfer-function/rl-bode-response.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/transfer-function/feedback-block-diagram.svg">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/transfer-function/feedback-poles-and-step-response.png">
+<meta property="article:published_time" content="2026-07-27T02:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-03T10:05:14.110Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="信号与系统">
+<meta property="article:tag" content="传递函数">
+<meta property="article:tag" content="MATLAB">
+<meta property="article:tag" content="自动控制">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/myimge/transfer-function/lti-impulse-and-convolution.svg">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/myimge/wallhaven-pink/wallhaven-qr9jml.jpg" alt="从微分方程到波特图：我怎样理解传递函数">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">从微分方程到波特图：我怎样理解传递函数</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E4%BC%A0%E9%80%92%E5%87%BD%E6%95%B0%E8%A7%A3%E5%86%B3%E7%9A%84%E6%98%AF%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="toc-number">1.</span> <span class="toc-text"> 一、传递函数解决的是什么问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E4%BB%8E%E4%B8%B2%E8%81%94-rlc-%E7%94%B5%E8%B7%AF%E5%86%99%E5%87%BA%E4%BC%A0%E9%80%92%E5%87%BD%E6%95%B0"><span class="toc-number">2.</span> <span class="toc-text"> 二、从串联 RLC 电路写出传递函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-%E5%85%88%E7%94%A8-rl-%E7%94%B5%E8%B7%AF%E7%9C%8B%E6%B8%85%E4%B8%80%E4%B8%AA%E6%9E%81%E7%82%B9"><span class="toc-number">3.</span> <span class="toc-text"> 三、先用 RL 电路看清一个极点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E6%8A%8A%E5%90%8C%E4%B8%80%E4%B8%AA%E4%BC%A0%E9%80%92%E5%87%BD%E6%95%B0%E6%94%BE%E5%88%B0%E9%A2%91%E5%9F%9F%E8%A7%82%E5%AF%9F"><span class="toc-number">4.</span> <span class="toc-text"> 四、把同一个传递函数放到频域观察</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E9%9B%B6%E7%82%B9%E5%92%8C%E6%9E%81%E7%82%B9%E5%88%86%E5%88%AB%E6%94%B9%E5%8F%98%E4%BB%80%E4%B9%88"><span class="toc-number">5.</span> <span class="toc-text"> 五、零点和极点分别改变什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E8%BF%9B%E5%85%A5%E9%97%AD%E7%8E%AF%E5%90%8E%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E9%87%8D%E6%96%B0%E6%B1%82%E6%9E%81%E7%82%B9"><span class="toc-number">6.</span> <span class="toc-text"> 六、进入闭环后，为什么要重新求极点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E8%BF%99%E6%AC%A1%E7%9C%9F%E6%AD%A3%E8%BF%9E%E8%B5%B7%E6%9D%A5%E7%9A%84%E5%87%A0%E4%B8%AA%E6%A6%82%E5%BF%B5"><span class="toc-number">7.</span> <span class="toc-text"> 七、这次真正连起来的几个概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%84%E6%96%99%E4%B8%8E%E8%84%9A%E6%9C%AC"><span class="toc-number">8.</span> <span class="toc-text"> 资料与脚本</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">40</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-transfer-function-from-differential-equation" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-07-27T02:00:00.000Z" itemprop="datePublished">2026-07-27</time>
+    <time style="display: none;" id="post-update-time">2026-08-03</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-03T10:05:14.110Z" itemprop="dateModified">2026-08-03</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>我以前学传递函数时，记住的是“输出除以输入”，极点就是让分母等于零的点。公式会算，但看到一个电路还是不知道该从哪里下手：为什么微分方程做一次拉普拉斯变换就成了分式？同一个分式为什么既能算阶跃响应，又能画波特图？</p>
+<p>这篇文章就按我当时弄明白这个问题的顺序来写。先从冲激响应和卷积开始，再用串联 RLC 电路把微分方程一步步变成传递函数，最后看时域、频域和极点之间到底是什么关系。文中的曲线都是 MATLAB 理论仿真，不是硬件实测结果。</p>
+<h2 id="一-传递函数解决的是什么问题"><a class="markdownIt-Anchor" href="#一-传递函数解决的是什么问题"></a> 一、传递函数解决的是什么问题</h2>
+<p>先不急着写 $H(s)$，首先得知道线性时不变系统是怎样处理输入的。一个系统接收到 $u(t)$ 后产生输出 $x(t)$。只要它满足线性和时不变条件，就可以把复杂输入拆成许多移位冲激，让每个冲激分别通过系统，再把所有响应叠加起来。</p>
+<p><img src="/images/myimge/transfer-function/lti-impulse-and-convolution.svg" alt="线性时不变系统中，输入分解为移位冲激并叠加响应的示意图" /></p>
+<p>连续时间系统的零状态输出可以写成卷积：</p>
+<p>$$x(t)&#x3D;u(t)*h(t)&#x3D;\int_{-\infty}^{+\infty}u(\tau)h(t-\tau)\,d\tau
+$$</p><p>$h(t)$ 是系统对单位冲激的响应。这个积分看着复杂，意思却不难：输入在每个时刻都激发一份冲激响应，当前输出就是这些响应叠加后的结果。</p>
+<p>卷积在时域中需要积分。拉普拉斯变换把卷积变成乘法：</p>
+<p>$$X(s)&#x3D;U(s)H(s)
+$$</p><p>这里不是把时域中的 $u(t)$ 和 $h(t)$ 直接相乘，而是把整段卷积运算变成拉普拉斯域中的乘法。反过来，对 $U(s)H(s)$ 做逆拉普拉斯变换，得到的还是 $u(t)*h(t)$。简单地说，拉普拉斯变换把一个积分问题变成了代数问题。</p>
+<p>因此，在零初始条件下，传递函数定义为：</p>
+<p>$$H(s)&#x3D;\frac{X(s)}{U(s)}
+$$</p><p>这里最容易产生一个误解：传递函数就是频域公式。实际上 $H(s)$ 和频率响应 $H(j\omega)$ 不是一回事。$s&#x3D;\sigma+j\omega$ 是拉普拉斯变换中的复变量，$H(s)$ 可以求时域响应，也可以分析零点和极点。只有系统存在正弦稳态响应，并把 $s$ 限制到虚轴 $j\omega$ 上时，才得到画波特图所用的频率响应。</p>
+<p>这里需要注意“零初始条件”。如果电感原来就有电流，或者电容原来已经充电，输出中还会包含零输入响应。传递函数描述的是系统本身的输入—输出关系，不能把初始储能产生的响应也塞进 $X(s)&#x2F;U(s)$ 中。</p>
+<h2 id="二-从串联-rlc-电路写出传递函数"><a class="markdownIt-Anchor" href="#二-从串联-rlc-电路写出传递函数"></a> 二、从串联 RLC 电路写出传递函数</h2>
+<p>为什么从串联 RLC 电路开始？因为它同时包含电阻、电感和电容，但电流关系又很简单：三个元件流过同一电流 $i(t)$。我之前的手写学习笔记也用这个电路说明怎样从元件关系得到系统方程。</p>
+<p><img src="/images/myimge/transfer-function/handwritten-rlc-model-page-7.png" alt="串联 RLC 电路及微分方程（作者《传递函数学习笔记》手写稿第 7 页局部）" /></p>
+<p>根据基尔霍夫电压定律：</p>
+<p>$$u(t)&#x3D;L\frac{di(t)}{dt}+Ri(t)+\frac{1}{C}\int_0^t i(\tau)\,d\tau
+$$</p><p>在零初始条件下进行拉普拉斯变换：</p>
+<p>$$U(s)&#x3D;\left(Ls+R+\frac{1}{Cs}\right)I(s)
+$$</p><p>若把输入电压作为输入、回路电流作为输出，则：</p>
+<p>$$G_i(s)&#x3D;\frac{I(s)}{U(s)}
+&#x3D;\frac{Cs}{LCs^2+RCs+1}
+$$</p><p>同一电路选择不同输出时，传递函数也会改变。电阻电压和电容电压分别为：</p>
+<p>$$G_R(s)&#x3D;\frac{V_R(s)}{U(s)}
+&#x3D;\frac{RCs}{LCs^2+RCs+1}
+$$</p><p>$$G_C(s)&#x3D;\frac{V_C(s)}{U(s)}
+&#x3D;\frac{1}{LCs^2+RCs+1}
+$$</p><p>这三个式子共用同一个分母，因此具有相同的自然响应；但分子不同，零点和频率选择特性也不同。所以“这个电路的传递函数是什么”还少了一个条件：必须先说明输入量和输出量分别是什么。</p>
+<h2 id="三-先用-rl-电路看清一个极点"><a class="markdownIt-Anchor" href="#三-先用-rl-电路看清一个极点"></a> 三、先用 RL 电路看清一个极点</h2>
+<p>RLC 直接就是二阶系统，刚开始看容易把两个极点混在一起。这里先去掉电容，只保留串联 RL 电路，仍然以输入电压为输入、回路电流为输出：</p>
+<p>$$u(t)&#x3D;L\frac{di(t)}{dt}+Ri(t)
+$$</p><p>拉普拉斯变换后得到：</p>
+<p>$$G_{RL}(s)&#x3D;\frac{I(s)}{U(s)}&#x3D;\frac{1}{Ls+R}
+$$</p><p>把分母整理成标准一阶形式：</p>
+<p>$$G_{RL}(s)&#x3D;\frac{1&#x2F;R}{1+sL&#x2F;R}
+$$</p><p>因此极点和时间常数分别为：</p>
+<p>$$p&#x3D;-\frac{R}{L},\qquad \tau&#x3D;\frac{L}{R}
+$$</p><p>取 $R&#x3D;10\ \Omega$、$L&#x3D;10\ \text{mH}$，得到 $\tau&#x3D;1\ \text{ms}$，极点为 $-1000\ \text{rad&#x2F;s}$。对 $1\ \text{V}$ 阶跃输入，电流响应为：</p>
+<p>$$i(t)&#x3D;\frac{1}{R}\left(1-e^{-t&#x2F;\tau}\right)
+$$</p><p><img src="/images/myimge/transfer-function/rl-step-response.png" alt="RL 串联电路对 1 V 阶跃输入的电流响应（MATLAB 理论仿真）" /></p>
+<p>$t&#x3D;\tau$ 时，电流达到最终值的 $1-e^{-1}\approx63.2\%$。对于这里唯一的负实极点，极点越靠左，$|p|$ 越大，时间常数越小，响应越快。到了复共轭极点的情况，决定衰减速度的是极点实部，虚部则决定振荡频率，不能再只比较 $|p|$。</p>
+<h2 id="四-把同一个传递函数放到频域观察"><a class="markdownIt-Anchor" href="#四-把同一个传递函数放到频域观察"></a> 四、把同一个传递函数放到频域观察</h2>
+<p>接下来把同一个 RL 模型放到频域。对于这个稳定电路，把 $s$ 限制为 $j\omega$，就得到正弦稳态频率响应：</p>
+<p>$$G_{RL}(j\omega)&#x3D;\frac{1}{R+j\omega L}
+$$</p><p>它的幅值和相位分别为：</p>
+<p>$$|G_{RL}(j\omega)|&#x3D;\frac{1}{\sqrt{R^2+(\omega L)^2}}
+$$</p><p>$$\angle G_{RL}(j\omega)&#x3D;-\arctan\frac{\omega L}{R}
+$$</p><p>当 $\omega L&#x3D;R$ 时，电阻与电感的阻抗幅值相等。对应的转折频率为：</p>
+<p>$$\omega_p&#x3D;\frac{R}{L},\qquad
+f_p&#x3D;\frac{R}{2\pi L}&#x3D;159.2\ \text{Hz}
+$$</p><p><img src="/images/myimge/transfer-function/rl-bode-response.png" alt="RL 电流传递函数的幅频和相频特性（MATLAB 理论仿真）" /></p>
+<p>低频时，电感阻抗很小，电流增益接近 $1&#x2F;R&#x3D;0.1\ \text{A&#x2F;V}$，也就是 $-20\ \text{dB}$。超过转折频率后，电感阻抗开始占主导，幅值按约 $-20\ \text{dB&#x2F;dec}$ 下降，相位逐渐从 $0^\circ$ 走向 $-90^\circ$。</p>
+<p>时域中的“指数衰减速度”和频域中的“转折频率”来自同一个极点：</p>
+<p>$$|p|&#x3D;\omega_p&#x3D;\frac{1}{\tau}
+$$</p><p>这也是传递函数最有用的地方。它没有把时域和频域变成两个问题，而是让两种观察方式共用同一个模型。</p>
+<h2 id="五-零点和极点分别改变什么"><a class="markdownIt-Anchor" href="#五-零点和极点分别改变什么"></a> 五、零点和极点分别改变什么</h2>
+<p>对于有理传递函数：</p>
+<p>$$G(s)&#x3D;K\frac{(s-z_1)(s-z_2)\cdots}{(s-p_1)(s-p_2)\cdots}
+$$</p><p>使分子为零的 $z_i$ 是零点，使分母为零的 $p_i$ 是极点。简单地说，极点决定系统自己会以什么方式变化，零点决定输入怎样把这些变化激发出来。零点不会产生新的自然模态，但会改变幅值和相位。</p>
+<p>为什么极点位置能判断稳定性？连续时间系统的极点 $p&#x3D;\sigma+j\omega_d$ 对应的自然响应中包含 $e^{\sigma t}$，并可能以 $\omega_d$ 振荡。此时实部 $\sigma$ 决定振幅是衰减还是增长，虚部决定振荡频率。所有极点都严格位于左半平面时，自然模态会逐渐衰减；只要存在右半平面极点，就至少有一个模态会增长。</p>
+<p>这里需要补充两个条件。第一，虚轴上的极点不能忽略。单个虚轴极点会产生不衰减的常值项或振荡，重复虚轴极点还会带来随时间增长的项。因此“没有右半平面极点”并不等于渐近稳定。对因果、真有理且采用最小实现的连续时间 LTI 系统，所有极点严格位于左半平面，才可以直接得到渐近稳定和 BIBO 稳定的结论。</p>
+<p>第二，上面的判断默认系统采用最小实现。如果不稳定极点刚好被零点抵消，化简后的输入—输出分式看不见这个模态，但系统内部仍可能不稳定。分析实际闭环时，不能只凭化简后的分式排除内部稳定性问题。离散系统也不看左半平面，它要求极点位于单位圆内。</p>
+<h2 id="六-进入闭环后为什么要重新求极点"><a class="markdownIt-Anchor" href="#六-进入闭环后为什么要重新求极点"></a> 六、进入闭环后，为什么要重新求极点</h2>
+<p>开环时，输出不会回来影响输入。加入单位负反馈后，情况变了：真正送进系统的不再是参考量 $R(s)$，而是参考量与输出之差：</p>
+<p>$$E(s)&#x3D;R(s)-X(s)
+$$</p><p><img src="/images/myimge/transfer-function/feedback-block-diagram.svg" alt="开环系统与单位负反馈闭环系统的信号关系" /></p>
+<p>由 $X(s)&#x3D;G(s)E(s)$ 可得：</p>
+<p>$$X(s)&#x3D;G(s)[R(s)-X(s)]
+$$</p><p>整理后，闭环传递函数为：</p>
+<p>$$G_{cl}(s)&#x3D;\frac{X(s)}{R(s)}&#x3D;\frac{G(s)}{1+G(s)}
+$$</p><p>所以进入闭环以后，不能继续拿开环极点直接判断响应。闭环极点由特征方程 $1+G(s)&#x3D;0$ 决定。为了把极点位置和阶跃响应直接对应起来，MATLAB 中取：</p>
+<p>$$G_p(s)&#x3D;\frac{1}{s(s+2)}
+$$</p><p>令开环传递函数为 $G(s)&#x3D;K G_p(s)$，并比较单位负反馈下 $K&#x3D;0.25$、$1$ 和 $9$ 三种情况。闭环分母为：</p>
+<p>$$s^2+2s+K
+$$</p><p><img src="/images/myimge/transfer-function/feedback-poles-and-step-response.png" alt="不同闭环极点对应的阶跃响应（MATLAB 理论仿真）" /></p>
+<p>$K&#x3D;0.25$ 时有两个不同的负实极点，响应过阻尼且较慢；$K&#x3D;1$ 时两个极点重合在 $-1$，属于临界阻尼；$K&#x3D;9$ 时极点为 $-1\pm j2.828$，响应出现衰减振荡和超调。三组极点都在左半平面，所以最终都稳定，但“稳定”并不等于“没有振铃”，也不等于“很快到达目标值”。</p>
+<h2 id="七-这次真正连起来的几个概念"><a class="markdownIt-Anchor" href="#七-这次真正连起来的几个概念"></a> 七、这次真正连起来的几个概念</h2>
+<p>这次再回头看，传递函数并不是从电路图上直接读出来的。首先要确定输入和输出，再根据元件关系建立微分方程，最后在零初始条件下做拉普拉斯变换。</p>
+<p>同一个 $G(s)$ 可以从不同角度观察：阶跃响应描述它面对突变输入时怎样变化；令 $s&#x3D;j\omega$ 得到频率响应；极点位置解释自然响应为什么衰减、振荡或发散。时域曲线、波特图和极点图不是三套互不相关的知识，它们只是同一个系统模型的不同投影。</p>
+<p>这篇文章仍然是原理学习记录。RLC 电路来自手写培训材料，RL 和闭环曲线来自 MATLAB 理论模型，没有对应硬件实测数据。以后分析真实电源环路、滤波器或控制系统时，还需要把器件寄生参数、工作点和测量条件加入模型，不能直接把这里的理想结果当成实物结论。</p>
+<h2 id="资料与脚本"><a class="markdownIt-Anchor" href="#资料与脚本"></a> 资料与脚本</h2>
+<ul>
+<li>作者《传递函数学习笔记》手写稿：正文中的串联 RLC 电路与微分方程截取自第 7 页局部。</li>
+<li><code>matlab/transfer-function/generate_transfer_function_figures.m</code>：生成 RL 阶跃响应、RL 波特图和闭环极点对比图；参数与单位以脚本为准。</li>
+</ul>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录" data-aos="zoom-in">学习记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/MATLAB/" rel="tag" title="MATLAB">MATLAB</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E4%BC%A0%E9%80%92%E5%87%BD%E6%95%B0/" rel="tag" title="传递函数">传递函数</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E4%BF%A1%E5%8F%B7%E4%B8%8E%E7%B3%BB%E7%BB%9F/" rel="tag" title="信号与系统">信号与系统</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E8%87%AA%E5%8A%A8%E6%8E%A7%E5%88%B6/" rel="tag" title="自动控制">自动控制</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+          <img data-src="/images/myimge/wallhaven-pink/wallhaven-vq95d8.jpg" data-sizes="auto" alt="从一个多路选择器开始学 Verilog：module、assign 和 always" class="lazyload">
+        <a href="/2026/07/27/verilog-from-module-to-always/" aria-label="前一篇: 从一个多路选择器开始学 Verilog：module、assign 和 always" title="前一篇: 从一个多路选择器开始学 Verilog：module、assign 和 always"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            从一个多路选择器开始学 Verilog：module、assign 和 always
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-qz655l.jpg" data-sizes="auto" alt="从一段声音到无线电波：AM 调制与解调入门" class="lazyload">
+      <a href="/2026/07/25/am-modulation-demodulation-basics/" aria-label="后一篇: 从一段声音到无线电波：AM 调制与解调入门"  title="后一篇: 从一段声音到无线电波：AM 调制与解调入门"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          从一段声音到无线电波：AM 调制与解调入门
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E4%BC%A0%E9%80%92%E5%87%BD%E6%95%B0%E8%A7%A3%E5%86%B3%E7%9A%84%E6%98%AF%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98"><span class="toc-number">1.</span> <span class="toc-text"> 一、传递函数解决的是什么问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E4%BB%8E%E4%B8%B2%E8%81%94-rlc-%E7%94%B5%E8%B7%AF%E5%86%99%E5%87%BA%E4%BC%A0%E9%80%92%E5%87%BD%E6%95%B0"><span class="toc-number">2.</span> <span class="toc-text"> 二、从串联 RLC 电路写出传递函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-%E5%85%88%E7%94%A8-rl-%E7%94%B5%E8%B7%AF%E7%9C%8B%E6%B8%85%E4%B8%80%E4%B8%AA%E6%9E%81%E7%82%B9"><span class="toc-number">3.</span> <span class="toc-text"> 三、先用 RL 电路看清一个极点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E6%8A%8A%E5%90%8C%E4%B8%80%E4%B8%AA%E4%BC%A0%E9%80%92%E5%87%BD%E6%95%B0%E6%94%BE%E5%88%B0%E9%A2%91%E5%9F%9F%E8%A7%82%E5%AF%9F"><span class="toc-number">4.</span> <span class="toc-text"> 四、把同一个传递函数放到频域观察</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E9%9B%B6%E7%82%B9%E5%92%8C%E6%9E%81%E7%82%B9%E5%88%86%E5%88%AB%E6%94%B9%E5%8F%98%E4%BB%80%E4%B9%88"><span class="toc-number">5.</span> <span class="toc-text"> 五、零点和极点分别改变什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E8%BF%9B%E5%85%A5%E9%97%AD%E7%8E%AF%E5%90%8E%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E9%87%8D%E6%96%B0%E6%B1%82%E6%9E%81%E7%82%B9"><span class="toc-number">6.</span> <span class="toc-text"> 六、进入闭环后，为什么要重新求极点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E8%BF%99%E6%AC%A1%E7%9C%9F%E6%AD%A3%E8%BF%9E%E8%B5%B7%E6%9D%A5%E7%9A%84%E5%87%A0%E4%B8%AA%E6%A6%82%E5%BF%B5"><span class="toc-number">7.</span> <span class="toc-text"> 七、这次真正连起来的几个概念</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%84%E6%96%99%E4%B8%8E%E8%84%9A%E6%9C%AC"><span class="toc-number">8.</span> <span class="toc-text"> 资料与脚本</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">40</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "从微分方程到波特图：我怎样理解传递函数",
+          url: "https://alen9966.github.io/2026/07/27/transfer-function-from-differential-equation/",
+          excerpt: "",
+          description: "从串联 RLC 电路的微分方程出发，理解传递函数、卷积、零极点、频率响应和闭环稳定性之间的关系，并用 MATLAB 验证 RL 一阶系统与反馈系统的响应。",
+          stripContent: "我以前学传递函数时，记住的是“输出除以输入”，极点就是让分母等于零的点。公式会算，但看到一个电路还是不知道该从哪里下手：为什么微分方程做一次拉普拉斯变换就成了分式？同一个分式为什么既能算阶跃响应，又能画波特图？ 这篇文章就按我当时弄明白这个问题的顺序来写。先从冲激响应和卷积开始，再用串联 RLC 电路把微分方程一步步变成传递函数，最后看时域、频域和极点之间到底是什么关系。文中的曲线都是 MATLAB 理论仿真，不是硬件实测结果。  一、传递函数解决的是什么问题 先不急着写 $H(s)$，首先得知",
+          date: "Mon Jul 27 2026 10:00:00 GMT+0800",
+          updated: "Mon Aug 03 2026 18:05:14 GMT+0800",
+          cover: "/images/myimge/wallhaven-pink/wallhaven-7p3we9.jpg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://npm.webcache.cn/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6&#x2F;1Nxveei" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+  </body>
+  </html>

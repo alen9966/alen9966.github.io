@@ -1,0 +1,678 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    开关电源拓扑怎么选：从 Buck、Boost 到移相全桥 | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="结合电路结构、理想 CCM 变换关系和关键节点波形，系统梳理 Buck、Boost、Buck-Boost、SEPIC、Cuk、Zeta、Flyback、Forward、Push-Pull、Half-Bridge、Full-Bridge 与 PSFB。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥">
+<meta property="og:url" content="https://alen9966.github.io/2026/07/28/power-topologies-selection-from-buck-to-psfb/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="结合电路结构、理想 CCM 变换关系和关键节点波形，系统梳理 Buck、Boost、Buck-Boost、SEPIC、Cuk、Zeta、Flyback、Forward、Push-Pull、Half-Bridge、Full-Bridge 与 PSFB。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/buck-asynchronous-and-synchronous.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/buck-inductor-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/boost-converter-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/boost-inductor-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/inverting-buck-boost-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/inverting-buck-boost-inductor-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/sepic-converter-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/sepic-key-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/cuk-converter-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/cuk-input-inductor-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/zeta-converter-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/zeta-input-inductor-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/flyback-converter-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/flyback-primary-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/flyback-secondary-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/two-switch-flyback-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/two-switch-flyback-primary-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/active-clamp-forward-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/active-clamp-forward-key-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/single-switch-forward-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/single-switch-forward-key-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/two-switch-forward-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/two-switch-forward-key-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/push-pull-converter-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/push-pull-key-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/half-bridge-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/half-bridge-key-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/full-bridge-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/full-bridge-key-waveforms.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/phase-shifted-full-bridge-schematic.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/power-topologies/phase-shifted-full-bridge-key-waveforms.png">
+<meta property="article:published_time" content="2026-07-28T06:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-03T10:05:14.105Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="开关电源">
+<meta property="article:tag" content="电源拓扑">
+<meta property="article:tag" content="Buck">
+<meta property="article:tag" content="Boost">
+<meta property="article:tag" content="隔离电源">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/myimge/power-topologies/buck-asynchronous-and-synchronous.png">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/myimge/power-topologies/power-topologies-handbook-cover.jpg" alt="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">开关电源拓扑怎么选：从 Buck、Boost 到移相全桥</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E5%85%88%E7%BB%9F%E4%B8%80%E7%AC%A6%E5%8F%B7%E5%92%8C%E8%AF%BB%E6%B3%A2%E5%BD%A2%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text"> 一、先统一符号和读波形的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E9%9D%9E%E9%9A%94%E7%A6%BB%E6%8B%93%E6%89%91"><span class="toc-number">2.</span> <span class="toc-text"> 二、非隔离拓扑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-buck%E5%AF%BC%E9%80%9A%E6%97%B6%E7%9B%B4%E6%8E%A5%E5%90%91%E8%BE%93%E5%87%BA%E4%BC%A0%E8%83%BD"><span class="toc-number">2.1.</span> <span class="toc-text"> 1. Buck：导通时直接向输出传能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-boost%E5%AF%BC%E9%80%9A%E5%82%A8%E8%83%BD%E5%85%B3%E6%96%AD%E5%8D%87%E5%8E%8B"><span class="toc-number">2.2.</span> <span class="toc-text"> 2. Boost：导通储能，关断升压</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%8F%8D%E7%9B%B8-buck-boost%E4%B8%80%E5%8F%AA%E7%94%B5%E6%84%9F%E5%AE%8C%E6%88%90%E5%8D%87%E9%99%8D%E5%8E%8B"><span class="toc-number">2.3.</span> <span class="toc-text"> 3. 反相 Buck-Boost：一只电感完成升降压</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-sepic%E5%90%8C%E7%9B%B8%E5%8D%87%E9%99%8D%E5%8E%8B%E8%BE%93%E5%85%A5%E7%94%B5%E6%B5%81%E8%BF%9E%E7%BB%AD"><span class="toc-number">2.4.</span> <span class="toc-text"> 4. SEPIC：同相升降压，输入电流连续</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-cuk%E5%8F%8D%E7%9B%B8%E5%8D%87%E9%99%8D%E5%8E%8B%E8%BE%93%E5%85%A5%E5%92%8C%E8%BE%93%E5%87%BA%E7%94%B5%E6%B5%81%E9%83%BD%E8%BE%83%E8%BF%9E%E7%BB%AD"><span class="toc-number">2.5.</span> <span class="toc-text"> 5. Cuk：反相升降压，输入和输出电流都较连续</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-zeta%E5%90%8C%E7%9B%B8%E5%8D%87%E9%99%8D%E5%8E%8B%E8%BE%93%E5%87%BA%E7%94%B5%E6%B5%81%E8%BF%9E%E7%BB%AD"><span class="toc-number">2.6.</span> <span class="toc-text"> 6. Zeta：同相升降压，输出电流连续</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-flyback-%E5%AE%B6%E6%97%8F%E7%A3%81%E8%8A%AF%E5%85%88%E5%82%A8%E8%83%BD%E5%86%8D%E5%90%91%E6%AC%A1%E7%BA%A7%E9%87%8A%E6%94%BE"><span class="toc-number">3.</span> <span class="toc-text"> 三、Flyback 家族：磁芯先储能，再向次级释放</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E5%8D%95%E7%AE%A1-flyback"><span class="toc-number">3.1.</span> <span class="toc-text"> 7. 单管 Flyback</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-%E5%8F%8C%E7%AE%A1-flyback%E7%94%A8%E4%B8%A4%E4%B8%AA%E5%BC%80%E5%85%B3%E9%92%B3%E4%BD%8F%E7%94%B5%E5%8E%8B"><span class="toc-number">3.2.</span> <span class="toc-text"> 8. 双管 Flyback：用两个开关钳住电压</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-forward-%E5%AE%B6%E6%97%8F%E5%BC%80%E9%80%9A%E6%97%B6%E7%9B%B4%E6%8E%A5%E5%90%91%E6%AC%A1%E7%BA%A7%E4%BC%A0%E8%83%BD"><span class="toc-number">4.</span> <span class="toc-text"> 四、Forward 家族：开通时直接向次级传能</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-%E6%9C%89%E6%BA%90%E9%92%B3%E4%BD%8D-forward"><span class="toc-number">4.1.</span> <span class="toc-text"> 9. 有源钳位 Forward</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-%E5%8D%95%E7%AE%A1-forward"><span class="toc-number">4.2.</span> <span class="toc-text"> 10. 单管 Forward</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-%E5%8F%8C%E7%AE%A1-forward"><span class="toc-number">4.3.</span> <span class="toc-text"> 11. 双管 Forward</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E5%8F%8C%E7%AB%AF%E4%B8%8E%E6%A1%A5%E5%BC%8F%E6%8B%93%E6%89%91%E8%AE%A9%E5%8F%98%E5%8E%8B%E5%99%A8%E5%8F%8C%E5%90%91%E5%8A%B1%E7%A3%81"><span class="toc-number">5.</span> <span class="toc-text"> 五、双端与桥式拓扑：让变压器双向励磁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#12-push-pull%E4%B8%A4%E5%8D%8A%E5%88%9D%E7%BA%A7%E4%BA%A4%E6%9B%BF%E5%B7%A5%E4%BD%9C"><span class="toc-number">5.1.</span> <span class="toc-text"> 12. Push-Pull：两半初级交替工作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-half-bridge%E5%88%9D%E7%BA%A7%E5%BE%97%E5%88%B0%E6%AD%A3%E8%B4%9F%E5%8D%8A%E6%AF%8D%E7%BA%BF%E7%94%B5%E5%8E%8B"><span class="toc-number">5.2.</span> <span class="toc-text"> 13. Half-Bridge：初级得到正负半母线电压</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#14-full-bridge%E5%88%9D%E7%BA%A7%E5%BE%97%E5%88%B0%E5%AE%8C%E6%95%B4%E6%AD%A3%E8%B4%9F%E6%AF%8D%E7%BA%BF%E7%94%B5%E5%8E%8B"><span class="toc-number">5.3.</span> <span class="toc-text"> 14. Full-Bridge：初级得到完整正负母线电压</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#15-phase-shifted-full-bridge%E7%94%A8%E7%9B%B8%E7%A7%BB%E8%B0%83%E8%8A%82%E6%9C%89%E6%95%88%E8%84%89%E5%AE%BD"><span class="toc-number">5.4.</span> <span class="toc-text"> 15. Phase-Shifted Full-Bridge：用相移调节有效脉宽</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E6%8A%8A%E6%8B%93%E6%89%91%E6%94%BE%E5%88%B0%E5%90%8C%E4%B8%80%E5%BC%A0%E9%80%89%E6%8B%A9%E8%A1%A8%E9%87%8C"><span class="toc-number">6.</span> <span class="toc-text"> 六、把拓扑放到同一张选择表里</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">7.</span> <span class="toc-text"> 参考资料</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">40</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-power-topologies-selection-from-buck-to-psfb" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-07-28T06:00:00.000Z" itemprop="datePublished">2026-07-28</time>
+    <time style="display: none;" id="post-update-time">2026-08-03</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-03T10:05:14.105Z" itemprop="dateModified">2026-08-03</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>刚开始接触开关电源时，我很容易把拓扑选择理解成“降压用 Buck，升压用 Boost”。真正开始看器件应力和关键节点波形后才发现，升降压关系只是第一层：输入会不会跨过输出、是否隔离、能量在哪个开关状态送到负载、磁芯怎样复位、功率器件承受多大的峰值和 RMS 电流，都会改变最终选择。</p>
+<p>这篇文章以 TI《Power Topologies Handbook》为主线，把文中出现的拓扑逐一展开。重点不是罗列名称，而是把每一种电路的功率路径、关键公式和电压电流波形对应起来。文中的波形来自手册，是理想化的理论波形，不是硬件实测；公式默认理想器件、稳态和连续导通模式（CCM），实际设计还要加入器件压降、死区、漏感、寄生参数和损耗。</p>
+<h2 id="一-先统一符号和读波形的方法"><a class="markdownIt-Anchor" href="#一-先统一符号和读波形的方法"></a> 一、先统一符号和读波形的方法</h2>
+<ul>
+<li>$D$：占空比；除桥式拓扑另作说明外，表示一个周期内主开关导通时间占比。</li>
+<li>$f_s$：开关频率，周期 $T_s&#x3D;1&#x2F;f_s$。</li>
+<li>$n&#x3D;N_s&#x2F;N_p$：变压器次级对初级匝比。</li>
+<li>红线：关键节点或磁性器件电压；蓝线：对应电流。</li>
+<li>$t_1$：主开关导通或正向传能区间；$t_2$：关断、续流或反向复位区间；$t_3$：DCM 中电流已经降为零的区间。</li>
+</ul>
+<p>CCM 表示周期末电感电流仍大于零，DCM 表示电感电流会降到零，临界模式位于两者边界。对三角纹波叠加直流分量的 CCM 电流，常用近似为：</p>
+<p>$$I_{L,\mathrm{RMS}}&#x3D;\sqrt{I_{L,\mathrm{avg}}^2+\frac{\Delta I_L^2}{12}},\qquad
+I_{L,\mathrm{pk}}&#x3D;I_{L,\mathrm{avg}}+\frac{\Delta I_L}{2}
+$$</p><p>这两个量分别联系发热和饱和：铜损及导通损耗更关心 RMS，电感饱和和逐周期限流更关心峰值。</p>
+<h2 id="二-非隔离拓扑"><a class="markdownIt-Anchor" href="#二-非隔离拓扑"></a> 二、非隔离拓扑</h2>
+<h3 id="1-buck导通时直接向输出传能"><a class="markdownIt-Anchor" href="#1-buck导通时直接向输出传能"></a> 1. Buck：导通时直接向输出传能</h3>
+<p><img src="/images/myimge/power-topologies/buck-asynchronous-and-synchronous.png" alt="异步 Buck 与同步 Buck 的功率级（TI《Power Topologies Handbook》SLYU036A，第 13 页局部）" /></p>
+<p>Buck 只降压。Q1 导通时，电感两端为 $V_{in}-V_o$，电流线性上升；Q1 关断时，电感通过 D1 或同步下管续流，电感电压约为 $-V_o$，电流线性下降。对电感做一周期伏秒平衡：</p>
+<p>$$V_o&#x3D;D V_{in}
+$$</p><p>$$\Delta I_L&#x3D;\frac{(V_{in}-V_o)D}{L f_s}
+&#x3D;\frac{V_o(1-D)}{L f_s}
+$$</p><p><img src="/images/myimge/power-topologies/buck-inductor-waveforms.png" alt="Buck 电感电压、电流在 CCM、DCM 和强制 PWM 下的理论波形（TI 手册第 14～15 页局部）" /></p>
+<p>上半部分红色电压在 $t_1$ 为正、在 $t_2$ 为负，因此蓝色电感电流先升后降。CCM 波形有正的谷值；DCM 在 $t_3$ 贴近零；同步强制 PWM 允许电流穿过零点变为负值，轻载时可能把能量送回输入。异步 Buck 结构简单，同步 Buck 用 MOSFET 替代续流二极管，低压大电流时效率更高，但必须处理死区、体二极管导通和反向电流。</p>
+<h3 id="2-boost导通储能关断升压"><a class="markdownIt-Anchor" href="#2-boost导通储能关断升压"></a> 2. Boost：导通储能，关断升压</h3>
+<p><img src="/images/myimge/power-topologies/boost-converter-schematic.png" alt="Boost 功率级（TI 手册第 21 页局部）" /></p>
+<p>Q1 导通时，D1 截止，电感承受 $V_{in}$ 并储能，输出暂时由 $C_o$ 供电；Q1 关断后，电感电压翻转，与输入串联向输出送能。理想 CCM 关系为：</p>
+<p>$$V_o&#x3D;\frac{V_{in}}{1-D},\qquad
+\Delta I_L&#x3D;\frac{V_{in}D}{L f_s}
+$$</p><p><img src="/images/myimge/power-topologies/boost-inductor-waveforms.png" alt="Boost 电感电压与电流的 CCM、DCM 理论波形（TI 手册第 22 页局部）" /></p>
+<p>CCM 中，电感电流在整个周期连续，但输出只在关断区间接收电感电流。占空比突然增大时，当前周期的关断传能时间反而先缩短，所以 CCM Boost 存在右半平面零点（RHPZ）：</p>
+<p>$$f_{\mathrm{RHPZ}}\approx\frac{V_o(1-D)^2}{2\pi L I_o}
+$$</p><p>控制环路交越频率要明显低于它。Boost 还没有天然的输入输出隔断：即使 Q1 永久关断，输入仍可能经 L1、D1 到达输出。</p>
+<h3 id="3-反相-buck-boost一只电感完成升降压"><a class="markdownIt-Anchor" href="#3-反相-buck-boost一只电感完成升降压"></a> 3. 反相 Buck-Boost：一只电感完成升降压</h3>
+<p><img src="/images/myimge/power-topologies/inverting-buck-boost-schematic.png" alt="反相 Buck-Boost 功率级（TI 手册第 28 页局部）" /></p>
+<p>Q1 导通时，输入给 L1 储能，D1 截止；Q1 关断时，L1 通过 D1 向输出释放能量。由于输出参考方向与输入相反，理想关系带负号：</p>
+<p>$$V_o&#x3D;-\frac{D}{1-D}V_{in},\qquad
+\Delta I_L&#x3D;\frac{V_{in}D}{L f_s}
+$$</p><p><img src="/images/myimge/power-topologies/inverting-buck-boost-inductor-waveforms.png" alt="反相 Buck-Boost 电感电压与电流的 CCM、DCM 理论波形（TI 手册第 29 页局部）" /></p>
+<p>红色电感电压在导通时为 $+V_{in}$，关断时约为 $V_o$，所以蓝色电流按两段线性斜率变化。开关和二极管关断电压均接近 $V_{in}+|V_o|$，不是只承受输入或输出。CCM 同样存在 RHPZ，按输出幅值写成：</p>
+<p>$$f_{\mathrm{RHPZ}}\approx\frac{|V_o|(1-D)^2}{2\pi D L I_o}
+$$</p><p>它的优势是器件少，代价是反相输出、脉冲输出电流和较高器件应力。</p>
+<h3 id="4-sepic同相升降压输入电流连续"><a class="markdownIt-Anchor" href="#4-sepic同相升降压输入电流连续"></a> 4. SEPIC：同相升降压，输入电流连续</h3>
+<p><img src="/images/myimge/power-topologies/sepic-converter-schematic.png" alt="SEPIC 功率级（TI 手册第 35 页局部）" /></p>
+<p>SEPIC 用 L1、L2 和串联耦合电容 C1 把输入与输出的直流分量隔开。Q1 导通时，L1 从输入储能，C1 同时给 L2 储能，D1 截止；Q1 关断时，两只电感共同经 D1 向输出送能。理想 CCM 变换比为：</p>
+<p>$$V_o&#x3D;\frac{D}{1-D}V_{in}
+$$</p><p>在稳态下，C1 的平均电压约等于 $V_{in}$；L1 输入电流连续，适合不希望输入端出现强脉冲电流的场景。以 L1 为例：</p>
+<p>$$\Delta I_{L1}\approx\frac{V_{in}D}{L_1f_s}
+$$</p><p><img src="/images/myimge/power-topologies/sepic-key-waveforms.png" alt="SEPIC 输入电感 L1 的电压、电流 CCM 与 DCM 理论波形（TI 手册第 36 页局部）" /></p>
+<p>波形说明 L1 电流在 CCM 连续，但二极管电流、Q1 电流和 C1 电流仍是脉冲量；C1 必须按 RMS 电流和纹波而不只是容量选型。其 CCM RHPZ 近似为：</p>
+<p>$$f_{\mathrm{RHPZ}}\approx\frac{V_o(1-D)^2}{2\pi D^2L_1I_o}
+$$</p><p>SEPIC 解决了同相升降压，却付出了两个电感、一个能量传递电容以及更高 RMS 电流的代价。</p>
+<h3 id="5-cuk反相升降压输入和输出电流都较连续"><a class="markdownIt-Anchor" href="#5-cuk反相升降压输入和输出电流都较连续"></a> 5. Cuk：反相升降压，输入和输出电流都较连续</h3>
+<p><img src="/images/myimge/power-topologies/cuk-converter-schematic.png" alt="Cuk 功率级（TI 手册第 45 页局部）" /></p>
+<p>Cuk 通过 C1 在输入侧 L1 和输出侧 L2 之间传递能量。Q1 导通时，L1 储能，同时 C1 经 Q1、L2 向输出侧送能；Q1 关断时，输入通过 L1、D1 给 C1 补充能量，L2 继续维持负载电流。理想关系为：</p>
+<p>$$V_o&#x3D;-\frac{D}{1-D}V_{in}
+$$</p><p><img src="/images/myimge/power-topologies/cuk-input-inductor-waveforms.png" alt="Cuk 输入电感 L1 的电压、电流 CCM 与 DCM 理论波形（TI 手册第 46 页局部）" /></p>
+<p>L1 和 L2 分别让输入、输出电流连续，这是 Cuk 相比反相 Buck-Boost 最明显的端口特性。C1 是主能量传递元件，稳态平均电压约为 $V_{in}+|V_o|$，同时承受较大的交流电流。它适合重视输入输出电流连续性的场合，但需要接受反相输出、器件数量和电容应力。</p>
+<h3 id="6-zeta同相升降压输出电流连续"><a class="markdownIt-Anchor" href="#6-zeta同相升降压输出电流连续"></a> 6. Zeta：同相升降压，输出电流连续</h3>
+<p><img src="/images/myimge/power-topologies/zeta-converter-schematic.png" alt="Zeta 功率级（TI 手册第 55 页局部）" /></p>
+<p>Zeta 可视为 SEPIC 的互补形式。Q1 导通时，输入经 Q1、C1 和 L2 直接参与向输出传能，同时 L1 建立磁能；Q1 关断时，D1 提供续流路径，L2 继续给负载供电。理想 CCM 关系同样是：</p>
+<p>$$V_o&#x3D;\frac{D}{1-D}V_{in}
+$$</p><p><img src="/images/myimge/power-topologies/zeta-input-inductor-waveforms.png" alt="Zeta 输入侧电感 L1 的电压、电流 CCM 与 DCM 理论波形（TI 手册第 56 页局部）" /></p>
+<p>Zeta 的输出电流由 L2 平滑，因此连续；输入侧开关电流则更脉冲。选择它通常是为了同相升降压和连续输出电流，而不是为了最少器件。L1、L2、C1 的纹波和 RMS 电流仍需要逐一计算。</p>
+<h2 id="三-flyback-家族磁芯先储能再向次级释放"><a class="markdownIt-Anchor" href="#三-flyback-家族磁芯先储能再向次级释放"></a> 三、Flyback 家族：磁芯先储能，再向次级释放</h2>
+<h3 id="7-单管-flyback"><a class="markdownIt-Anchor" href="#7-单管-flyback"></a> 7. 单管 Flyback</h3>
+<p><img src="/images/myimge/power-topologies/flyback-converter-schematic.png" alt="单管 Flyback 功率级（TI 手册第 65 页局部）" /></p>
+<p>Flyback 的磁性器件本质上是带多绕组的储能电感。Q1 导通时，初级承受 $+V_{in}$，初级电流按 $V&#x3D;L\,di&#x2F;dt$ 上升；由于绕组同名端关系，次级 D1 反偏，磁芯在气隙中储能。Q1 关断后，绕组电压反向，D1 导通，次级电流从峰值向下下降并给 $C_o$ 和负载供能。</p>
+<p>理想 CCM 变换比和初级纹波为：</p>
+<p>$$V_o&#x3D;n\frac{D}{1-D}V_{in},\qquad
+\Delta I_p&#x3D;\frac{V_{in}D}{L_pf_s}
+$$</p><p><img src="/images/myimge/power-topologies/flyback-primary-waveforms.png" alt="Flyback 初级电压、电流在 CCM、DCM 和临界模式下的理论波形（TI 手册第 67 页局部）" /></p>
+<p>左列 CCM 的初级电流从非零谷值上升，关断后初级开关支路电流立刻为零；中列 DCM 在 $t_3$ 出现磁化电流归零区；右列临界模式刚好在下一周期前降到零。图中的蓝线是初级绕组/开关时段电流，并不表示磁芯能量在关断瞬间消失，而是能量已经转移到次级。</p>
+<p><img src="/images/myimge/power-topologies/flyback-secondary-waveforms.png" alt="Flyback 次级绕组电压与整流电流的 CCM 理论波形（TI 手册第 68 页局部）" /></p>
+<p>次级电流只出现在 Q1 关断期间，起点约为初级关断电流按匝比反射后的值，再线性下降。输出电容因此要吸收脉冲充电电流。MOSFET 的关断电压不能只按输入选：</p>
+<p>$$V_{DS,off}\approx V_{in}+\frac{N_p}{N_s}(V_o+V_D)+V_{spike}
+$$</p><p>$V_{spike}$ 主要来自漏感，通常由 RCD、TVS 或有源钳位限制。在 DCM 的第一轮能量估算中，每周期储能为 $\tfrac12L_pI_{pk}^2$：</p>
+<p>$$P_o\approx\eta\frac{1}{2}L_pI_{pk}^2f_s
+$$</p><p>CCM Flyback 也有“先缩短次级传能时间”的 RHPZ，补偿带宽需要保守处理。多路输出、器件少和易隔离是它的优势；峰值电流、漏感尖峰、变压器气隙和交叉调整率是主要代价。</p>
+<h3 id="8-双管-flyback用两个开关钳住电压"><a class="markdownIt-Anchor" href="#8-双管-flyback用两个开关钳住电压"></a> 8. 双管 Flyback：用两个开关钳住电压</h3>
+<p><img src="/images/myimge/power-topologies/two-switch-flyback-schematic.png" alt="双管 Flyback 功率级（TI 手册第 76 页局部）" /></p>
+<p>Q1、Q2 同时导通时，初级承受 $V_{in}$ 并储能；两管同时关断时，D3、D4 把漏感和复位能量送回输入，次级向输出放能。理想变换比仍是：</p>
+<p>$$V_o&#x3D;n\frac{D}{1-D}V_{in}
+$$</p><p><img src="/images/myimge/power-topologies/two-switch-flyback-primary-waveforms.png" alt="双管 Flyback 初级电压、电流的 CCM 与 DCM 理论波形（TI 手册第 78 页局部）" /></p>
+<p>相较单管 Flyback，每只 MOSFET 的理想电压应力被钳在约 $V_{in}$，而不是 $V_{in}$ 再叠加反射输出电压；实际仍要留寄生尖峰裕量。代价是两只功率管、两路驱动和两个钳位二极管，复位要求也通常把占空比限制在 0.5 以下。</p>
+<h2 id="四-forward-家族开通时直接向次级传能"><a class="markdownIt-Anchor" href="#四-forward-家族开通时直接向次级传能"></a> 四、Forward 家族：开通时直接向次级传能</h2>
+<p>Forward 与 Flyback 的根本差异是能量时序。主开关导通时，变压器立即把能量送到次级，输出电感 L1 负责平滑；关断时，次级整流管截止，续流管让输出电感继续供电。三种 Forward 的理想 CCM 主关系相同：</p>
+<p>$$V_o\approx DnV_{in}
+$$</p><p>$$\Delta I_L&#x3D;\frac{(nV_{in}-V_o)D}{Lf_s}
+&#x3D;\frac{V_o(1-D)}{Lf_s}
+$$</p><p>它们真正不同的是磁化电流怎样复位、主开关承受多高电压，以及能否回收复位能量。</p>
+<h3 id="9-有源钳位-forward"><a class="markdownIt-Anchor" href="#9-有源钳位-forward"></a> 9. 有源钳位 Forward</h3>
+<p><img src="/images/myimge/power-topologies/active-clamp-forward-schematic.png" alt="有源钳位 Forward 功率级（TI 手册第 85 页局部）" /></p>
+<p>Q1 导通时，初级加正电压，次级 D1 导通，输出电感电流上升。Q1 关断后，钳位管 Q2 与 C1 给磁化电流提供通路，初级出现反向复位电压；次级转入 D2 续流，输出电感电流下降。理想稳态钳位电容电压可近似理解为：</p>
+<p>$$V_{clamp}\approx\frac{V_{in}}{1-D}
+$$</p><p><img src="/images/myimge/power-topologies/active-clamp-forward-key-waveforms.png" alt="有源钳位 Forward 的初级与输出电感关键理论波形，上半为变压器初级，下半为输出电感（TI 手册第 87、89 页局部）" /></p>
+<p>上半图中，初级电压在 $t_1$ 为正、$t_2$ 为负，负电压完成磁通复位；初级电流在关断区间仍可沿钳位支路流动。下半图中，输出电感电压一正一负，对应连续的三角电流。有源钳位可以回收磁化和漏感能量，并在合适的寄生参数、负载和死区条件下形成 ZVS，但不能只凭拓扑名称保证全负载软开关。</p>
+<h3 id="10-单管-forward"><a class="markdownIt-Anchor" href="#10-单管-forward"></a> 10. 单管 Forward</h3>
+<p><img src="/images/myimge/power-topologies/single-switch-forward-schematic.png" alt="单管 Forward 功率级（TI 手册第 98 页局部）" /></p>
+<p>单管 Forward 用复位绕组 $N_d$ 和二极管 D3 在 Q1 关断后给初级施加反向电压。若 $N_d&#x3D;N_p$，复位时间至少等于导通时间，因此：</p>
+<p>$$D_{max}\le\frac{N_p}{N_p+N_d}&#x3D;0.5
+$$</p><p>主开关理想关断应力近似为：</p>
+<p>$$V_{DS,max}\approx V_{in}\left(1+\frac{N_p}{N_d}\right)
+$$</p><p>一比一复位绕组时约为 $2V_{in}$，还要再计漏感尖峰。</p>
+<p><img src="/images/myimge/power-topologies/single-switch-forward-key-waveforms.png" alt="单管 Forward 的初级复位与输出电感关键理论波形，上半为变压器初级，下半为输出电感（TI 手册第 100、102 页局部）" /></p>
+<p>初级红色波形在 $t_1$ 为 $+V_{in}$，随后在复位区间 $t_d$ 为负；伏秒面积必须相等，否则磁通会逐周期偏移。输出电感的蓝色电流在 CCM 不归零，在 DCM 则经历上升、下降和零电流三个区间。</p>
+<h3 id="11-双管-forward"><a class="markdownIt-Anchor" href="#11-双管-forward"></a> 11. 双管 Forward</h3>
+<p><img src="/images/myimge/power-topologies/two-switch-forward-schematic.png" alt="双管 Forward 功率级（TI 手册第 111 页局部）" /></p>
+<p>Q1、Q2 同时导通，把输入电压加到初级；关断后 D3、D4 同时导通，把磁化能量回送输入，并将两只 MOSFET 的理想关断电压各自钳在约 $V_{in}$。输出侧仍是 D1 整流、D2 续流，所以变换比仍为 $V_o\approx DnV_{in}$。</p>
+<p><img src="/images/myimge/power-topologies/two-switch-forward-key-waveforms.png" alt="双管 Forward 的初级与输出电感关键理论波形，上半为变压器初级，下半为输出电感（TI 手册第 113、115 页局部）" /></p>
+<p>初级波形有正向传能和负向复位两段，因此占空比通常小于 0.5。它比单管方案多一只 MOSFET 和一路驱动，却显著降低单管电压应力，且钳位路径明确，适合较高输入电压的硬开关 Forward。</p>
+<h2 id="五-双端与桥式拓扑让变压器双向励磁"><a class="markdownIt-Anchor" href="#五-双端与桥式拓扑让变压器双向励磁"></a> 五、双端与桥式拓扑：让变压器双向励磁</h2>
+<h3 id="12-push-pull两半初级交替工作"><a class="markdownIt-Anchor" href="#12-push-pull两半初级交替工作"></a> 12. Push-Pull：两半初级交替工作</h3>
+<p><img src="/images/myimge/power-topologies/push-pull-converter-schematic.png" alt="Push-Pull 功率级（TI 手册第 123 页局部）" /></p>
+<p>Q1、Q2 交替导通，每次驱动中心抽头初级的一半，次级经全波整流后向输出电感送能。若 $D$ 表示每只开关相对完整周期的导通占比，则每周期有两个传能脉冲：</p>
+<p>$$V_o\approx2DnV_{in},\qquad D&lt;0.5
+$$</p><p><img src="/images/myimge/power-topologies/push-pull-key-waveforms.png" alt="Push-Pull 的初级与输出电感关键理论波形，上半为变压器初级，下半为输出电感（TI 手册第 125、129 页局部）" /></p>
+<p>初级红色电压正负交替，磁芯双向励磁；次级整流后，输出电感每周期得到两次正向电压脉冲。两路驱动、开关参数或半绕组匝数稍有不对称，都可能产生伏秒不平衡并推动磁芯偏磁。关断开关电压通常接近 $2V_{in}$ 再叠加尖峰，因此它更适合低压、大电流输入，而不是高压母线。</p>
+<h3 id="13-half-bridge初级得到正负半母线电压"><a class="markdownIt-Anchor" href="#13-half-bridge初级得到正负半母线电压"></a> 13. Half-Bridge：初级得到正负半母线电压</h3>
+<p><img src="/images/myimge/power-topologies/half-bridge-schematic.png" alt="Half-Bridge 功率级（TI 手册第 148 页局部）" /></p>
+<p>两个 MOSFET 交替导通，分压电容把初级一端维持在母线中点，因此变压器承受约 $+V_{in}&#x2F;2$ 和 $-V_{in}&#x2F;2$。若 $D$ 是每只开关在完整周期中的导通占比，则：</p>
+<p>$$V_o\approx DnV_{in}
+$$</p><p><img src="/images/myimge/power-topologies/half-bridge-key-waveforms.png" alt="Half-Bridge 的初级与输出电感关键理论波形，上半为变压器初级，下半为输出电感（TI 手册第 150、153 页局部）" /></p>
+<p>上半图的初级电压幅值只有半母线，但正负交替；下半图显示次级全波整流后，输出电感在两个传能区间上升，在间隔区间下降。每只 MOSFET 的关断电压约为 $V_{in}$。设计重点是分压电容的容量、纹波电流和中点平衡，任何长期直流偏置都会影响磁通对称性。</p>
+<h3 id="14-full-bridge初级得到完整正负母线电压"><a class="markdownIt-Anchor" href="#14-full-bridge初级得到完整正负母线电压"></a> 14. Full-Bridge：初级得到完整正负母线电压</h3>
+<p><img src="/images/myimge/power-topologies/full-bridge-schematic.png" alt="Full-Bridge 功率级（TI 手册第 161 页局部）" /></p>
+<p>两组对角管交替导通，初级得到 $+V_{in}$ 和 $-V_{in}$。若 $D$ 表示每组对角管相对完整周期的导通占比，则：</p>
+<p>$$V_o\approx2DnV_{in}
+$$</p><p><img src="/images/myimge/power-topologies/full-bridge-key-waveforms.png" alt="Full-Bridge 的初级与输出电感关键理论波形，上半为变压器初级，下半为输出电感（TI 手册第 163、166 页局部）" /></p>
+<p>它与 Half-Bridge 的波形形状相似，但初级电压幅值翻倍，因此同一母线和匝比下可以传递更高功率。每只 MOSFET 仍主要承受母线电压。代价是四只功率管、两组高侧驱动以及严格的死区和直通保护；硬开关时，开关损耗也会限制频率。</p>
+<h3 id="15-phase-shifted-full-bridge用相移调节有效脉宽"><a class="markdownIt-Anchor" href="#15-phase-shifted-full-bridge用相移调节有效脉宽"></a> 15. Phase-Shifted Full-Bridge：用相移调节有效脉宽</h3>
+<p><img src="/images/myimge/power-topologies/phase-shifted-full-bridge-schematic.png" alt="移相全桥功率级（TI 手册第 174 页局部）" /></p>
+<p>PSFB 的每只 MOSFET 通常保持接近 50% 占空比，控制量是两桥臂之间的相移。桥臂状态相反时，初级得到 $+V_{in}$ 或 $-V_{in}$；两桥臂同为高电平或同为低电平时，初级电压为零，电流在桥内续流。定义变压器的有效占空比为 $D_{eff}$：</p>
+<p>$$V_o\approx D_{eff}nV_{in}
+$$</p><p><img src="/images/myimge/power-topologies/phase-shifted-full-bridge-key-waveforms.png" alt="PSFB 的初级相移与输出电感关键理论波形，上半为变压器初级，下半为输出电感（TI 手册第 175、177 页局部）" /></p>
+<p>上半图的 $t_{ph}$ 是相移造成的零电压续流区间；相移越大，有效加在变压器上的脉宽越短。初级电流在零电压区仍可能循环，这部分电流不向输出传递有效功率，却会增加导通损耗。换相时，漏感或外加串联电感的能量可以给 MOSFET 输出电容充放电，形成 ZVS。一个直观的必要条件是：</p>
+<p>$$\frac12L_{eq}I_{pri}^2\gtrsim\frac12C_{oss,eq}V_{in}^2
+$$</p><p>负载变轻后 $I_{pri}$ 下降，换相能量可能不足，ZVS 会丢失。TI 手册这一章的计算前提是约 50%～100% 负载实现 ZVS，不能把它外推成全负载保证。PSFB 还要检查环流、占空比丢失、次级整流尖峰和领先/滞后桥臂的换相差异。</p>
+<h2 id="六-把拓扑放到同一张选择表里"><a class="markdownIt-Anchor" href="#六-把拓扑放到同一张选择表里"></a> 六、把拓扑放到同一张选择表里</h2>
+<table>
+<thead>
+<tr>
+<th>需求</th>
+<th>优先比较</th>
+<th>关键代价</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>非隔离、固定降压</td>
+<td>Buck、同步 Buck</td>
+<td>最大占空比、低压大电流损耗、负载瞬态</td>
+</tr>
+<tr>
+<td>非隔离、固定升压</td>
+<td>Boost</td>
+<td>RHPZ、输出不可天然关断、器件电压应力</td>
+</tr>
+<tr>
+<td>输入跨过输出、允许反相</td>
+<td>反相 Buck-Boost、Cuk</td>
+<td>反相输出、RHPZ或能量电容应力</td>
+</tr>
+<tr>
+<td>输入跨过输出、要求同相</td>
+<td>SEPIC、Zeta</td>
+<td>两个电感、耦合电容、RMS 电流</td>
+</tr>
+<tr>
+<td>隔离、器件数优先</td>
+<td>单管 Flyback</td>
+<td>峰值电流、漏感尖峰、气隙、交叉调整率</td>
+</tr>
+<tr>
+<td>隔离、希望降低单管应力</td>
+<td>双管 Flyback</td>
+<td>两只开关、驱动和占空比限制</td>
+</tr>
+<tr>
+<td>隔离、开通时直接传能</td>
+<td>单管/双管/有源钳位 Forward</td>
+<td>磁芯复位、输出电感、钳位设计</td>
+</tr>
+<tr>
+<td>低压大电流输入</td>
+<td>Push-Pull</td>
+<td>偏磁、开关约两倍输入电压应力</td>
+</tr>
+<tr>
+<td>较高功率隔离</td>
+<td>Half-Bridge、Full-Bridge</td>
+<td>驱动复杂度、磁通平衡、硬开关损耗</td>
+</tr>
+<tr>
+<td>较高功率且希望软开关</td>
+<td>PSFB</td>
+<td>轻载 ZVS、环流、占空比丢失</td>
+</tr>
+</tbody>
+</table>
+<p>初选以后，我会按同一顺序继续计算：先用伏秒平衡得到占空比和电感纹波，再计算每只 MOSFET、二极管、绕组和电容的峰值及 RMS 电流；随后加入漏感、寄生电容、死区和压降重新检查应力；最后建立小信号模型，确认 RHPZ、交越频率和相位裕量，并通过样机验证效率、温升、纹波、负载瞬态、启动与保护。</p>
+<p>这篇文章完成的是拓扑结构、理想关系和理论波形的对应。它可以用于缩小候选范围，但不能代替具体控制器数据手册、磁芯设计和硬件实测。</p>
+<h2 id="参考资料"><a class="markdownIt-Anchor" href="#参考资料"></a> 参考资料</h2>
+<ul>
+<li>Texas Instruments, <em>Power Topologies Handbook</em>, SLYU036A, Rev. A, 2024.</li>
+<li>Robert W. Erickson, Dragan Maksimović, <em>Fundamentals of Power Electronics</em>.</li>
+</ul>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录" data-aos="zoom-in">学习记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/Boost/" rel="tag" title="Boost">Boost</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/Buck/" rel="tag" title="Buck">Buck</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E5%BC%80%E5%85%B3%E7%94%B5%E6%BA%90/" rel="tag" title="开关电源">开关电源</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E7%94%B5%E6%BA%90%E6%8B%93%E6%89%91/" rel="tag" title="电源拓扑">电源拓扑</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E9%9A%94%E7%A6%BB%E7%94%B5%E6%BA%90/" rel="tag" title="隔离电源">隔离电源</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+          <img data-src="/images/myimge/llc-resonant-half-bridge/llc-resonant-half-bridge-cover-gj9krd.jpg" data-sizes="auto" alt="第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数" class="lazyload">
+        <a href="/2026/07/29/llc-resonant-half-bridge-from-specs-to-parameters/" aria-label="前一篇: 第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数" title="前一篇: 第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-vq95d8.jpg" data-sizes="auto" alt="从一个多路选择器开始学 Verilog：module、assign 和 always" class="lazyload">
+      <a href="/2026/07/27/verilog-from-module-to-always/" aria-label="后一篇: 从一个多路选择器开始学 Verilog：module、assign 和 always"  title="后一篇: 从一个多路选择器开始学 Verilog：module、assign 和 always"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          从一个多路选择器开始学 Verilog：module、assign 和 always
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E5%85%88%E7%BB%9F%E4%B8%80%E7%AC%A6%E5%8F%B7%E5%92%8C%E8%AF%BB%E6%B3%A2%E5%BD%A2%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text"> 一、先统一符号和读波形的方法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E9%9D%9E%E9%9A%94%E7%A6%BB%E6%8B%93%E6%89%91"><span class="toc-number">2.</span> <span class="toc-text"> 二、非隔离拓扑</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-buck%E5%AF%BC%E9%80%9A%E6%97%B6%E7%9B%B4%E6%8E%A5%E5%90%91%E8%BE%93%E5%87%BA%E4%BC%A0%E8%83%BD"><span class="toc-number">2.1.</span> <span class="toc-text"> 1. Buck：导通时直接向输出传能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-boost%E5%AF%BC%E9%80%9A%E5%82%A8%E8%83%BD%E5%85%B3%E6%96%AD%E5%8D%87%E5%8E%8B"><span class="toc-number">2.2.</span> <span class="toc-text"> 2. Boost：导通储能，关断升压</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%8F%8D%E7%9B%B8-buck-boost%E4%B8%80%E5%8F%AA%E7%94%B5%E6%84%9F%E5%AE%8C%E6%88%90%E5%8D%87%E9%99%8D%E5%8E%8B"><span class="toc-number">2.3.</span> <span class="toc-text"> 3. 反相 Buck-Boost：一只电感完成升降压</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-sepic%E5%90%8C%E7%9B%B8%E5%8D%87%E9%99%8D%E5%8E%8B%E8%BE%93%E5%85%A5%E7%94%B5%E6%B5%81%E8%BF%9E%E7%BB%AD"><span class="toc-number">2.4.</span> <span class="toc-text"> 4. SEPIC：同相升降压，输入电流连续</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-cuk%E5%8F%8D%E7%9B%B8%E5%8D%87%E9%99%8D%E5%8E%8B%E8%BE%93%E5%85%A5%E5%92%8C%E8%BE%93%E5%87%BA%E7%94%B5%E6%B5%81%E9%83%BD%E8%BE%83%E8%BF%9E%E7%BB%AD"><span class="toc-number">2.5.</span> <span class="toc-text"> 5. Cuk：反相升降压，输入和输出电流都较连续</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-zeta%E5%90%8C%E7%9B%B8%E5%8D%87%E9%99%8D%E5%8E%8B%E8%BE%93%E5%87%BA%E7%94%B5%E6%B5%81%E8%BF%9E%E7%BB%AD"><span class="toc-number">2.6.</span> <span class="toc-text"> 6. Zeta：同相升降压，输出电流连续</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-flyback-%E5%AE%B6%E6%97%8F%E7%A3%81%E8%8A%AF%E5%85%88%E5%82%A8%E8%83%BD%E5%86%8D%E5%90%91%E6%AC%A1%E7%BA%A7%E9%87%8A%E6%94%BE"><span class="toc-number">3.</span> <span class="toc-text"> 三、Flyback 家族：磁芯先储能，再向次级释放</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-%E5%8D%95%E7%AE%A1-flyback"><span class="toc-number">3.1.</span> <span class="toc-text"> 7. 单管 Flyback</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-%E5%8F%8C%E7%AE%A1-flyback%E7%94%A8%E4%B8%A4%E4%B8%AA%E5%BC%80%E5%85%B3%E9%92%B3%E4%BD%8F%E7%94%B5%E5%8E%8B"><span class="toc-number">3.2.</span> <span class="toc-text"> 8. 双管 Flyback：用两个开关钳住电压</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-forward-%E5%AE%B6%E6%97%8F%E5%BC%80%E9%80%9A%E6%97%B6%E7%9B%B4%E6%8E%A5%E5%90%91%E6%AC%A1%E7%BA%A7%E4%BC%A0%E8%83%BD"><span class="toc-number">4.</span> <span class="toc-text"> 四、Forward 家族：开通时直接向次级传能</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#9-%E6%9C%89%E6%BA%90%E9%92%B3%E4%BD%8D-forward"><span class="toc-number">4.1.</span> <span class="toc-text"> 9. 有源钳位 Forward</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-%E5%8D%95%E7%AE%A1-forward"><span class="toc-number">4.2.</span> <span class="toc-text"> 10. 单管 Forward</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#11-%E5%8F%8C%E7%AE%A1-forward"><span class="toc-number">4.3.</span> <span class="toc-text"> 11. 双管 Forward</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E5%8F%8C%E7%AB%AF%E4%B8%8E%E6%A1%A5%E5%BC%8F%E6%8B%93%E6%89%91%E8%AE%A9%E5%8F%98%E5%8E%8B%E5%99%A8%E5%8F%8C%E5%90%91%E5%8A%B1%E7%A3%81"><span class="toc-number">5.</span> <span class="toc-text"> 五、双端与桥式拓扑：让变压器双向励磁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#12-push-pull%E4%B8%A4%E5%8D%8A%E5%88%9D%E7%BA%A7%E4%BA%A4%E6%9B%BF%E5%B7%A5%E4%BD%9C"><span class="toc-number">5.1.</span> <span class="toc-text"> 12. Push-Pull：两半初级交替工作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#13-half-bridge%E5%88%9D%E7%BA%A7%E5%BE%97%E5%88%B0%E6%AD%A3%E8%B4%9F%E5%8D%8A%E6%AF%8D%E7%BA%BF%E7%94%B5%E5%8E%8B"><span class="toc-number">5.2.</span> <span class="toc-text"> 13. Half-Bridge：初级得到正负半母线电压</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#14-full-bridge%E5%88%9D%E7%BA%A7%E5%BE%97%E5%88%B0%E5%AE%8C%E6%95%B4%E6%AD%A3%E8%B4%9F%E6%AF%8D%E7%BA%BF%E7%94%B5%E5%8E%8B"><span class="toc-number">5.3.</span> <span class="toc-text"> 14. Full-Bridge：初级得到完整正负母线电压</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#15-phase-shifted-full-bridge%E7%94%A8%E7%9B%B8%E7%A7%BB%E8%B0%83%E8%8A%82%E6%9C%89%E6%95%88%E8%84%89%E5%AE%BD"><span class="toc-number">5.4.</span> <span class="toc-text"> 15. Phase-Shifted Full-Bridge：用相移调节有效脉宽</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E6%8A%8A%E6%8B%93%E6%89%91%E6%94%BE%E5%88%B0%E5%90%8C%E4%B8%80%E5%BC%A0%E9%80%89%E6%8B%A9%E8%A1%A8%E9%87%8C"><span class="toc-number">6.</span> <span class="toc-text"> 六、把拓扑放到同一张选择表里</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">7.</span> <span class="toc-text"> 参考资料</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">40</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "开关电源拓扑怎么选：从 Buck、Boost 到移相全桥",
+          url: "https://alen9966.github.io/2026/07/28/power-topologies-selection-from-buck-to-psfb/",
+          excerpt: "",
+          description: "结合电路结构、理想 CCM 变换关系和关键节点波形，系统梳理 Buck、Boost、Buck-Boost、SEPIC、Cuk、Zeta、Flyback、Forward、Push-Pull、Half-Bridge、Full-Bridge 与 PSFB。",
+          stripContent: "刚开始接触开关电源时，我很容易把拓扑选择理解成“降压用 Buck，升压用 Boost”。真正开始看器件应力和关键节点波形后才发现，升降压关系只是第一层：输入会不会跨过输出、是否隔离、能量在哪个开关状态送到负载、磁芯怎样复位、功率器件承受多大的峰值和 RMS 电流，都会改变最终选择。 这篇文章以 TI《Power Topologies Handbook》为主线，把文中出现的拓扑逐一展开。重点不是罗列名称，而是把每一种电路的功率路径、关键公式和电压电流波形对应起来。文中的波形来自手册，是理想化的理论",
+          date: "Tue Jul 28 2026 14:00:00 GMT+0800",
+          updated: "Mon Aug 03 2026 18:05:14 GMT+0800",
+          cover: "/images/myimge/power-topologies/power-topologies-handbook-card.jpg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://npm.webcache.cn/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6&#x2F;1Nxveei" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+  </body>
+  </html>

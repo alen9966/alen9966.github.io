@@ -1,0 +1,548 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    从一个多路选择器开始学 Verilog：module、assign 和 always | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="从二选一多路选择器出发，理解 Verilog 模块、连续赋值、过程块、阻塞与非阻塞赋值，以及 wire、reg 和锁存器之间的关系。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从一个多路选择器开始学 Verilog：module、assign 和 always">
+<meta property="og:url" content="https://alen9966.github.io/2026/07/27/verilog-from-module-to-always/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="从二选一多路选择器出发，理解 Verilog 模块、连续赋值、过程块、阻塞与非阻塞赋值，以及 wire、reg 和锁存器之间的关系。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/verilog-basics/mux-hardware-waveform-slide-3.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/verilog-basics/verilog-module-and-port-example-slide-7.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/verilog-basics/blocking-nonblocking-example-slide-31.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/verilog-basics/module-port-mapping-slide-36.png">
+<meta property="article:published_time" content="2026-07-27T03:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-03T10:05:14.114Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="Verilog">
+<meta property="article:tag" content="FPGA">
+<meta property="article:tag" content="RTL">
+<meta property="article:tag" content="数字电路">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/myimge/verilog-basics/mux-hardware-waveform-slide-3.png">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/myimge/wallhaven-pink/wallhaven-x6xq2v.jpg" alt="从一个多路选择器开始学 Verilog：module、assign 和 always">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">从一个多路选择器开始学 Verilog：module、assign 和 always</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E5%85%88%E6%8A%8A%E4%BB%A3%E7%A0%81%E5%BD%93%E6%88%90%E7%94%B5%E8%B7%AF"><span class="toc-number">1.</span> <span class="toc-text"> 一、先把代码当成电路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-module-%E5%AE%9A%E4%B9%89%E4%BA%86%E7%94%B5%E8%B7%AF%E7%9A%84%E8%BE%B9%E7%95%8C"><span class="toc-number">2.</span> <span class="toc-text"> 二、module 定义了电路的边界</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-assign-%E9%80%82%E5%90%88%E7%9B%B4%E6%8E%A5%E6%8F%8F%E8%BF%B0%E7%BB%84%E5%90%88%E5%85%B3%E7%B3%BB"><span class="toc-number">3.</span> <span class="toc-text"> 三、assign 适合直接描述组合关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-always-%E4%B8%8D%E6%98%AF%E6%8C%89%E9%A1%BA%E5%BA%8F%E4%B8%80%E7%9B%B4%E6%89%A7%E8%A1%8C"><span class="toc-number">4.</span> <span class="toc-text"> 四、always 不是“按顺序一直执行”</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%BB%84%E5%90%88%E9%80%BB%E8%BE%91%E8%BF%87%E7%A8%8B%E5%9D%97"><span class="toc-number">4.1.</span> <span class="toc-text"> 1. 组合逻辑过程块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%97%B6%E5%BA%8F%E9%80%BB%E8%BE%91%E8%BF%87%E7%A8%8B%E5%9D%97"><span class="toc-number">4.2.</span> <span class="toc-text"> 2. 时序逻辑过程块</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E9%98%BB%E5%A1%9E%E8%B5%8B%E5%80%BC%E5%92%8C%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B5%8B%E5%80%BC"><span class="toc-number">5.</span> <span class="toc-text"> 五、阻塞赋值和非阻塞赋值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-wire-%E5%92%8C-reg-%E5%88%B0%E5%BA%95%E8%A1%A8%E7%A4%BA%E4%BB%80%E4%B9%88"><span class="toc-number">6.</span> <span class="toc-text"> 六、wire 和 reg 到底表示什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-if-%E5%92%8C-case-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E7%BB%BC%E5%90%88%E5%87%BA%E9%94%81%E5%AD%98%E5%99%A8"><span class="toc-number">7.</span> <span class="toc-text"> 七、if 和 case 为什么会综合出锁存器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E8%B0%83%E7%94%A8%E5%BA%95%E5%B1%82%E6%A8%A1%E5%9D%97%E5%B0%B1%E6%98%AF%E8%BF%9E%E6%8E%A5%E7%8E%B0%E6%88%90%E7%94%B5%E8%B7%AF"><span class="toc-number">8.</span> <span class="toc-text"> 八、调用底层模块就是连接现成电路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D-%E5%86%99%E5%AE%8C%E4%B8%80%E4%B8%AA%E6%A8%A1%E5%9D%97%E5%90%8E%E6%A3%80%E6%9F%A5%E4%BB%80%E4%B9%88"><span class="toc-number">9.</span> <span class="toc-text"> 九、写完一个模块后检查什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%84%E6%96%99%E6%9D%A5%E6%BA%90"><span class="toc-number">10.</span> <span class="toc-text"> 资料来源</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">40</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-verilog-from-module-to-always" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-07-27T03:30:00.000Z" itemprop="datePublished">2026-07-27</time>
+    <time style="display: none;" id="post-update-time">2026-08-03</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-03T10:05:14.114Z" itemprop="dateModified">2026-08-03</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>我刚开始学 Verilog 时，最容易犯的错误是把它当成 C 语言：代码从上往下执行，写几行判断和赋值，就能得到想要的结果。可真正开始写 FPGA 程序后会发现，同样是一个等号，放在 <code>assign</code> 里和放在 <code>always</code> 里含义不同；同样是 <code>always</code>，敏感列表写信号变化和写时钟上升沿，最后得到的电路也完全不同。</p>
+<p>Verilog 不是在告诉处理器“下一步做什么”，而是在描述一块数字电路“由什么组成、信号怎样连接、什么时候更新”。这篇文章从最简单的多路选择器开始，把 <code>module</code>、<code>assign</code>、<code>always</code>、阻塞赋值和非阻塞赋值串起来。资料采用传统 Verilog-2001 的 <code>wire</code>、<code>reg</code> 写法，暂不展开 SystemVerilog。</p>
+<h2 id="一-先把代码当成电路"><a class="markdownIt-Anchor" href="#一-先把代码当成电路"></a> 一、先把代码当成电路</h2>
+<p>二选一多路选择器有两个数据输入、一个选择信号和一个输出。选择信号为 <code>0</code> 时输出其中一路，为 <code>1</code> 时输出另一路。这个功能既可以画成一个 MUX 符号，也可以展开成非门、与门和或门。</p>
+<p><img src="/images/myimge/verilog-basics/mux-hardware-waveform-slide-3.png" alt="二选一多路选择器的符号、门级结构和波形（《Verilog语言知识学习快速基础学习》第 3 页）" /></p>
+<p>从波形上看，<code>sel</code> 改变后，输出 <code>y</code> 跟着切换。这里没有时钟，也不需要记住上一次结果，因此它是组合逻辑。用 Verilog 描述时，可以直接写：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> mux2 (</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> a,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> b,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> sel,</span><br><span class="line">    <span class="keyword">output</span> <span class="keyword">wire</span> y</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> y = sel ? b : a;</span><br><span class="line"></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+<p>这段代码不是先声明输入、再执行 <code>assign</code>、最后执行 <code>endmodule</code>。综合工具会把它理解成一个电路模块，其中 <code>sel ? b : a</code> 对应选择关系。只要 <code>a</code>、<code>b</code> 或 <code>sel</code> 发生变化，<code>y</code> 就按新的组合结果变化。</p>
+<h2 id="二-module-定义了电路的边界"><a class="markdownIt-Anchor" href="#二-module-定义了电路的边界"></a> 二、module 定义了电路的边界</h2>
+<p>首先看最外层结构：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> 模块名 (</span><br><span class="line">    端口列表</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">    内部信号和功能描述</span><br><span class="line"></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+<p><code>module</code> 和 <code>endmodule</code> 圈出一块电路。端口就是这块电路与外部连接的引脚，<code>input</code>、<code>output</code> 和 <code>inout</code> 分别表示输入、输出和双向端口。位宽写成 <code>[高位:低位]</code>，例如 <code>[3:0]</code> 表示 4 位信号。</p>
+<p><img src="/images/myimge/verilog-basics/verilog-module-and-port-example-slide-7.png" alt="模块端口、位宽和符号之间的关系（《Verilog语言知识学习快速基础学习》第 7 页）" /></p>
+<p>以 4 位输入为例：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> full_adder (</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> [<span class="number">3</span>:<span class="number">0</span>] a,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> [<span class="number">3</span>:<span class="number">0</span>] b,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span>       cin,</span><br><span class="line">    <span class="keyword">output</span> <span class="keyword">wire</span> [<span class="number">3</span>:<span class="number">0</span>] sum,</span><br><span class="line">    <span class="keyword">output</span> <span class="keyword">wire</span>       cout</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 功能描述略</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+<p>这里 <code>[3:0]</code> 对应 <code>a[3]</code> 到 <code>a[0]</code> 四根线。端口没有写位宽时默认是 1 位，但工程中最好把位宽写清楚。模块名和文件名在 Verilog 语法上不要求一致，不过保持一致更方便工程管理和查找顶层模块。</p>
+<p>模块里面最常见的描述方式有三种：</p>
+<ul>
+<li><code>assign</code> 连续赋值；</li>
+<li><code>always</code> 过程块；</li>
+<li>调用已经写好的底层模块或门原语。</li>
+</ul>
+<p>它们在模块中是并行存在的，书写顺序通常不表示硬件工作的先后顺序。</p>
+<h2 id="三-assign-适合直接描述组合关系"><a class="markdownIt-Anchor" href="#三-assign-适合直接描述组合关系"></a> 三、assign 适合直接描述组合关系</h2>
+<p><code>assign</code> 的基本格式是：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">assign</span> 目标信号 = 表达式;</span><br></pre></td></tr></table></figure>
+<p>例如一个与或逻辑：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> m;</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> m = b | c;</span><br><span class="line"><span class="keyword">assign</span> y = a &amp; m;</span><br></pre></td></tr></table></figure>
+<p>两条 <code>assign</code> 同时描述两段组合逻辑，并不是先算 <code>m</code> 再执行下一行。实际电路中，<code>m</code> 是前一级逻辑的输出，也是后一级逻辑的输入。输入变化经过门延迟传播后，整个组合网络会得到新的稳定值。</p>
+<p>为什么 <code>assign</code> 的目标通常写成 <code>wire</code>？因为它描述的是一根被持续驱动的连线，不需要在过程块内部保存一个变量值。表达式中可以使用算术、逻辑、关系、按位、移位、拼接和条件运算符，但要特别注意位宽。</p>
+<p>例如：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">wire</span> [<span class="number">3</span>:<span class="number">0</span>] a = <span class="number">4&#x27;b1001</span>;</span><br><span class="line"><span class="keyword">wire</span> [<span class="number">3</span>:<span class="number">0</span>] y;</span><br><span class="line"></span><br><span class="line"><span class="keyword">assign</span> y = a &lt;&lt; <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p><code>y</code> 仍然只有 4 位，因此最高位移出去以后不会自动保留。Verilog 中很多看起来奇怪的计算结果，最后都能追到位宽、符号位或常量写法上。</p>
+<h2 id="四-always-不是按顺序一直执行"><a class="markdownIt-Anchor" href="#四-always-不是按顺序一直执行"></a> 四、always 不是“按顺序一直执行”</h2>
+<p><code>always</code> 的基本形式为：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">always</span> @(触发条件) <span class="keyword">begin</span></span><br><span class="line">    过程语句</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>关键不只是里面写了什么，还要看它什么时候被触发。</p>
+<h3 id="1-组合逻辑过程块"><a class="markdownIt-Anchor" href="#1-组合逻辑过程块"></a> 1. 组合逻辑过程块</h3>
+<p>二选一多路选择器也可以用 <code>always</code> 描述：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> mux2_always (</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> a,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> b,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> sel,</span><br><span class="line">    <span class="keyword">output</span> <span class="keyword">reg</span>  y</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">if</span> (sel)</span><br><span class="line">        y = b;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        y = a;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+<p><code>@(*)</code> 表示只要过程块读取的任意信号发生变化，就重新计算一次。旧式代码会把敏感信号手工写成 <code>@(a or b or sel)</code>，但漏掉一个信号会造成仿真结果与综合电路不一致，因此组合逻辑优先使用 <code>@(*)</code>。</p>
+<p>这里的 <code>y</code> 声明为 <code>reg</code>，只是因为它在过程块中被赋值，并不表示综合后一定出现寄存器。这个过程对 <code>sel=0</code> 和 <code>sel=1</code> 都给出了 <code>y</code>，所以综合结果仍然是组合逻辑。</p>
+<h3 id="2-时序逻辑过程块"><a class="markdownIt-Anchor" href="#2-时序逻辑过程块"></a> 2. 时序逻辑过程块</h3>
+<p>如果敏感条件改成时钟上升沿，含义就不同了：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> dff (</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> clk,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> rst_n,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> d,</span><br><span class="line">    <span class="keyword">output</span> <span class="keyword">reg</span>  q</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk <span class="keyword">or</span> <span class="keyword">negedge</span> rst_n) <span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">if</span> (!rst_n)</span><br><span class="line">        q &lt;= <span class="number">1&#x27;b0</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        q &lt;= d;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+<p>正常工作时，只有 <code>clk</code> 上升沿到来，<code>q</code> 才采样 <code>d</code>。两个时钟沿之间即使 <code>d</code> 改变，<code>q</code> 仍保持原值。<code>rst_n</code> 写在敏感列表中，表示这里采用低电平异步复位。</p>
+<p>所以区分组合逻辑和时序逻辑时，不能只看有没有 <code>always</code>。真正需要看的是触发条件，以及输出是否需要跨时间保存状态。</p>
+<h2 id="五-阻塞赋值和非阻塞赋值"><a class="markdownIt-Anchor" href="#五-阻塞赋值和非阻塞赋值"></a> 五、阻塞赋值和非阻塞赋值</h2>
+<p>Verilog 过程块中有两种赋值符号：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">y = expression;   <span class="comment">// 阻塞赋值</span></span><br><span class="line">y &lt;= expression;  <span class="comment">// 非阻塞赋值</span></span><br></pre></td></tr></table></figure>
+<p>阻塞赋值 <code>=</code> 会在当前过程内完成计算和更新，后面的语句能够读到新值。非阻塞赋值 <code>&lt;=</code> 会先计算右侧表达式，再把左侧更新安排到当前仿真时间片的非阻塞赋值阶段，因此同一时钟沿触发的各级寄存器读到的是更新前的值。</p>
+<p><img src="/images/myimge/verilog-basics/blocking-nonblocking-example-slide-31.png" alt="阻塞赋值和非阻塞赋值读取新旧值的对比（《Verilog语言知识学习快速基础学习》第 31 页）" /></p>
+<p>以两级移位寄存器为例：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk) <span class="keyword">begin</span></span><br><span class="line">    q1 &lt;= d;</span><br><span class="line">    q2 &lt;= q1;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>时钟上升沿到来时，<code>q1</code> 准备接收 <code>d</code>，<code>q2</code> 准备接收旧的 <code>q1</code>。这样才能得到两级寄存器。如果改成阻塞赋值：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk) <span class="keyword">begin</span></span><br><span class="line">    q1 = d;</span><br><span class="line">    q2 = q1;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>第二行会读到刚刚更新的 <code>q1</code>，仿真行为不再是预期的两级延迟。</p>
+<p>入门时可以先记住一条工程规则：组合逻辑过程块使用阻塞赋值 <code>=</code>，时钟触发的时序逻辑使用非阻塞赋值 <code>&lt;=</code>，不要在同一个过程块里混用。它不是 Verilog 语法的全部边界，但能避开大多数初学阶段的仿真问题。</p>
+<h2 id="六-wire-和-reg-到底表示什么"><a class="markdownIt-Anchor" href="#六-wire-和-reg-到底表示什么"></a> 六、wire 和 reg 到底表示什么</h2>
+<p>传统 Verilog 中，<code>wire</code> 属于线网类型，<code>reg</code> 属于变量类型。二者的区别主要是由谁来驱动，而不是看信号名称像不像寄存器。</p>
+<p><code>wire</code> 常用于：</p>
+<ul>
+<li><code>assign</code> 的赋值目标；</li>
+<li>模块实例的连接线；</li>
+<li>门原语的输出；</li>
+<li>输入端口。</li>
+</ul>
+<p><code>reg</code> 常用于 <code>always</code> 或 <code>initial</code> 过程块中的赋值目标。一个 <code>reg</code> 最终可能综合成触发器、锁存器，也可能只是组合逻辑输出。综合成什么，取决于过程块是否在所有情况下完成赋值，以及过程块由电平变化还是时钟边沿触发。</p>
+<p>SystemVerilog 中常使用 <code>logic</code> 代替很多 <code>reg</code> 声明，但驱动规则和组合、时序逻辑的区别仍然存在。本文继续使用 PPT 中的 Verilog-2001 写法，避免把两套语法混在一起。</p>
+<h2 id="七-if-和-case-为什么会综合出锁存器"><a class="markdownIt-Anchor" href="#七-if-和-case-为什么会综合出锁存器"></a> 七、if 和 case 为什么会综合出锁存器</h2>
+<p>使用 <code>if</code> 或 <code>case</code> 描述组合逻辑时，输出必须在所有可能路径中得到赋值。如果有一条路径没有赋值，电路就需要保留上一次结果，综合工具只能加入锁存器。</p>
+<p>下面的写法条件不完整：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">if</span> (en)</span><br><span class="line">        y = d;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p>当 <code>en=0</code> 时没有说明 <code>y</code> 应该是多少，于是 <code>y</code> 必须记住原值。改成完整条件即可：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">if</span> (en)</span><br><span class="line">        y = d;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        y = <span class="number">1&#x27;b0</span>;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+<p><code>case</code> 也一样。四选一多路选择器可以写成：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> mux4 (</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span>       d0,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span>       d1,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span>       d2,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span>       d3,</span><br><span class="line">    <span class="keyword">input</span>  <span class="keyword">wire</span> [<span class="number">1</span>:<span class="number">0</span>] sel,</span><br><span class="line">    <span class="keyword">output</span> <span class="keyword">reg</span>        y</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">case</span> (sel)</span><br><span class="line">        <span class="number">2&#x27;b00</span>: y = d0;</span><br><span class="line">        <span class="number">2&#x27;b01</span>: y = d1;</span><br><span class="line">        <span class="number">2&#x27;b10</span>: y = d2;</span><br><span class="line">        <span class="number">2&#x27;b11</span>: y = d3;</span><br><span class="line">        <span class="keyword">default</span>: y = <span class="number">1&#x27;b0</span>;</span><br><span class="line">    <span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">endmodule</span></span><br></pre></td></tr></table></figure>
+<p>对于 2 位 <code>sel</code>，四个取值已经写全，<code>default</code> 理论上不会处理新的二进制组合。不过仿真中还存在 <code>x</code> 和 <code>z</code>，保留 <code>default</code> 能让未确定状态的处理更明确。</p>
+<h2 id="八-调用底层模块就是连接现成电路"><a class="markdownIt-Anchor" href="#八-调用底层模块就是连接现成电路"></a> 八、调用底层模块就是连接现成电路</h2>
+<p>一个工程不可能把所有逻辑都塞进同一个 <code>module</code>。更常见的做法是先写好 D 触发器、计数器、滤波器或通信接口，再在顶层模块中实例化它们。</p>
+<p><img src="/images/myimge/verilog-basics/module-port-mapping-slide-36.png" alt="命名端口映射与顺序端口映射（《Verilog语言知识学习快速基础学习》第 36 页）" /></p>
+<p>假设已经有一个 <code>dff</code> 模块，命名端口映射写法为：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">dff u_dff1 (</span><br><span class="line">    <span class="variable">.clk</span>   (clk),</span><br><span class="line">    <span class="variable">.rst_n</span> (rst_n),</span><br><span class="line">    <span class="variable">.d</span>     (d1),</span><br><span class="line">    <span class="variable">.q</span>     (q1)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+<p>点号后面是底层模块的端口名，括号里面是当前模块的连接信号。命名映射不依赖端口声明顺序，阅读时也能直接知道每根线接到哪里，因此工程中通常优先使用。</p>
+<p>顺序映射也能工作：</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dff u_dff2 (clk, rst_n, d2, q2);</span><br></pre></td></tr></table></figure>
+<p>但只要底层模块调整端口顺序，或者调用处少看了一位，就可能接错。模块实例越来越多以后，命名端口带来的几行额外代码通常是值得的。</p>
+<h2 id="九-写完一个模块后检查什么"><a class="markdownIt-Anchor" href="#九-写完一个模块后检查什么"></a> 九、写完一个模块后检查什么</h2>
+<p>一段代码能够通过语法检查，不代表它一定描述了想要的硬件。我现在写完一个基础模块后，会先检查下面几件事：</p>
+<ul>
+<li>输入、输出和内部信号的位宽是否一致；</li>
+<li>组合逻辑是否使用 <code>@(*)</code>，每个输出是否在所有路径中赋值；</li>
+<li>时序逻辑是否统一使用非阻塞赋值 <code>&lt;=</code>；</li>
+<li><code>reg</code> 是否真的因为过程赋值而声明，而不是因为名字像寄存器；</li>
+<li>模块实例是否使用命名端口，方向和位宽是否对应；</li>
+<li>常量是否写清位宽和进制，例如 <code>4'b0011</code>；</li>
+<li>仿真中是否考虑 <code>x</code>、复位和边界输入。</li>
+</ul>
+<p>Verilog 入门真正需要建立的不是关键字清单，而是代码与电路之间的对应关系。<code>module</code> 定义边界，<code>assign</code> 描述持续存在的组合关系，<code>always @(*)</code> 描述组合过程，<code>always @(posedge clk)</code> 描述时钟触发的状态更新。把这几层关系分清以后，再学习计数器、状态机和接口时，代码就不会只剩下语法。</p>
+<p>这篇文章目前只整理了语言基础和综合习惯，没有加入具体 FPGA 工程、时序约束和板级测试结果。后面真正建立 Quartus 或 Vivado 工程时，还需要补上 testbench、波形仿真、引脚约束和时序分析。</p>
+<h2 id="资料来源"><a class="markdownIt-Anchor" href="#资料来源"></a> 资料来源</h2>
+<ul>
+<li>《Verilog语言知识学习快速基础学习》：模块结构、多路选择器、连续赋值、过程块、阻塞与非阻塞赋值、数据类型及模块调用，正文图片分别截取自第 3、7、31、36 页。</li>
+</ul>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录" data-aos="zoom-in">学习记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/FPGA/" rel="tag" title="FPGA">FPGA</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/RTL/" rel="tag" title="RTL">RTL</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/Verilog/" rel="tag" title="Verilog">Verilog</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%95%B0%E5%AD%97%E7%94%B5%E8%B7%AF/" rel="tag" title="数字电路">数字电路</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+          <img data-src="/images/myimge/power-topologies/power-topologies-handbook-card.jpg" data-sizes="auto" alt="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥" class="lazyload">
+        <a href="/2026/07/28/power-topologies-selection-from-buck-to-psfb/" aria-label="前一篇: 开关电源拓扑怎么选：从 Buck、Boost 到移相全桥" title="前一篇: 开关电源拓扑怎么选：从 Buck、Boost 到移相全桥"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            开关电源拓扑怎么选：从 Buck、Boost 到移相全桥
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-7p3we9.jpg" data-sizes="auto" alt="从微分方程到波特图：我怎样理解传递函数" class="lazyload">
+      <a href="/2026/07/27/transfer-function-from-differential-equation/" aria-label="后一篇: 从微分方程到波特图：我怎样理解传递函数"  title="后一篇: 从微分方程到波特图：我怎样理解传递函数"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          从微分方程到波特图：我怎样理解传递函数
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E5%85%88%E6%8A%8A%E4%BB%A3%E7%A0%81%E5%BD%93%E6%88%90%E7%94%B5%E8%B7%AF"><span class="toc-number">1.</span> <span class="toc-text"> 一、先把代码当成电路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-module-%E5%AE%9A%E4%B9%89%E4%BA%86%E7%94%B5%E8%B7%AF%E7%9A%84%E8%BE%B9%E7%95%8C"><span class="toc-number">2.</span> <span class="toc-text"> 二、module 定义了电路的边界</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-assign-%E9%80%82%E5%90%88%E7%9B%B4%E6%8E%A5%E6%8F%8F%E8%BF%B0%E7%BB%84%E5%90%88%E5%85%B3%E7%B3%BB"><span class="toc-number">3.</span> <span class="toc-text"> 三、assign 适合直接描述组合关系</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-always-%E4%B8%8D%E6%98%AF%E6%8C%89%E9%A1%BA%E5%BA%8F%E4%B8%80%E7%9B%B4%E6%89%A7%E8%A1%8C"><span class="toc-number">4.</span> <span class="toc-text"> 四、always 不是“按顺序一直执行”</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E7%BB%84%E5%90%88%E9%80%BB%E8%BE%91%E8%BF%87%E7%A8%8B%E5%9D%97"><span class="toc-number">4.1.</span> <span class="toc-text"> 1. 组合逻辑过程块</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E6%97%B6%E5%BA%8F%E9%80%BB%E8%BE%91%E8%BF%87%E7%A8%8B%E5%9D%97"><span class="toc-number">4.2.</span> <span class="toc-text"> 2. 时序逻辑过程块</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E9%98%BB%E5%A1%9E%E8%B5%8B%E5%80%BC%E5%92%8C%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B5%8B%E5%80%BC"><span class="toc-number">5.</span> <span class="toc-text"> 五、阻塞赋值和非阻塞赋值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-wire-%E5%92%8C-reg-%E5%88%B0%E5%BA%95%E8%A1%A8%E7%A4%BA%E4%BB%80%E4%B9%88"><span class="toc-number">6.</span> <span class="toc-text"> 六、wire 和 reg 到底表示什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-if-%E5%92%8C-case-%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E7%BB%BC%E5%90%88%E5%87%BA%E9%94%81%E5%AD%98%E5%99%A8"><span class="toc-number">7.</span> <span class="toc-text"> 七、if 和 case 为什么会综合出锁存器</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E8%B0%83%E7%94%A8%E5%BA%95%E5%B1%82%E6%A8%A1%E5%9D%97%E5%B0%B1%E6%98%AF%E8%BF%9E%E6%8E%A5%E7%8E%B0%E6%88%90%E7%94%B5%E8%B7%AF"><span class="toc-number">8.</span> <span class="toc-text"> 八、调用底层模块就是连接现成电路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D-%E5%86%99%E5%AE%8C%E4%B8%80%E4%B8%AA%E6%A8%A1%E5%9D%97%E5%90%8E%E6%A3%80%E6%9F%A5%E4%BB%80%E4%B9%88"><span class="toc-number">9.</span> <span class="toc-text"> 九、写完一个模块后检查什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%84%E6%96%99%E6%9D%A5%E6%BA%90"><span class="toc-number">10.</span> <span class="toc-text"> 资料来源</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">12</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">2</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">40</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="https://npm.webcache.cn/lazysizes@5.3.2/lazysizes.min.js" integrity="sha384-3gT&#x2F;vsepWkfz&#x2F;ff7PpWNUeMzeWoH3cDhm&#x2F;A8jM7ouoAK0&#x2F;fP&#x2F;9bcHHR5kHq2nf+e" crossorigin="anonymous"></script>
+
+
+<script src="https://npm.webcache.cn/clipboard@2.0.11/dist/clipboard.min.js" integrity="sha384-J08i8An&#x2F;QeARD9ExYpvphB8BsyOj3Gh2TSh1aLINKO3L0cMSH2dN3E22zFoXEi0Q" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "从一个多路选择器开始学 Verilog：module、assign 和 always",
+          url: "https://alen9966.github.io/2026/07/27/verilog-from-module-to-always/",
+          excerpt: "",
+          description: "从二选一多路选择器出发，理解 Verilog 模块、连续赋值、过程块、阻塞与非阻塞赋值，以及 wire、reg 和锁存器之间的关系。",
+          stripContent: "我刚开始学 Verilog 时，最容易犯的错误是把它当成 C 语言：代码从上往下执行，写几行判断和赋值，就能得到想要的结果。可真正开始写 FPGA 程序后会发现，同样是一个等号，放在 assign 里和放在 always 里含义不同；同样是 always，敏感列表写信号变化和写时钟上升沿，最后得到的电路也完全不同。 Verilog 不是在告诉处理器“下一步做什么”，而是在描述一块数字电路“由什么组成、信号怎样连接、什么时候更新”。这篇文章从最简单的多路选择器开始，把 module、assign、",
+          date: "Mon Jul 27 2026 11:30:00 GMT+0800",
+          updated: "Mon Aug 03 2026 18:05:14 GMT+0800",
+          cover: "/images/myimge/wallhaven-pink/wallhaven-vq95d8.jpg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://npm.webcache.cn/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha384-Wuix6BuhrWbjDBs24bXrjf4ZQ5aFeFWBuKkFekO2t8xFU0iNaLQfp2K6&#x2F;1Nxveei" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+  </body>
+  </html>
