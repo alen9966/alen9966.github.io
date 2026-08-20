@@ -1,0 +1,523 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统 | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="对照 TIDRZ70 原理图和 TIDUEI2 设计指南，梳理 TIDA-01028 的四路模拟输入、双 ADC12DJ3200、JESD204B、时钟树、配置接口与分层供电。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统">
+<meta property="og:url" content="https://alen9966.github.io/2026/07/22/tida-01028-schematic-deep-dive/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="对照 TIDRZ70 原理图和 TIDUEI2 设计指南，梳理 TIDA-01028 的四路模拟输入、双 ADC12DJ3200、JESD204B、时钟树、配置接口与分层供电。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/tida-01028/schematic-deep-dive/system-overview-schematic-page-1.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/tida-01028/schematic-deep-dive/analog-input-channel-schematic-page-2.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/tida-01028/schematic-deep-dive/adc-jesd-clock-interface-schematic-page-7.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/tida-01028/schematic-deep-dive/lmk04828-clock-distribution-schematic-page-14.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/tida-01028/schematic-deep-dive/power-input-and-1v9-rail-schematic-page-22.png">
+<meta property="article:published_time" content="2026-07-22T06:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-20T08:30:48.106Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="高速采集">
+<meta property="article:tag" content="ADC">
+<meta property="article:tag" content="JESD204B">
+<meta property="article:tag" content="时钟设计">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/myimge/tida-01028/schematic-deep-dive/system-overview-schematic-page-1.png">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/myimge/wallhaven-pink/wallhaven-6d56k6.jpg" alt="TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E5%85%88%E5%88%86%E6%B8%85%E5%9B%9B%E8%B7%AF%E8%BE%93%E5%85%A5%E5%92%8C%E4%B8%80%E8%B7%AF-128-gsps"><span class="toc-number">1.</span> <span class="toc-text"> 一、先分清四路输入和一路 12.8 GSPS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E6%A8%A1%E6%8B%9F%E8%BE%93%E5%85%A5%E9%A1%B5%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%89%E5%A4%A7%E9%87%8F-dnp"><span class="toc-number">2.</span> <span class="toc-text"> 二、模拟输入页为什么有大量 DNP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-adc-%E9%A1%B5%E4%B8%8D%E4%BB%85%E6%98%AF%E4%B8%80%E4%B8%AA%E5%A4%A7%E8%8A%AF%E7%89%87%E7%AC%A6%E5%8F%B7"><span class="toc-number">3.</span> <span class="toc-text"> 三、ADC 页不仅是一个大芯片符号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E6%97%B6%E9%92%9F%E6%A0%91%E4%B8%BA%E4%BB%80%E4%B9%88%E5%88%86%E6%88%90-lmk-%E5%92%8C%E4%B8%A4%E9%A2%97-lmx"><span class="toc-number">4.</span> <span class="toc-text"> 四、时钟树为什么分成 LMK 和两颗 LMX</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-usb-%E6%8E%A5%E5%8F%A3%E5%8F%AA%E8%B4%9F%E8%B4%A3%E9%85%8D%E7%BD%AE%E4%B8%8D%E8%B4%9F%E8%B4%A3%E9%AB%98%E9%80%9F%E6%95%B0%E6%8D%AE"><span class="toc-number">5.</span> <span class="toc-text"> 五、USB 接口只负责配置，不负责高速数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E7%94%B5%E6%BA%90%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%85%88%E5%BC%80%E5%85%B3%E9%99%8D%E5%8E%8B%E5%86%8D%E7%94%A8-ldo"><span class="toc-number">6.</span> <span class="toc-text"> 六、电源为什么要先开关降压再用 LDO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E5%8E%9F%E7%90%86%E5%9B%BE%E8%83%BD%E7%A1%AE%E8%AE%A4%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E7%A1%AE%E8%AE%A4%E4%BB%80%E4%B9%88"><span class="toc-number">7.</span> <span class="toc-text"> 七、原理图能确认什么，不能确认什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E6%88%91%E4%BC%9A%E6%80%8E%E6%A0%B7%E5%AE%A1%E6%9F%A5%E8%BF%99%E7%B1%BB%E5%8E%9F%E7%90%86%E5%9B%BE"><span class="toc-number">8.</span> <span class="toc-text"> 八、我会怎样审查这类原理图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">9.</span> <span class="toc-text"> 参考资料</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-tida-01028-schematic-deep-dive" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-07-22T06:30:00.000Z" itemprop="datePublished">2026-07-22</time>
+    <time style="display: none;" id="post-update-time">2026-08-20</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-20T08:30:48.106Z" itemprop="dateModified">2026-08-20</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>第一次打开 TIDA-01028 的原理图时，我注意力全在两颗 <code>ADC12DJ3200</code> 上，总觉得找到 ADC 就算抓住了系统核心。重新对照设计指南后才发现，这块板真正难的部分并不是 ADC 本身，而是模拟输入、时钟、JESD204B、电源和配置接口怎样一起工作。</p>
+<p><code>TIDRZ70</code> 这份 PDF 一共 28 页，其中前 26 页是框图和正式电路页，后两页是说明与法律信息。原理图标题栏还写明：它建立在 <code>TIDA-01022-E3</code> PCB 上，并使用 <code>TIDA-01027</code> 的电源方案。因此它不是从零开始画的一张“12.8 GSPS 最小系统”，而是把已经验证过的模拟采集平台和电源模块组合起来，再完成双 ADC 板级交织。</p>
+<h2 id="一-先分清四路输入和一路-128-gsps"><a class="markdownIt-Anchor" href="#一-先分清四路输入和一路-128-gsps"></a> 一、先分清四路输入和一路 12.8 GSPS</h2>
+<p>整板有 CH1～CH4 四条物理模拟输入链路，两颗 <code>ADC12DJ3200</code> 各接两路输入。每颗 ADC 还各自连接一个 FMC+ 接口，把 JESD204B 数据送到采集卡。</p>
+<p><img src="/images/myimge/tida-01028/schematic-deep-dive/system-overview-schematic-page-1.png" alt="TIDA-01028 原理图系统总览" /></p>
+<p><em>资料：TI《TIDA-01028 Schematic and Block Diagram》TIDRZ70，原理图第 1 页。</em></p>
+<p>这里最容易产生的误解是“四路模拟输入都能以 12.8 GSPS 同时采样”。设计指南的板级交织测试实际使用 CH1 和 CH3：两颗 ADC 分别工作在单通道 <code>6.4 GSPS</code> 模式，再把两路样点错开 <code>78.1 ps</code> 后合并为一路 <code>12.8 GSPS</code>。</p>
+<p>因此这块板有两种不同的观察方式：把它当作四路模拟前端和两颗双通道 ADC 的验证平台，或者选择两条匹配通道做一路更高采样率的板级交织。物理通道数量、ADC 工作模式和最终输出通道数量不能混在一起。</p>
+<h2 id="二-模拟输入页为什么有大量-dnp"><a class="markdownIt-Anchor" href="#二-模拟输入页为什么有大量-dnp"></a> 二、模拟输入页为什么有大量 DNP</h2>
+<p>CH1～CH4 的电路基本重复，原理图第 2 页可以代表一条完整模拟链路。</p>
+<p><img src="/images/myimge/tida-01028/schematic-deep-dive/analog-input-channel-schematic-page-2.png" alt="TIDA-01028 模拟输入 CH1 原理图" /></p>
+<p><em>资料：TIDRZ70，原理图第 2 页。图中红色叉号表示当前装配变体中不安装的器件或支路。</em></p>
+<p>设计指南把输入链分成两种路径：</p>
+<ul>
+<li>变压器输入路径用于高频交流信号，资料给出的覆盖范围约为 <code>500 kHz～6 GHz</code>；</li>
+<li><code>LMH5401 + LMH6401</code> 有源路径可以处理接近 DC 的信号，带宽约到 <code>1.5 GHz</code>。</li>
+</ul>
+<p><code>LMH5401</code> 负责把单端输入变为差分信号并完成接口转换，<code>LMH6401</code> 是数字可编程全差分放大器，用于调整增益。后面还能看到电感、电容、隔离电阻和可选滤波器位置，用来做阻抗匹配和带宽整形。</p>
+<p>红色叉号与大量 <code>DNP</code> 说明这是一块验证平台。同一张 PCB 预留了多种输入方案，但当前装配并不会让所有支路同时工作。第 2 页底部还特别注明：如果需要 DC 耦合，要把 <code>C492、C13、C14</code> 换成 0 Ω，并保持 50 Ω 输入条件。</p>
+<p>这类原理图不能只凭“线路画在图上”就判断器件已经安装。真正复现硬件时，需要同时核对装配变体和 BOM；否则很容易把一个预留验证路径误写成默认信号链。</p>
+<h2 id="三-adc-页不仅是一个大芯片符号"><a class="markdownIt-Anchor" href="#三-adc-页不仅是一个大芯片符号"></a> 三、ADC 页不仅是一个大芯片符号</h2>
+<p>原理图第 7～10 页分别给出两颗 ADC 的连接。ADC 主符号周围可以分成四组信号：模拟输入、采样时钟与 SYSREF、低速配置、JESD204B 数据。</p>
+<p><img src="/images/myimge/tida-01028/schematic-deep-dive/adc-jesd-clock-interface-schematic-page-7.png" alt="ADC12DJ3200 的时钟、SYSREF 和 JESD204B 接口" /></p>
+<p><em>资料：TIDRZ70，原理图第 7 页。图中右侧 <code>DA0～DA7</code>、<code>DB0～DB7</code> 为差分 JESD204B 数据通道。</em></p>
+<p>器件时钟从左侧差分接口进入，经过变压器耦合后送到 ADC 的 <code>CLK+/-</code>。SYSREF 也采用差分连接，并通过电容耦合到 ADC。ADC 的 SPI 控制经过电平转换器进入数字接口；过量程信号则通过比较器和指示电路引出，方便调试输入幅度。</p>
+<p>右侧两组 <code>DA</code>、<code>DB</code> 数据一共形成 16 条差分 JESD204B lane，并通过串联耦合电容继续送往 FMC+。设计指南给出的 lane 速率最高可到 <code>12.8 Gbps</code>。这些差分对旁边反复出现长度匹配标记，说明 PCB 审查时必须同时关心差分对内偏差、lane 间偏差、过孔、参考平面和 FMC+ 连接器损耗。</p>
+<p>JESD204B 链路能建立，只能说明数据“可以传”。要做两颗 ADC 的时间交织，每次上电后的延迟还要可重复，因此 <code>SYSREF</code>、ADC 同步、FPGA 参考时钟和 lane 对齐都要进入同一个确定性延迟方案。</p>
+<h2 id="四-时钟树为什么分成-lmk-和两颗-lmx"><a class="markdownIt-Anchor" href="#四-时钟树为什么分成-lmk-和两颗-lmx"></a> 四、时钟树为什么分成 LMK 和两颗 LMX</h2>
+<p>原理图第 11、12 页分别是两颗 <code>LMX2594</code>，第 13 页是时钟缓冲和选择，第 14、15 页是 <code>LMK04828</code>。这几页连在一起才是完整时钟树。</p>
+<p><img src="/images/myimge/tida-01028/schematic-deep-dive/lmk04828-clock-distribution-schematic-page-14.png" alt="LMK04828 时钟分配与 FPGA 时钟连接" /></p>
+<p><em>资料：TIDRZ70，原理图第 14 页。右侧同时引出 ADC 时钟/SYSREF 与 FPGA 的 REFCLK、CORECLK、SYSREF。</em></p>
+<p>信号关系可以按下面的顺序理解：</p>
+<ol>
+<li><code>LMK61E2</code> 提供低抖动参考源；</li>
+<li><code>LMK04828</code> 完成系统级时钟分配和同步；</li>
+<li>两颗 <code>LMX2594</code> 分别给 ADC1、ADC2 产生 <code>3.2 GHz DEVCLK</code> 和 <code>40 MHz SYSREF</code>；</li>
+<li><code>LMK04828</code> 同时给两块采集 FPGA 提供 <code>320 MHz REFCLK</code>、<code>320 MHz CORECLK</code> 和 <code>40 MHz SYSREF</code>；</li>
+<li>ADC 内部 <code>tAD Adjust</code> 再把第二颗器件的采样时刻细调到约 <code>78.1 ps</code> 相位差。</li>
+</ol>
+<p>两颗 LMX 的作用不是单纯增加输出口，而是让两颗 ADC 的高频采样时钟可以独立设置，同时共享同一个低频参考和同步体系。设计指南还给出三个不同量级的相位调节手段：LMK 输出延时、LMX 的 MASH SEED 粗调，以及 ADC 内部 <code>19 fs</code> 步进的 <code>tAD</code> 微调。</p>
+<p>实际调试时，时钟表至少要列出每个输出的频率、接收器、逻辑制式、相位关系和是否参与 SYSREF。只画一棵“时钟树”而不记录这些条件，后面很难判断问题来自频率配置、同步顺序还是模拟抖动。</p>
+<h2 id="五-usb-接口只负责配置不负责高速数据"><a class="markdownIt-Anchor" href="#五-usb-接口只负责配置不负责高速数据"></a> 五、USB 接口只负责配置，不负责高速数据</h2>
+<p>原理图第 16、17 页包含 ADC、LMX、LMK 和放大器的控制选择，以及 <code>FT4232HL</code> USB 转 SPI/I²C 接口。它用于给时钟芯片、ADC 和 <code>LMH6401</code> 加载寄存器配置，也方便使用 TI 的 HSDC TID GUI 调试。</p>
+<p>高速采样数据并不经过这个 USB 接口。真正的数据通路是 ADC 的 JESD204B lane 经过 FMC+ 进入 <code>TSW14J57</code> 采集卡，电脑上的 USB 主要用于控制和从采集卡读取测试结果。把配置链和数据链分开以后，原理图第 16～21 页就容易看懂了。</p>
+<h2 id="六-电源为什么要先开关降压再用-ldo"><a class="markdownIt-Anchor" href="#六-电源为什么要先开关降压再用-ldo"></a> 六、电源为什么要先开关降压再用 LDO</h2>
+<p>第 22～26 页是完整电源部分。设计指南给出的输入为 <code>12 V、4 A</code>，最终要产生 <code>1.9 V、1.1 V、3.3 V、2.5 V、-2.5 V</code> 五组电源。</p>
+<p><img src="/images/myimge/tida-01028/schematic-deep-dive/power-input-and-1v9-rail-schematic-page-22.png" alt="12 V 输入保护和 1.9 V 电源轨" /></p>
+<p><em>资料：TIDRZ70，原理图第 22 页。上方为 12 V 输入保护，下方为 2 MHz 开关预降压和 1.9 V 低噪声 LDO。</em></p>
+<p>12 V 入口先经过 <code>TPS259261</code> 电子保险丝，完成浪涌控制、欠压和限流。随后 <code>TPS82130</code> 以 <code>2 MHz</code> 开关频率把电压高效率降到中间电压，再由 <code>TPS7A8400</code> LDO 生成干净的 <code>1.9 V</code>。LDO 输出又通过独立磁珠分成 ADC1 和 ADC2 的 1.9 V 电源，局部各自放置去耦电容。</p>
+<p>其他电源页使用相同思路生成 <code>1.1 V</code>、<code>3.3 V</code> 和正负 <code>2.5 V</code>。设计指南给出的最大输出能力为：前三路各 <code>4 A</code>，<code>2.5 V</code> 为 <code>1 A</code>，<code>-2.5 V</code> 为 <code>800 mA</code>，整套电源效率目标高于 <code>85%</code>。</p>
+<p>这种“开关预降压 + LDO 最后净化”的结构兼顾效率和噪声，但还要检查三件事：开关频率及其谐波是否进入观测带宽，LDO 在高频下还有多少 PSRR，以及 ADC、PLL、放大器之间的上电顺序是否满足要求。</p>
+<p>原理图使用了 <code>GND_ADC1</code>、<code>GND_ADC2</code>、<code>GND_PLL</code> 和多组 <code>AGND</code> 网络名。它们表达了噪声分区意图，但仅凭原理图不能判断 PCB 是否真的把地平面切开。高速差分信号的回流路径必须连续，具体怎样连接还需要结合 PCB 层叠和布局检查。</p>
+<h2 id="七-原理图能确认什么不能确认什么"><a class="markdownIt-Anchor" href="#七-原理图能确认什么不能确认什么"></a> 七、原理图能确认什么，不能确认什么</h2>
+<p>通过这两份 PDF，已经可以确认系统拓扑、器件连接、时钟频率、电源轨和 TI 的测试条件。仍然不能只靠原理图确认的内容包括：</p>
+<ul>
+<li>当前板卡的实际装配变体和所有 DNP 选项；</li>
+<li>高频走线长度、阻抗、过孔和参考平面；</li>
+<li>每次上电时的寄存器配置与同步顺序；</li>
+<li>交织校准算法是否实时运行；</li>
+<li>温度变化后的增益、相位和时间漂移。</li>
+</ul>
+<p>TI 的设计指南给出了实测边界：保留交织杂散时，约 <code>2 GHz</code> 输入带宽内 ENOB 高于 <code>7.5 bit</code>；在分析中去除交织杂散后可以超过 <code>8.5 bit</code>。这说明标称 <code>12 bit ADC</code> 并不等于整机有 12 bit 有效分辨率，系统性能最终由模拟前端、时钟、电源和校准共同决定。</p>
+<h2 id="八-我会怎样审查这类原理图"><a class="markdownIt-Anchor" href="#八-我会怎样审查这类原理图"></a> 八、我会怎样审查这类原理图</h2>
+<p>重新阅读后，我更倾向于按信号流而不是页码检查：</p>
+<ol>
+<li>先用第 1 页确认模拟流、时钟流、数据流、控制流和电源流；</li>
+<li>沿一条模拟通道核对输入模式、增益、共模、滤波和 DNP；</li>
+<li>从 ADC 向右核对 JESD204B lane、SYNC、SYSREF 和 FMC+；</li>
+<li>从 ADC 时钟脚向左反查 LMX、LMK 与参考源；</li>
+<li>最后建立电源表，记录每路负载、电流、噪声、时序和测试点。</li>
+</ol>
+<p>TIDA-01028 的价值不在于提供一份可以直接照抄的 BOM，而在于展示高速采集系统怎样分层。真正自己做板时，应该先跑通单条模拟链和单颗 ADC，再验证两颗器件的确定性同步，最后才打开板级交织和数字校准。这样每一步都有明确的故障边界。</p>
+<h2 id="参考资料"><a class="markdownIt-Anchor" href="#参考资料"></a> 参考资料</h2>
+<ul>
+<li>Texas Instruments, <em>TIDA-01028 Schematic and Block Diagram</em>, TIDRZ70, March 2019，重点参考原理图第 1～26 页。</li>
+<li>Texas Instruments, <em>12.8-GSPS Analog Front End Reference Design for High-Speed Oscilloscope and Wide-Band Digitizer</em>, TIDUEI2, March 2019，重点参考第 4～25 页。</li>
+</ul>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录" data-aos="zoom-in">学习记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/ADC/" rel="tag" title="ADC">ADC</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/JESD204B/" rel="tag" title="JESD204B">JESD204B</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%97%B6%E9%92%9F%E8%AE%BE%E8%AE%A1/" rel="tag" title="时钟设计">时钟设计</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E9%AB%98%E9%80%9F%E9%87%87%E9%9B%86/" rel="tag" title="高速采集">高速采集</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+          <img data-src="/images/myimge/wallhaven-pink/wallhaven-0wg366.jpg" data-sizes="auto" alt="从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性" class="lazyload">
+        <a href="/2026/07/24/linear-regulator-and-ldo-basics/" aria-label="前一篇: 从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性" title="前一篇: 从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            从 ±310V 到 ±300V：学习 LDO 的反馈环路、零极点与稳定性
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-3l5z63.jpg" data-sizes="auto" alt="示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片" class="lazyload">
+      <a href="/2026/07/22/oscilloscope-time-interleaving-and-spectrum-slicing/" aria-label="后一篇: 示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片"  title="后一篇: 示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E5%85%88%E5%88%86%E6%B8%85%E5%9B%9B%E8%B7%AF%E8%BE%93%E5%85%A5%E5%92%8C%E4%B8%80%E8%B7%AF-128-gsps"><span class="toc-number">1.</span> <span class="toc-text"> 一、先分清四路输入和一路 12.8 GSPS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E6%A8%A1%E6%8B%9F%E8%BE%93%E5%85%A5%E9%A1%B5%E4%B8%BA%E4%BB%80%E4%B9%88%E6%9C%89%E5%A4%A7%E9%87%8F-dnp"><span class="toc-number">2.</span> <span class="toc-text"> 二、模拟输入页为什么有大量 DNP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-adc-%E9%A1%B5%E4%B8%8D%E4%BB%85%E6%98%AF%E4%B8%80%E4%B8%AA%E5%A4%A7%E8%8A%AF%E7%89%87%E7%AC%A6%E5%8F%B7"><span class="toc-number">3.</span> <span class="toc-text"> 三、ADC 页不仅是一个大芯片符号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E6%97%B6%E9%92%9F%E6%A0%91%E4%B8%BA%E4%BB%80%E4%B9%88%E5%88%86%E6%88%90-lmk-%E5%92%8C%E4%B8%A4%E9%A2%97-lmx"><span class="toc-number">4.</span> <span class="toc-text"> 四、时钟树为什么分成 LMK 和两颗 LMX</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-usb-%E6%8E%A5%E5%8F%A3%E5%8F%AA%E8%B4%9F%E8%B4%A3%E9%85%8D%E7%BD%AE%E4%B8%8D%E8%B4%9F%E8%B4%A3%E9%AB%98%E9%80%9F%E6%95%B0%E6%8D%AE"><span class="toc-number">5.</span> <span class="toc-text"> 五、USB 接口只负责配置，不负责高速数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E7%94%B5%E6%BA%90%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%85%88%E5%BC%80%E5%85%B3%E9%99%8D%E5%8E%8B%E5%86%8D%E7%94%A8-ldo"><span class="toc-number">6.</span> <span class="toc-text"> 六、电源为什么要先开关降压再用 LDO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E5%8E%9F%E7%90%86%E5%9B%BE%E8%83%BD%E7%A1%AE%E8%AE%A4%E4%BB%80%E4%B9%88%E4%B8%8D%E8%83%BD%E7%A1%AE%E8%AE%A4%E4%BB%80%E4%B9%88"><span class="toc-number">7.</span> <span class="toc-text"> 七、原理图能确认什么，不能确认什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E6%88%91%E4%BC%9A%E6%80%8E%E6%A0%B7%E5%AE%A1%E6%9F%A5%E8%BF%99%E7%B1%BB%E5%8E%9F%E7%90%86%E5%9B%BE"><span class="toc-number">8.</span> <span class="toc-text"> 八、我会怎样审查这类原理图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">9.</span> <span class="toc-text"> 参考资料</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="/js/vendor/lazysizes.min.js" crossorigin="anonymous"></script>
+
+
+<script src="/js/vendor/clipboard.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "TIDA-01028 原理图深度拆解：从 4 路模拟前端到 12.8 GSPS 采集系统",
+          url: "https://alen9966.github.io/2026/07/22/tida-01028-schematic-deep-dive/",
+          excerpt: "",
+          description: "对照 TIDRZ70 原理图和 TIDUEI2 设计指南，梳理 TIDA-01028 的四路模拟输入、双 ADC12DJ3200、JESD204B、时钟树、配置接口与分层供电。",
+          stripContent: "第一次打开 TIDA-01028 的原理图时，我注意力全在两颗 ADC12DJ3200 上，总觉得找到 ADC 就算抓住了系统核心。重新对照设计指南后才发现，这块板真正难的部分并不是 ADC 本身，而是模拟输入、时钟、JESD204B、电源和配置接口怎样一起工作。 TIDRZ70 这份 PDF 一共 28 页，其中前 26 页是框图和正式电路页，后两页是说明与法律信息。原理图标题栏还写明：它建立在 TIDA-01022-E3 PCB 上，并使用 TIDA-01027 的电源方案。因此它不是从零开",
+          date: "Wed Jul 22 2026 14:30:00 GMT+0800",
+          updated: "Thu Aug 20 2026 16:30:48 GMT+0800",
+          cover: "/images/myimge/wallhaven-pink/wallhaven-57eey1.jpg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+      <script src="/js/lazyload-fallback.js"></script>
+  </body>
+  </html>

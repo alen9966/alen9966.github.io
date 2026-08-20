@@ -1,0 +1,500 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    示波器校准仪的电源 | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="给高压运放做一块 ±300V 低纹波电源，前级建立 ±310V 母线，后级用分立 LDO 做最后一级净化。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="示波器校准仪的电源">
+<meta property="og:url" content="https://alen9966.github.io/2026/07/21/oscilloscope-calibrator-power/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="给高压运放做一块 ±300V 低纹波电源，前级建立 ±310V 母线，后级用分立 LDO 做最后一级净化。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-21T02:40:00.000Z">
+<meta property="article:modified_time" content="2026-08-20T08:30:48.105Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="电源设计">
+<meta property="article:tag" content="PCB">
+<meta property="article:tag" content="调试">
+<meta name="twitter:card" content="summary">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/myimge/wallhaven-pink/wallhaven-pkxqpm.jpg" alt="示波器校准仪的电源">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">示波器校准仪的电源</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E7%9B%AE%E6%A0%87%E5%92%8C%E6%80%BB%E4%BD%93%E6%96%B9%E6%A1%88"><span class="toc-number">1.</span> <span class="toc-text"> 项目目标和总体方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%B5%E6%BA%90%E9%93%BE%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text"> 电源链路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BE%85%E5%8A%A9%E7%94%B5%E6%BA%90"><span class="toc-number">3.</span> <span class="toc-text"> 辅助电源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E5%87%86-%E5%8F%8D%E9%A6%88%E5%92%8C%E7%9B%91%E6%B5%8B"><span class="toc-number">4.</span> <span class="toc-text"> 基准、反馈和监测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E7%AB%8B-ldo"><span class="toc-number">5.</span> <span class="toc-text"> 分立 LDO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pcb-%E5%B8%83%E5%B1%80"><span class="toc-number">6.</span> <span class="toc-text"> PCB 布局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BE%85%E9%AA%8C%E8%AF%81%E9%A1%B9%E7%9B%AE"><span class="toc-number">7.</span> <span class="toc-text"> 待验证项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%84%8A%E6%8E%A5%E4%B8%8E%E8%B0%83%E8%AF%95"><span class="toc-number">8.</span> <span class="toc-text"> 焊接与调试</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-oscilloscope-calibrator-power" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-07-21T02:40:00.000Z" itemprop="datePublished">2026-07-21</time>
+    <time style="display: none;" id="post-update-time">2026-08-20</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-20T08:30:48.105Z" itemprop="dateModified">2026-08-20</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>这块板用于给高压运放提供 <code>±300V</code> 电源。系统先把 <code>24V</code> 升压为 <code>±310V</code>，再通过正负两路分立 LDO 得到 <code>±300V</code>。后级线性稳压器只承担约 <code>10V</code> 压差，目的是进一步抑制前级开关纹波，同时避免直接线性降压带来的巨大损耗。整板按 <code>200W</code> 级别设计。</p>
+<p>目前已经完成原理图、PCB 和 <code>.ms14</code> 仿真文件，暂时还没有完整的实测数据。这一版先记录电源结构和调试计划，输出纹波、负载瞬态、温升和环路稳定性等结果会在板子调通后补充。</p>
+<h2 id="项目目标和总体方案"><a class="markdownIt-Anchor" href="#项目目标和总体方案"></a> 项目目标和总体方案</h2>
+<p>这不是单纯的升压板。高压运放对电源纹波、基准漂移和正负电源一致性比较敏感，因此电源分成前级升压和后级线性净化两部分。<code>±310V</code> 母线给 LDO 留出约 <code>10V</code> 的调节余量；压差过小可能使调整管退出稳压状态，压差过大又会增加功率管耗散。实际所需余量还要结合负载电流、功率管工作点和环路动态测试确定。</p>
+<p>整块板分为三部分：</p>
+<ol>
+<li><code>24V</code> 前级负责把系统输入抬到高压母线。</li>
+<li>辅助电源负责给参考、误差放大和监测电路提供低压工作环境。</li>
+<li>分立 LDO 负责把 <code>±310V</code> 最后压到 <code>±300V</code>，尽量把前级开关纹波拦在高压运放前面。</li>
+</ol>
+<h2 id="电源链路"><a class="markdownIt-Anchor" href="#电源链路"></a> 电源链路</h2>
+<p><code>24V</code> 输入一路生成控制电路需要的低压电源，另外两路分别升压得到 <code>+310V</code> 和 <code>-310V</code>。正负高压母线再经过独立的分立 LDO，输出 <code>+300V</code> 和 <code>-300V</code>。前级使用 <code>6.8µH</code> 电感，开关频率为 <code>300kHz</code>；具体工作模式和电流应力还需要结合完整回路和仿真结果核对。</p>
+<p>完整原理图保存在站点中：</p>
+<ul>
+<li><a href="/files/oscilloscope-power/SCH_Schematic1_1_2026-07-21.pdf">完整原理图 PDF</a></li>
+</ul>
+<h2 id="辅助电源"><a class="markdownIt-Anchor" href="#辅助电源"></a> 辅助电源</h2>
+<p>辅助电源为基准源、误差放大器和监测电路供电，包含 <code>+12V</code>、<code>-12V</code> 和 <code>5V</code> 等电源轨，并通过 <code>EN</code> 控制上电。<code>TPS7A3901DSCR</code> 用于双极性低压供电。调试时需要先确认这些电源轨正常，再给高压部分上电；否则基准和误差放大器未进入正常状态，高压输出没有闭环条件。</p>
+<h2 id="基准-反馈和监测"><a class="markdownIt-Anchor" href="#基准-反馈和监测"></a> 基准、反馈和监测</h2>
+<p><code>REF5025AIDR</code> 提供基准，<code>OPA2192IDR</code> 和 <code>ADA4622-2ARZ</code> 用于反馈、缓冲或监测，<code>MJE5731AG</code>、<code>TIP50G</code>、<code>PZTA42-QX</code> 和 <code>PZTA92(T1G)</code> 构成高压调整和驱动部分。各器件在环路中的具体分工仍需结合仿真模型继续核对。</p>
+<p>控制和监测信号包括：</p>
+<ul>
+<li><code>VREFA</code>、<code>VREFB</code></li>
+<li><code>FBP</code>、<code>FBN</code></li>
+<li><code>IPROGA</code>、<code>IPROGB</code></li>
+<li><code>IMONA</code>、<code>IMONB</code></li>
+<li><code>VMONA</code>、<code>VMONB</code></li>
+<li><code>VMODA</code>、<code>VMODB</code></li>
+<li><code>IMODEA</code>、<code>IMODEB</code></li>
+<li><code>ENA</code>、<code>ENB</code>、<code>EN</code></li>
+</ul>
+<p><code>FBP/FBN</code> 用于正负输出反馈，<code>VMON</code> 和 <code>IMON</code> 分别对应电压、电流监测，<code>IPROG</code> 用于电流设定，<code>ENA/ENB</code> 控制两路输出。调试记录需要同时保存输出实测值和监测端读数，用来验证监测比例和限流功能。</p>
+<h2 id="分立-ldo"><a class="markdownIt-Anchor" href="#分立-ldo"></a> 分立 LDO</h2>
+<p>正负两路 LDO 分别把 <code>+310VIN/-310VIN</code> 稳定到 <code>+300V/-300V</code>。反馈电压与 <code>VREFA/VREFB</code> 比较后，误差放大器控制高压调整管的导通程度。<code>FBP/FBN</code> 是判断闭环工作状态的关键节点。</p>
+<p>这一部分的主要风险是调整管安全工作区和环路稳定性。正常工作时调整管承担约 <code>10V</code> 压差，但启动、短路和负载突变时的瞬时应力可能更高。目前还没有实测温升和瞬态数据，也没有完成环路增益验证。</p>
+<h2 id="pcb-布局"><a class="markdownIt-Anchor" href="#pcb-布局"></a> PCB 布局</h2>
+<p>PCB 将 <code>24V/PGND</code> 输入、高压母线、辅助低压和小信号控制区域分开布置。右侧连接器引出 <code>-310V</code>、两个 <code>GND</code> 和 <code>+310V</code>，<code>TP-REF</code>、<code>TP-LDO-FB</code> 等测试点用于测量基准和反馈节点。</p>
+<p>布局还需要通过实测确认两个问题：</p>
+<ul>
+<li>高压大电流回路和小信号参考地之间有没有被开关回流污染。</li>
+<li>分立 LDO 的反馈节点、参考节点和功率管散热铜皮之间有没有互相影响。</li>
+</ul>
+<h2 id="待验证项目"><a class="markdownIt-Anchor" href="#待验证项目"></a> 待验证项目</h2>
+<p>目前还没有完整实测数据，板子调通后需要验证：</p>
+<ul>
+<li><code>±310V</code> 母线的开关纹波，以及 LDO 对 <code>300kHz</code> 及其谐波的抑制能力；</li>
+<li><code>+300V</code> 与 <code>-300V</code> 的稳态误差、启动时序和负载瞬态一致性；</li>
+<li>调整管在空载、典型负载和最大负载下的耗散、温升与安全工作区；</li>
+<li><code>VMON</code>、<code>IMON</code>、<code>IPROG</code> 与真实输出电压、电流之间的对应关系；</li>
+<li>反馈环路的振铃、相位裕量和不同输出电容下的稳定性。</li>
+</ul>
+<h2 id="焊接与调试"><a class="markdownIt-Anchor" href="#焊接与调试"></a> 焊接与调试</h2>
+<p>计划按下面的顺序上电和调试：</p>
+<ol>
+<li>不上高压，先做冷检查。确认高压器件方向、关键阻值、参考源焊接、反馈链路和输入输出之间没有低阻短路。</li>
+<li>单独验证辅助低压部分。确认 <code>5V</code>、<code>+12V</code>、<code>-12V</code> 以及基准源输出正常，再给高压部分上电。</li>
+<li>分段看前级升压。先限流上电，确认 <code>+310V</code>、<code>-310V</code> 母线是否能稳定建立，再看空载纹波和启动过程。</li>
+<li>再闭合分立 LDO。重点测 <code>TP-REF</code>、<code>TP-LDO-FB</code> 一类测试点，确认参考、反馈和输出之间的关系是不是和设计预期一致。</li>
+<li>最后做带载测试。记录空载、典型负载和接近目标负载时的输出电压、纹波和温升。</li>
+</ol>
+<p><code>.ms14</code> 仿真会重点记录启动、负载变化和分立 LDO 反馈环路。仿真结果和实测波形尚未整理，完成后再补充对照。</p>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/" title="项目记录" data-aos="zoom-in">项目记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/PCB/" rel="tag" title="PCB">PCB</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E7%94%B5%E6%BA%90%E8%AE%BE%E8%AE%A1/" rel="tag" title="电源设计">电源设计</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E8%B0%83%E8%AF%95/" rel="tag" title="调试">调试</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+          <img data-src="/images/myimge/wallhaven-pink/wallhaven-werdv6.jpg" data-sizes="auto" alt="超声波探伤仪的面板" class="lazyload">
+        <a href="/2026/07/21/ultrasonic-flaw-detector-panel/" aria-label="前一篇: 超声波探伤仪的面板" title="前一篇: 超声波探伤仪的面板"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            超声波探伤仪的面板
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-5we787.jpg" data-sizes="auto" alt="硬件项目记录方法：从原理图到调试闭环" class="lazyload">
+      <a href="/2026/07/21/project-writing-framework/" aria-label="后一篇: 硬件项目记录方法：从原理图到调试闭环"  title="后一篇: 硬件项目记录方法：从原理图到调试闭环"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          硬件项目记录方法：从原理图到调试闭环
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%A1%B9%E7%9B%AE%E7%9B%AE%E6%A0%87%E5%92%8C%E6%80%BB%E4%BD%93%E6%96%B9%E6%A1%88"><span class="toc-number">1.</span> <span class="toc-text"> 项目目标和总体方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%B5%E6%BA%90%E9%93%BE%E8%B7%AF"><span class="toc-number">2.</span> <span class="toc-text"> 电源链路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BE%85%E5%8A%A9%E7%94%B5%E6%BA%90"><span class="toc-number">3.</span> <span class="toc-text"> 辅助电源</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E5%87%86-%E5%8F%8D%E9%A6%88%E5%92%8C%E7%9B%91%E6%B5%8B"><span class="toc-number">4.</span> <span class="toc-text"> 基准、反馈和监测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E7%AB%8B-ldo"><span class="toc-number">5.</span> <span class="toc-text"> 分立 LDO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#pcb-%E5%B8%83%E5%B1%80"><span class="toc-number">6.</span> <span class="toc-text"> PCB 布局</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BE%85%E9%AA%8C%E8%AF%81%E9%A1%B9%E7%9B%AE"><span class="toc-number">7.</span> <span class="toc-text"> 待验证项目</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%84%8A%E6%8E%A5%E4%B8%8E%E8%B0%83%E8%AF%95"><span class="toc-number">8.</span> <span class="toc-text"> 焊接与调试</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="/js/vendor/lazysizes.min.js" crossorigin="anonymous"></script>
+
+
+<script src="/js/vendor/clipboard.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "示波器校准仪的电源",
+          url: "https://alen9966.github.io/2026/07/21/oscilloscope-calibrator-power/",
+          excerpt: "",
+          description: "给高压运放做一块 ±300V 低纹波电源，前级建立 ±310V 母线，后级用分立 LDO 做最后一级净化。",
+          stripContent: "这块板用于给高压运放提供 ±300V 电源。系统先把 24V 升压为 ±310V，再通过正负两路分立 LDO 得到 ±300V。后级线性稳压器只承担约 10V 压差，目的是进一步抑制前级开关纹波，同时避免直接线性降压带来的巨大损耗。整板按 200W 级别设计。 目前已经完成原理图、PCB 和 .ms14 仿真文件，暂时还没有完整的实测数据。这一版先记录电源结构和调试计划，输出纹波、负载瞬态、温升和环路稳定性等结果会在板子调通后补充。  项目目标和总体方案 这不是单纯的升压板。高压运放对电源纹波、",
+          date: "Tue Jul 21 2026 10:40:00 GMT+0800",
+          updated: "Thu Aug 20 2026 16:30:48 GMT+0800",
+          cover: "/images/myimge/wallhaven-pink/wallhaven-l35xgr.jpg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+      <script src="/js/lazyload-fallback.js"></script>
+  </body>
+  </html>

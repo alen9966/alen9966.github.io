@@ -1,0 +1,454 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    超声波探伤仪的面板 | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="记录超声波探伤仪面板的项目范围和当前进度，后续补充按键、显示、接口与整机联调结果。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="超声波探伤仪的面板">
+<meta property="og:url" content="https://alen9966.github.io/2026/07/21/ultrasonic-flaw-detector-panel/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="记录超声波探伤仪面板的项目范围和当前进度，后续补充按键、显示、接口与整机联调结果。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-07-21T02:50:00.000Z">
+<meta property="article:modified_time" content="2026-08-20T08:30:48.106Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="PCB">
+<meta property="article:tag" content="调试">
+<meta property="article:tag" content="接口">
+<meta name="twitter:card" content="summary">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/myimge/wallhaven-pink/wallhaven-jxe3ry.jpg" alt="超声波探伤仪的面板">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">超声波探伤仪的面板</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E5%89%8D%E9%9C%80%E8%A6%81%E7%A1%AE%E5%AE%9A%E7%9A%84%E5%86%85%E5%AE%B9"><span class="toc-number">1.</span> <span class="toc-text"> 当前需要确定的内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E5%9B%BE%E5%92%8C-pcb"><span class="toc-number">2.</span> <span class="toc-text"> 原理图和 PCB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E5%89%8D%E7%8A%B6%E6%80%81"><span class="toc-number">3.</span> <span class="toc-text"> 当前状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%A1%E5%88%92%E9%AA%8C%E8%AF%81%E7%9A%84%E9%A1%B9%E7%9B%AE"><span class="toc-number">4.</span> <span class="toc-text"> 计划验证的项目</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-ultrasonic-flaw-detector-panel" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-07-21T02:50:00.000Z" itemprop="datePublished">2026-07-21</time>
+    <time style="display: none;" id="post-update-time">2026-08-20</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-20T08:30:48.106Z" itemprop="dateModified">2026-08-20</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>这个项目是超声波探伤仪的人机交互面板，负责承载显示、按键、编码器和状态指示，并通过连接器与主控板、模拟前端和电源部分连接。目前还没有完整的原理图说明、接口定义和实测数据，因此这篇文章只记录项目范围和当前状态，不提前补写尚未确认的设计结论。</p>
+<h2 id="当前需要确定的内容"><a class="markdownIt-Anchor" href="#当前需要确定的内容"></a> 当前需要确定的内容</h2>
+<p>面板设计需要同时满足电气和结构要求。显示器、按键和编码器的位置会直接影响 PCB 外形与固定孔位；连接器的位置则由整机内部的板卡关系和排线方向决定。开始布局前，需要先确定面板尺寸、安装位置、显示器型号、输入器件数量和各连接器定义。</p>
+<h2 id="原理图和-pcb"><a class="markdownIt-Anchor" href="#原理图和-pcb"></a> 原理图和 PCB</h2>
+<p>原理图需要把显示、按键、指示灯、编码器和外部接口分区整理。PCB 布局首先服从面板开孔和装配尺寸，再处理排线方向、器件高度和操作间距。按键信号是否需要硬件消抖、显示接口的信号类型以及连接器是否需要保护，目前都还没有足够资料确认。</p>
+<h2 id="当前状态"><a class="markdownIt-Anchor" href="#当前状态"></a> 当前状态</h2>
+<p>项目还没有进入完整的单板测试和整机联调阶段，暂时没有可以记录的故障结论。后续会补充结构配合、接口定义、焊接问题和修改结果，并区分设计值与实测值。</p>
+<h2 id="计划验证的项目"><a class="markdownIt-Anchor" href="#计划验证的项目"></a> 计划验证的项目</h2>
+<ul>
+<li>上电前检查电源与地之间是否存在短路；</li>
+<li>分别验证显示、按键、编码器和指示灯；</li>
+<li>检查排线方向和接口电平；</li>
+<li>装入整机后确认开孔、按键行程和连接器位置；</li>
+<li>记录整机联调中出现的问题和修改结果。</li>
+</ul>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/" title="项目记录" data-aos="zoom-in">项目记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/PCB/" rel="tag" title="PCB">PCB</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%8E%A5%E5%8F%A3/" rel="tag" title="接口">接口</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E8%B0%83%E8%AF%95/" rel="tag" title="调试">调试</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+          <img data-src="/images/myimge/wallhaven-pink/wallhaven-3l5z63.jpg" data-sizes="auto" alt="示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片" class="lazyload">
+        <a href="/2026/07/22/oscilloscope-time-interleaving-and-spectrum-slicing/" aria-label="前一篇: 示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片" title="前一篇: 示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            示波器如何突破 ADC 采样率：从 TIDA-01028 的时间交织讲到频谱分片
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-l35xgr.jpg" data-sizes="auto" alt="示波器校准仪的电源" class="lazyload">
+      <a href="/2026/07/21/oscilloscope-calibrator-power/" aria-label="后一篇: 示波器校准仪的电源"  title="后一篇: 示波器校准仪的电源"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          示波器校准仪的电源
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E5%89%8D%E9%9C%80%E8%A6%81%E7%A1%AE%E5%AE%9A%E7%9A%84%E5%86%85%E5%AE%B9"><span class="toc-number">1.</span> <span class="toc-text"> 当前需要确定的内容</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86%E5%9B%BE%E5%92%8C-pcb"><span class="toc-number">2.</span> <span class="toc-text"> 原理图和 PCB</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BD%93%E5%89%8D%E7%8A%B6%E6%80%81"><span class="toc-number">3.</span> <span class="toc-text"> 当前状态</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%A1%E5%88%92%E9%AA%8C%E8%AF%81%E7%9A%84%E9%A1%B9%E7%9B%AE"><span class="toc-number">4.</span> <span class="toc-text"> 计划验证的项目</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="/js/vendor/lazysizes.min.js" crossorigin="anonymous"></script>
+
+
+<script src="/js/vendor/clipboard.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "超声波探伤仪的面板",
+          url: "https://alen9966.github.io/2026/07/21/ultrasonic-flaw-detector-panel/",
+          excerpt: "",
+          description: "记录超声波探伤仪面板的项目范围和当前进度，后续补充按键、显示、接口与整机联调结果。",
+          stripContent: "这个项目是超声波探伤仪的人机交互面板，负责承载显示、按键、编码器和状态指示，并通过连接器与主控板、模拟前端和电源部分连接。目前还没有完整的原理图说明、接口定义和实测数据，因此这篇文章只记录项目范围和当前状态，不提前补写尚未确认的设计结论。  当前需要确定的内容 面板设计需要同时满足电气和结构要求。显示器、按键和编码器的位置会直接影响 PCB 外形与固定孔位；连接器的位置则由整机内部的板卡关系和排线方向决定。开始布局前，需要先确定面板尺寸、安装位置、显示器型号、输入器件数量和各连接器定义。  原理",
+          date: "Tue Jul 21 2026 10:50:00 GMT+0800",
+          updated: "Thu Aug 20 2026 16:30:48 GMT+0800",
+          cover: "/images/myimge/wallhaven-pink/wallhaven-werdv6.jpg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+      <script src="/js/lazyload-fallback.js"></script>
+  </body>
+  </html>

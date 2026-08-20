@@ -1,0 +1,785 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型 | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="从带 φ(t) 的正弦波开始，给出 ℒ(f)、Sφ(f)、阿伦偏差 σ_y(τ) 的定义与换算关系，推导幂律五分区斜率，并按直接频谱、I&#x2F;Q 解调、PLL 鉴相、双通道互相关四种方法写出测量模型和适用边界。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型">
+<meta property="og:url" content="https://alen9966.github.io/2026/08/18/phase-noise-definition-and-measurement-math/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="从带 φ(t) 的正弦波开始，给出 ℒ(f)、Sφ(f)、阿伦偏差 σ_y(τ) 的定义与换算关系，推导幂律五分区斜率，并按直接频谱、I&#x2F;Q 解调、PLL 鉴相、双通道互相关四种方法写出测量模型和适用边界。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig01_phase_jitter_time_domain.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig02_Lf_definition_and_spurs.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig03_slope_regions_and_rms_integral.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig04_power_law_decomposition.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig05_Lf_vs_allan_deviation.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig06_direct_spectrum_ceiling.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig07_analog_vs_digital_iq.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig08_pll_double_balanced_mixer.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig09a_single_reference_ceiling.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig09b_dual_reference_cross_correlation.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig10_four_instrument_comparison.png">
+<meta property="article:published_time" content="2026-08-18T11:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-20T08:30:48.105Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="测试测量">
+<meta property="article:tag" content="相位噪声">
+<meta property="article:tag" content="信号与系统">
+<meta property="article:tag" content="频谱分析">
+<meta property="article:tag" content="阿伦方差">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/myimge/phase-noise-basics/fig01_phase_jitter_time_domain.png">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/myimge/phase-noise-basics/wallhaven-yqg6r7-banner.jpg" alt="相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E4%BB%8E%E6%97%B6%E5%9F%9F%E6%8A%96%E5%8A%A8%E5%88%B0%E9%A2%91%E5%9F%9F%E8%BE%B9%E5%B8%A6%E5%B8%A6-%CF%86t-%E7%9A%84%E6%AD%A3%E5%BC%A6%E6%B3%A2"><span class="toc-number">1.</span> <span class="toc-text"> 一、从时域抖动到频域边带：带 φ(t) 的正弦波</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-lf-%E7%9A%84%E6%95%B0%E5%AD%A6%E5%AE%9A%E4%B9%89-%E4%BB%80%E4%B9%88%E6%98%AF-dbchz-f_offset"><span class="toc-number">2.</span> <span class="toc-text"> 二、ℒ(f) 的数学定义 + 什么是 dBc&#x2F;Hz @ f_offset</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#21-%E5%8D%95%E8%BE%B9%E5%B8%A6%E7%9B%B8%E4%BD%8D%E5%99%AA%E5%A3%B0-lf"><span class="toc-number">2.1.</span> <span class="toc-text"> 2.1 单边带相位噪声 ℒ(f)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#22-%E5%B0%8F%E7%9B%B8%E4%BD%8D%E8%B0%83%E5%88%B6%E8%BF%91%E4%BC%BC%E4%B8%8E-s%CF%86f-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">2.2.</span> <span class="toc-text"> 2.2 小相位调制近似与 Sφ(f) 的关系</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-s%CF%86f-%E6%AE%8B%E4%BD%99%E7%9B%B8%E4%BD%8D%E6%8A%96%E5%8A%A8%E4%B8%8E-rms-%E6%97%B6%E9%97%B4%E6%8A%96%E5%8A%A8%E7%9A%84%E6%8D%A2%E7%AE%97"><span class="toc-number">3.</span> <span class="toc-text"> 三、Sφ(f)、残余相位抖动与 RMS 时间抖动的换算</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#31-%E6%8C%87%E5%AE%9A%E5%B8%A6%E5%AE%BD%E5%86%85%E7%9A%84-rms-%E7%9B%B8%E4%BD%8D%E6%8A%96%E5%8A%A8"><span class="toc-number">3.1.</span> <span class="toc-text"> 3.1 指定带宽内的 RMS 相位抖动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#32-%E6%97%B6%E9%97%B4%E6%8A%96%E5%8A%A8-j_rms"><span class="toc-number">3.2.</span> <span class="toc-text"> 3.2 时间抖动 J_rms</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#33-%E9%A2%91%E7%8E%87%E6%97%B6%E9%97%B4%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%9A%84%E5%8F%A6%E4%B8%80%E7%A7%8D%E5%BA%A6%E9%87%8Fs_yf"><span class="toc-number">3.3.</span> <span class="toc-text"> 3.3 频率&#x2F;时间稳定性的另一种度量：S_y(f)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E5%B9%82%E5%BE%8B%E6%A8%A1%E5%9E%8B%E4%B8%8E-1f2~f2-%E7%9A%84%E4%BA%94%E4%B8%AA%E7%9B%B8%E5%99%AA%E5%88%86%E5%8C%BA"><span class="toc-number">4.</span> <span class="toc-text"> 四、幂律模型与 1&#x2F;f⁻²～f² 的五个相噪分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E9%98%BF%E4%BC%A6%E5%81%8F%E5%B7%AE-%CF%83_y%CF%84-%E4%B8%8E-lf-%E7%9A%84%E6%96%9C%E7%8E%87%E5%AF%B9%E5%BA%94"><span class="toc-number">5.</span> <span class="toc-text"> 五、阿伦偏差 σ_y(τ) 与 ℒ(f) 的斜率对应</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#51-%CF%83_y%CF%84-%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">5.1.</span> <span class="toc-text"> 5.1 σ_y(τ) 的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#52-%E4%B8%8E-s_yf-lf-%E7%9A%84%E7%A7%AF%E5%88%86%E5%85%B3%E7%B3%BB"><span class="toc-number">5.2.</span> <span class="toc-text"> 5.2 与 S_y(f)、ℒ(f) 的积分关系</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E6%B5%8B%E9%87%8F%E6%96%B9%E6%B3%95-i%E7%9B%B4%E6%8E%A5%E9%A2%91%E8%B0%B1%E9%A2%91%E8%B0%B1%E4%BB%AA%E7%9B%B4%E6%8E%A5%E6%B5%8B"><span class="toc-number">6.</span> <span class="toc-text"> 六、测量方法 I：直接频谱（频谱仪直接测）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E6%B5%8B%E9%87%8F%E6%96%B9%E6%B3%95-ii%E6%A8%A1%E6%8B%9F%E6%95%B0%E5%AD%97-iq-%E8%A7%A3%E8%B0%83fswp-53100a-%E7%B1%BB%E6%96%B9%E6%A1%88"><span class="toc-number">7.</span> <span class="toc-text"> 七、测量方法 II：模拟&#x2F;数字 I&#x2F;Q 解调（FSWP &#x2F; 53100A 类方案）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E6%B5%8B%E9%87%8F%E6%96%B9%E6%B3%95-iiipll-%E5%8F%8C%E5%B9%B3%E8%A1%A1%E6%B7%B7%E9%A2%91%E9%89%B4%E7%9B%B8ha7402b-dcnts-e5052b-%E7%B1%BB%E6%96%B9%E6%A1%88"><span class="toc-number">8.</span> <span class="toc-text"> 八、测量方法 III：PLL + 双平衡混频鉴相（HA7402B &#x2F; DCNTS &#x2F; E5052B 类方案）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D-%E5%8F%82%E8%80%83%E6%BA%90%E5%A4%A9%E8%8A%B1%E6%9D%BF%E4%B8%8E%E4%BA%92%E7%9B%B8%E5%85%B3%E5%8D%95%E5%8F%82%E8%80%83-vs-%E5%8F%8C%E5%8F%82%E8%80%83"><span class="toc-number">9.</span> <span class="toc-text"> 九、参考源天花板与互相关：单参考 vs 双参考</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#91-%E5%8D%95%E5%8F%82%E8%80%83%E6%BA%90%E7%9A%84%E7%A1%AC%E5%A4%A9%E8%8A%B1%E6%9D%BF%E6%88%91%E7%9A%84%E4%B8%80%E6%89%8B%E7%BB%8F%E5%8E%86"><span class="toc-number">9.1.</span> <span class="toc-text"> 9.1 单参考源的硬天花板（我的一手经历）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#92-%E5%8F%8C%E5%8F%82%E8%80%83-%E5%8F%8C%E9%80%9A%E9%81%93%E4%BA%92%E7%9B%B8%E5%85%B3%E7%AA%81%E7%A0%B4%E5%A4%A9%E8%8A%B1%E6%9D%BF"><span class="toc-number">9.2.</span> <span class="toc-text"> 9.2 双参考 + 双通道互相关：突破天花板</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81-%E4%B8%BB%E6%B5%81%E4%BB%AA%E5%99%A8%E5%AF%B9%E7%85%A7%E8%A1%A8-%E5%9B%9B%E6%9C%BA%E5%AF%B9%E6%AF%94%E7%A4%BA%E6%84%8F%E6%9B%B2%E7%BA%BF"><span class="toc-number">10.</span> <span class="toc-text"> 十、主流仪器对照表 + 四机对比示意曲线</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#101-%E5%85%AD%E6%AC%BE%E4%B8%BB%E6%B5%81%E7%9B%B8%E5%99%AA%E4%BB%AA%E5%99%A8%E7%9A%84%E6%9E%B6%E6%9E%84%E5%AF%B9%E7%85%A7"><span class="toc-number">10.1.</span> <span class="toc-text"> 10.1 六款主流相噪仪器的架构对照</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#102-%E5%9B%9B%E6%9C%BA%E5%AF%B9%E6%AF%94%E7%A4%BA%E6%84%8F%E6%9B%B2%E7%BA%BF%E5%8E%9F%E7%90%86%E5%BB%BA%E6%A8%A1"><span class="toc-number">10.2.</span> <span class="toc-text"> 10.2 四机对比示意曲线（原理建模）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">11.</span> <span class="toc-text"> 小结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E7%89%87%E6%9D%A5%E6%BA%90"><span class="toc-number">12.</span> <span class="toc-text"> 图片来源</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-phase-noise-definition-and-measurement-math" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-08-18T11:30:00.000Z" itemprop="datePublished">2026-08-18</time>
+    <time style="display: none;" id="post-update-time">2026-08-20</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-20T08:30:48.105Z" itemprop="dateModified">2026-08-20</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <blockquote>
+<p><strong>关于图与数据</strong>：文中 11 张图为 MATLAB 理论仿真，由脚本<br />
+<code>matlab/phase-noise-basics/generate_phase_noise_figures.m</code><br />
+导出到 <code>source/images/myimge/phase-noise-basics/</code>。曲线用于说明定义与测量模型，不是硬件实测。</p>
+</blockquote>
+<p>这篇专注原理、公式和测量模型，<strong>不讨论某一只具体 OCXO 的实测结果</strong>——那些已经写在《<a href="/2026/08/12/phase-noise-53100a-100mhz-ocxo/">从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声</a>》里。本文的目标是回答：看到一个 <code>-120 dBc/Hz @ 10 kHz</code>，它在数学上到底指什么；以及同一只晶振换一台仪器读数为什么不同，什么时候应该信谁。</p>
+<p>我自己只用过 <strong>PhaseStation 53100A</strong>；文中涉及 R&amp;S FSWP、Holzworth HA7402B、Noise XT DCNTS、Keysight E5052B、Anapico APPH6000 的架构描述均来自厂家公开资料整理，<strong>不带有任何选型意见</strong>。</p>
+<h2 id="一-从时域抖动到频域边带带-φt-的正弦波"><a class="markdownIt-Anchor" href="#一-从时域抖动到频域边带带-φt-的正弦波"></a> 一、从时域抖动到频域边带：带 φ(t) 的正弦波</h2>
+<p>理想 100 MHz 载波：</p>
+<p>$$v_{ideal}(t)&#x3D;A\cos(2\pi f_0 t)
+$$</p><p>真实振荡器的相位在随机游走，信号写成：</p>
+<p>$$v(t)&#x3D;A\cos\bigl(2\pi f_0 t + \varphi(t)\bigr)
+$$</p><p>瞬时频率与分数频率波动按相位的时间导数定义：</p>
+<p>$$f_i(t)&#x3D;f_0+\frac{1}{2\pi}\frac{d\varphi}{dt},\qquad
+y(t)\equiv\frac{f_i(t)-f_0}{f_0}&#x3D;\frac{1}{2\pi f_0}\frac{d\varphi}{dt}
+$$</p><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>含义</th>
+<th>常用单位</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>$\varphi(t)$</td>
+<td>随机相位过程</td>
+<td>rad</td>
+</tr>
+<tr>
+<td>$y(t)$</td>
+<td>分数频率波动</td>
+<td>无量纲</td>
+</tr>
+<tr>
+<td>$\Delta t(N)$</td>
+<td>第 $N$ 个过零点相对理想位置的时间偏差</td>
+<td>s</td>
+</tr>
+</tbody>
+</table>
+<p>把这三者放到同一个时间窗里，过零点抖动就是 $\varphi(t)$ 在时域最直观的表现：</p>
+<p><img src="/images/myimge/phase-noise-basics/fig01_phase_jitter_time_domain.png" alt="图1  理想与实际正弦波的过零抖动差异（MATLAB 理论仿真）" /></p>
+<h2 id="二-lf-的数学定义-什么是-dbchz-f_offset"><a class="markdownIt-Anchor" href="#二-lf-的数学定义-什么是-dbchz-f_offset"></a> 二、ℒ(f) 的数学定义 + 什么是 dBc/Hz @ f_offset</h2>
+<h3 id="21-单边带相位噪声-lf"><a class="markdownIt-Anchor" href="#21-单边带相位噪声-lf"></a> 2.1 单边带相位噪声 ℒ(f)</h3>
+<p>NIST 的定义：<strong>距离载波 $f_{offset}$ 处，取 1 Hz 等效噪声带宽内的单边带噪声功率，除以载波总功率</strong>。</p>
+<p>$$\mathcal{L}(f_{offset}) \equiv \frac{P_{SSB}(f_0\pm f_{offset},\,1\,\text{Hz})}{P_{carrier}}
+$$</p><p>写成分贝：</p>
+<p>$$\mathcal{L}_{dB}(f)&#x3D;10\log_{10}\mathcal{L}(f)
+$$</p><p><strong>单位是 dBc/Hz</strong>。三个部分缺一不可：</p>
+<ul>
+<li><strong>dBc</strong> = $10\log_{10}(P&#x2F;P_{carrier})$，表示&quot;相对于载波的功率比&quot;。杂散也用 dBc，但杂散不带 <code>/Hz</code>。</li>
+<li><strong>/Hz</strong> = 已归一化到 1 Hz 等效噪声带宽。这使读数与频谱仪的 RBW 解耦。</li>
+<li><strong>@ $f_{offset}$ + $f_0$</strong> = 指定了在频率轴的位置。只写 <code>-120 dBc/Hz</code> 而不写 offset 和载波频率，信息量不完整。</li>
+</ul>
+<p><strong>工程上的正确写法示例</strong>：</p>
+<blockquote>
+<p><code>-150 dBc/Hz @ 1 kHz offset from 100 MHz carrier</code></p>
+</blockquote>
+<h3 id="22-小相位调制近似与-sφf-的关系"><a class="markdownIt-Anchor" href="#22-小相位调制近似与-sφf-的关系"></a> 2.2 小相位调制近似与 Sφ(f) 的关系</h3>
+<p>把 $v(t)$ 用 Jacobi–Anger 展开。当 $|\varphi(t)|\ll 1\ \text{rad}$ 时（对大多数相位噪声工程问题成立，典型 $\varphi_{rms}$ 仅为 mrad 级）：</p>
+<p>$$\cos(2\pi f_0 t+\varphi)\approx \cos(2\pi f_0 t) - \varphi(t)\sin(2\pi f_0 t)
+$$</p><p>右边第一项仍是纯载波；第二项把 $\varphi(t)$ 调制到了载波的正交边上，<strong>边带幅度 = $(\Delta\varphi&#x2F;2)A$</strong>。两边取功率比：</p>
+<p>$$\mathcal{L}(f)&#x3D;\tfrac{1}{2}S_\varphi(f)
+$$</p><p>这里 $S_\varphi(f)$ 是 $\varphi(t)$ 的<strong>单边功率谱密度</strong>，单位 $\text{rad}^2&#x2F;\text{Hz}$。因此只要在小相位条件下，测到的边带功率就能直接还原出相位本身的 PSD，这是所有后续公式推导的桥梁。</p>
+<p><img src="/images/myimge/phase-noise-basics/fig02_Lf_definition_and_spurs.png" alt="图2  ℒ(f) 的含义：某偏移处 1Hz 带宽功率 ÷ 载波总功率（理论仿真）" /></p>
+<h2 id="三-sφf-残余相位抖动与-rms-时间抖动的换算"><a class="markdownIt-Anchor" href="#三-sφf-残余相位抖动与-rms-时间抖动的换算"></a> 三、Sφ(f)、残余相位抖动与 RMS 时间抖动的换算</h2>
+<h3 id="31-指定带宽内的-rms-相位抖动"><a class="markdownIt-Anchor" href="#31-指定带宽内的-rms-相位抖动"></a> 3.1 指定带宽内的 RMS 相位抖动</h3>
+<p>相位本身的方差是把 $S_\varphi(f)$ 在感兴趣的带宽内积分（双侧 → 乘 2）：</p>
+<p>$$\Delta\varphi_{rms}^{2}
+&#x3D; \bigl\langle \varphi(t)^2 \bigr\rangle
+&#x3D; 2\int_{f_{low}}^{f_{high}} \mathcal{L}(f)\, df
+$$</p><p>代回 $\mathcal{L}&#x3D;S_\varphi&#x2F;2$ 就回到最朴素的 PSD 积分。$f_{low}$、$f_{high}$ 是应用关心的抖动带宽边界，<strong>任何 RMS 抖动数字都必须连带指定这两个频率</strong>。</p>
+<h3 id="32-时间抖动-j_rms"><a class="markdownIt-Anchor" href="#32-时间抖动-j_rms"></a> 3.2 时间抖动 J_rms</h3>
+<p>把弧度除以 $2\pi f_0$，得到单位为秒的时间抖动：</p>
+<p>$$J_{rms}&#x3D;\frac{\Delta\varphi_{rms}}{2\pi f_0}
+$$</p><h3 id="33-频率时间稳定性的另一种度量s_yf"><a class="markdownIt-Anchor" href="#33-频率时间稳定性的另一种度量s_yf"></a> 3.3 频率/时间稳定性的另一种度量：S_y(f)</h3>
+<p>分数频率波动 $y(t)$ 的 PSD 与 $\varphi(t)$ 的关系，由 $y&#x3D;\dot\varphi&#x2F;(2\pi f_0)$ 做傅里叶变换得到：</p>
+<p>$$S_y(f)&#x3D;\frac{f^2}{f_0^{2}}\,S_\varphi(f)&#x3D;2\frac{f^2}{f_0^{2}}\,\mathcal{L}(f)
+$$</p><p>这一节的三个公式把相位噪声、时域抖动和分数频率稳定度连成了一条可互推的链。</p>
+<p><img src="/images/myimge/phase-noise-basics/fig03_slope_regions_and_rms_integral.png" alt="图3  典型 OCXO 相噪分区斜率与 RMS 抖动积分示意（理论仿真）" /></p>
+<h2 id="四-幂律模型与-1f2~f2-的五个相噪分区"><a class="markdownIt-Anchor" href="#四-幂律模型与-1f2~f2-的五个相噪分区"></a> 四、幂律模型与 1/f⁻²～f² 的五个相噪分区</h2>
+<p>用幂律近似把 ℒ(f) 写成五段之和：</p>
+<p>$$\mathcal{L}(f)&#x3D;\sum_{\alpha&#x3D;-2}^{2}h_{\alpha}\,f^{\alpha}
+&#x3D; h_{-2}f^{-2} + h_{-1}f^{-1} + h_0 + h_{+1}f + h_{+2}f^{2}
+$$</p><table>
+<thead>
+<tr>
+<th style="text-align:right">指数 α</th>
+<th>ℒ(f) 斜率</th>
+<th>Sφ(f) 斜率</th>
+<th>常用名称</th>
+<th>物理来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">−2</td>
+<td>−40 dB/dec</td>
+<td>−40 dB/dec</td>
+<td>随机游走 FM</td>
+<td>环境扰动/机械振动/老化的漂移在频域的积累</td>
+</tr>
+<tr>
+<td style="text-align:right">−1</td>
+<td>−20 dB/dec</td>
+<td>−20 dB/dec</td>
+<td>闪烁 FM</td>
+<td>器件 1/f 噪声通过振荡过程转成近载频率噪声，决定 10 Hz～1 kHz 段</td>
+</tr>
+<tr>
+<td style="text-align:right">0</td>
+<td>0 dB/dec</td>
+<td>0 dB/dec</td>
+<td>白 FM</td>
+<td>热噪声，形成相噪曲线的平台</td>
+</tr>
+<tr>
+<td style="text-align:right">+1</td>
+<td>+20 dB/dec</td>
+<td>+20 dB/dec</td>
+<td>闪烁 PM</td>
+<td>输出缓冲级 1/f 相位噪声</td>
+</tr>
+<tr>
+<td style="text-align:right">+2</td>
+<td>+40 dB/dec</td>
+<td>+40 dB/dec</td>
+<td>白 PM</td>
+<td>宽带 ADC 量化、热噪声相位底</td>
+</tr>
+</tbody>
+</table>
+<p>相邻两项的交叉点就是大家常说的&quot;近端/中间/远端&quot;的分界线，具体位置由 $h_i$ 决定，不是固定的 1 kHz。</p>
+<p><img src="/images/myimge/phase-noise-basics/fig04_power_law_decomposition.png" alt="图4  五段幂律叠加合成一条完整相噪曲线（理论仿真）" /></p>
+<h2 id="五-阿伦偏差-σ_yτ-与-lf-的斜率对应"><a class="markdownIt-Anchor" href="#五-阿伦偏差-σ_yτ-与-lf-的斜率对应"></a> 五、阿伦偏差 σ_y(τ) 与 ℒ(f) 的斜率对应</h2>
+<h3 id="51-σ_yτ-的定义"><a class="markdownIt-Anchor" href="#51-σ_yτ-的定义"></a> 5.1 σ_y(τ) 的定义</h3>
+<p>对一段等间隔的平均分数频率序列 $\bar y_i$（平均时间 τ，共 M 段），非重叠阿伦偏差：</p>
+<p>$$\sigma_y(\tau)&#x3D;\sqrt{\frac{1}{2(M-1)}\sum_{i&#x3D;1}^{M-1}\bigl(\bar y_{i+1}-\bar y_i\bigr)^2}
+$$</p><h3 id="52-与-s_yf-lf-的积分关系"><a class="markdownIt-Anchor" href="#52-与-s_yf-lf-的积分关系"></a> 5.2 与 S_y(f)、ℒ(f) 的积分关系</h3>
+<p>$$\sigma_y^2(\tau)&#x3D;2\int_{0}^{\infty} S_y(f)\;\frac{\sin^4(\pi f\tau)}{(\pi f\tau)^2}\;df
+$$</p><p>$[\sin^4 x &#x2F; x^2]$ 这个传递函数就是阿伦偏差对不同傅里叶频率的加权。把第四节幂律模型的 $S_y(f)$ 代进去，得到下表——这张表最常用：</p>
+<table>
+<thead>
+<tr>
+<th>ℒ(f) ∝ f^α</th>
+<th>S_y(f) ∝ f^{α+2}</th>
+<th>σ_y(τ) ∝ τ^{k}</th>
+<th>k 的值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>f⁻²（随机游走 FM）</td>
+<td>f⁰</td>
+<td>τ¹</td>
+<td>+1</td>
+</tr>
+<tr>
+<td>f⁻¹（闪烁 FM）</td>
+<td>f¹</td>
+<td>τ⁰</td>
+<td><strong>0（平台）</strong></td>
+</tr>
+<tr>
+<td>f⁰（白 FM）</td>
+<td>f²</td>
+<td>τ⁻¹⁄²</td>
+<td>−0.5</td>
+</tr>
+<tr>
+<td>f⁺¹（闪烁 PM）</td>
+<td>f³</td>
+<td>τ⁻¹</td>
+<td>−1</td>
+</tr>
+<tr>
+<td>f⁺²（白 PM）</td>
+<td>f⁴</td>
+<td>τ⁻³⁄²</td>
+<td>−1.5</td>
+</tr>
+</tbody>
+</table>
+<p>工程口诀：<strong>ℒ 多一条 −20 dB/dec 斜率，σ_y 就多半个 τ 的斜率</strong>。对照图 5 看更直接：</p>
+<p><img src="/images/myimge/phase-noise-basics/fig05_Lf_vs_allan_deviation.png" alt="图5  同一信号的 ℒ(f) 与 σ_y(τ) 的斜率一一对应（理论仿真）" /></p>
+<h2 id="六-测量方法-i直接频谱频谱仪直接测"><a class="markdownIt-Anchor" href="#六-测量方法-i直接频谱频谱仪直接测"></a> 六、测量方法 I：直接频谱（频谱仪直接测）</h2>
+<p>按 ℒ(f) 的定义，在频谱仪上直接把载波和 1 Hz bin 处的噪声功率比一比：</p>
+<p>$$\mathcal{L}_{marker}(f)&#x3D;P_{noise,1\,Hz}(dBm)-P_{carrier}(dBm)
+$$</p><p>实际测量时 RBW &gt; 1 Hz，需要换算到等效噪声带宽（ENBW）：</p>
+<p>$$\mathcal{L}(f) &#x3D;
+\bigl[P_{noise,\,RBW}(dBm) - P_{carrier}(dBm)\bigr]
+-10\log_{10}\!\left(\frac{ENBW}{1\,Hz}\right)
+$$</p><p>高斯形状的中频滤波器典型 $ENBW \approx 1.05\sim 1.20 \times RBW_{标称}$，具体值查仪器手册。</p>
+<p>直接频谱法有两个硬前提：</p>
+<ol>
+<li><strong>仪器 LO 相噪 ≪ DUT 相噪</strong>（经验差值 ≥ 10 dB）。否则测到的是 LO，不是 DUT。</li>
+<li><strong>DUT 的 AM 噪声 ≪ DUT 的 PM 噪声</strong>（≥ 10 dB）。直接法只看功率，两者没法区分，直接相加后取较大者。</li>
+</ol>
+<p>因此直接法仅适合：快速估算近端很差的振荡器，或者测 DUT 较远载的杂散/底噪。<strong>近载波高精度测量必须交给 II/III/IV 类方法。</strong></p>
+<p><img src="/images/myimge/phase-noise-basics/fig06_direct_spectrum_ceiling.png" alt="图6  直接频谱法受限于 LO 相噪和 AM 噪声（理论示意）" /></p>
+<h2 id="七-测量方法-ii模拟数字-iq-解调fswp-53100a-类方案"><a class="markdownIt-Anchor" href="#七-测量方法-ii模拟数字-iq-解调fswp-53100a-类方案"></a> 七、测量方法 II：模拟/数字 I/Q 解调（FSWP / 53100A 类方案）</h2>
+<p>把 DUT RF 与本振 LO 送入一对正交混频器，LO 信号彼此相差 90°：</p>
+<p>$$\begin{aligned}
+I(t) &amp;&#x3D; \text{LPF}\{\,v_{DUT}(t)\cdot LO_I(t)\,\} \propto \cos\Delta\varphi(t) \\
+Q(t) &amp;&#x3D; \text{LPF}\{\,v_{DUT}(t)\cdot LO_Q(t)\,\} \propto \sin\Delta\varphi(t)
+\end{aligned}
+$$</p><p>然后：</p>
+<p>$$\varphi(t)&#x3D;\text{atan2}(Q,I),\qquad A(t)&#x3D;\sqrt{I^2+Q^2}
+$$</p><p>I 和 Q 被严格拆到两条通道上，<strong>幅度和相位自然分离</strong>，方法六的第二个前提（AM ≪ PM）就不再需要了。</p>
+<p>FSWP 和 53100A 的差别只在于正交解调发生在模拟域还是数字域：</p>
+<ul>
+<li><strong>FSWP 类：模拟 I/Q</strong>。RF 直接送入模拟正交混频，LPF 后 ADC 采 I、Q 两路基带；</li>
+<li><strong>53100A 类：数字 I/Q</strong>。先把 DUT RF 下变频到一个数字化的固定中频 IF，再在 FPGA/DS P 里做 90° 数字相移得到复数 I/Q。数字正交的好处是 90° 准确度与幅相平衡可以用校准保证，不随模拟器件温度漂移。</li>
+</ul>
+<p><img src="/images/myimge/phase-noise-basics/fig07_analog_vs_digital_iq.png" alt="图7  模拟 I/Q 与数字 I/Q 解调的架构差异（原理示意）" /></p>
+<h2 id="八-测量方法-iiipll-双平衡混频鉴相ha7402b-dcnts-e5052b-类方案"><a class="markdownIt-Anchor" href="#八-测量方法-iiipll-双平衡混频鉴相ha7402b-dcnts-e5052b-类方案"></a> 八、测量方法 III：PLL + 双平衡混频鉴相（HA7402B / DCNTS / E5052B 类方案）</h2>
+<p>把双平衡混频器当作鉴相器：DUT 送入 RF 口，参考源送入 LO 口，<strong>用一个 PLL 把两者锁定在正交点 Δφ ≈ π/2</strong>。在该点附近，混频器输出的基带信号近似正比于Δφ：</p>
+<p>$$v_{BM}(t) \approx K_{pd}\cdot\Delta\varphi(t) &#x3D; K_{pd}\bigl[\varphi_{DUT}(t)-\varphi_{REF}(t)\bigr]
+$$</p><p>LPF 之后分成两条路：</p>
+<ul>
+<li>一条送入基带频谱仪/FFT → 得到基带 $S_v(f)$ → 除以 $K_{pd}^2$ → $S_\varphi(f)$ → $\mathcal{L}(f)$；</li>
+<li>另一条送入 PLL 环路滤波器/控制器，输出调谐电压反馈到 REF，<strong>保持 π/2 正交锁定</strong>。</li>
+</ul>
+<p>两个关键条件：</p>
+<ol>
+<li><strong>PLL 环路带宽 $f_{BW} \ll f_{low}$</strong>（我们想测的最低偏移频率）。否则 PLL 会把 DUT 的低频相噪也&quot;纠正掉&quot;，近端被环路整形变形；</li>
+<li><strong>小角度近似 Δφ ≪ 1 rad</strong> 必须成立。如果正交点飘了、DUT 跳频或失锁，混频输出会进入非线性区，比例关系失效。</li>
+</ol>
+<p>由于双平衡结构天然抵消载波和 AM 项，这种方法天然能把 AM/PM 分离。</p>
+<p><img src="/images/myimge/phase-noise-basics/fig08_pll_double_balanced_mixer.png" alt="图8  PLL + 双平衡混频器鉴相（HA7402B / DCNTS / E5052B 类方案）" /></p>
+<h2 id="九-参考源天花板与互相关单参考-vs-双参考"><a class="markdownIt-Anchor" href="#九-参考源天花板与互相关单参考-vs-双参考"></a> 九、参考源天花板与互相关：单参考 vs 双参考</h2>
+<h3 id="91-单参考源的硬天花板我的一手经历"><a class="markdownIt-Anchor" href="#91-单参考源的硬天花板我的一手经历"></a> 9.1 单参考源的硬天花板（我的一手经历）</h3>
+<p>我在用 PhaseStation 53100A 之前，曾临时用一台内部参考一般、单参考架构的仪器测过同一只 100 MHz OCXO：读出的 10 Hz / 100 Hz 近端明显比预期差了 20 dB 以上。后来换 53100A 的双参考 + 互相关复测，近端立刻恢复到 OCXO 应有的水平。<strong>前一次测到的不是晶振本身，而是那台仪器内部参考源的相噪天花板。</strong></p>
+<p>对单参考 + PLL 鉴相法，数学上写得很清楚：</p>
+<p>$$\varphi_{meas}(t)&#x3D;\varphi_{DUT}(t)-\varphi_{REF}(t)
+$$</p><p>两边取 PSD，两者不相关时直接相加：</p>
+<p>$$\mathcal{L}_{meas}(f)\;\geq\;\max\bigl(\mathcal{L}_{DUT}(f),\;\mathcal{L}_{REF}(f)\bigr)
+$$</p><p>当 DUT 明显好于 REF 时，等号近似成立，<strong>测出来就是 REF</strong>。下图的阴影区已经被 REF 压住，DUT 近端再好也读不到：</p>
+<p><img src="/images/myimge/phase-noise-basics/fig09a_single_reference_ceiling.png" alt="图9a  单参考源的相噪测量天花板（原理示意）" /></p>
+<h3 id="92-双参考-双通道互相关突破天花板"><a class="markdownIt-Anchor" href="#92-双参考-双通道互相关突破天花板"></a> 9.2 双参考 + 双通道互相关：突破天花板</h3>
+<p>把 DUT 的信号通过功分器分成两路，每一路各自接一台独立的参考源/接收机：</p>
+<p>$$\begin{aligned}
+x_1(t) &amp;&#x3D; \varphi_D(t) - \varphi_{R1}(t) + n_1(t) \\
+x_2(t) &amp;&#x3D; \varphi_D(t) - \varphi_{R2}(t) + n_2(t)
+\end{aligned}
+$$</p><p>信号成分在两路中完全相干，R1/R2 噪声和通道噪声彼此非相干。对两路基带数据做互相关并累计 $M$ 次平均：</p>
+<ul>
+<li>相干的 DUT 项：互相关后幅度不变；</li>
+<li>非相干的 R1、R2、n1、n2：互相关平均 $M$ 次后幅度按 $1&#x2F;\sqrt{M}$ 衰减。</li>
+</ul>
+<p>因此：</p>
+<p>$$\mathcal{L}_{meas}(f) &#x3D; \mathcal{L}_{DUT}(f)
+    +\frac{\mathcal{L}_{R1}(f)+\mathcal{L}_{R2}(f)+\mathcal{L}_{n1}(f)+\mathcal{L}_{n2}(f)}{\sqrt{M}}
+$$</p><p><strong>即使两台参考源比 DUT 差 20 dB，只要把互相关平均次数 M 取到 10⁴（对应改善量 ≈ 20 dB），残余 REF 噪声仍然可以被压下去。</strong> 代价是时间成本：</p>
+<ul>
+<li>灵敏度改善 $\Delta L\approx 5\log_{10}M$ dB；</li>
+<li>测量时间 $T_{meas}\propto M$。</li>
+</ul>
+<p>工程上常取 $M&#x3D;100\sim1000$。$M&#x3D;1000$ 只比 $M&#x3D;100$ 多改善 5 dB，但耗时 10 倍；再往上收益更差。</p>
+<p><img src="/images/myimge/phase-noise-basics/fig09b_dual_reference_cross_correlation.png" alt="图9b  双参考互相关：M→×10，残余 REF 噪声→÷√10（理论示意）" /></p>
+<h2 id="十-主流仪器对照表-四机对比示意曲线"><a class="markdownIt-Anchor" href="#十-主流仪器对照表-四机对比示意曲线"></a> 十、主流仪器对照表 + 四机对比示意曲线</h2>
+<h3 id="101-六款主流相噪仪器的架构对照"><a class="markdownIt-Anchor" href="#101-六款主流相噪仪器的架构对照"></a> 10.1 六款主流相噪仪器的架构对照</h3>
+<p>（注：本人只实际操作过 PhaseStation 53100A。其它型号根据厂家公开资料整理，细节以最新手册为准。）</p>
+<table>
+<thead>
+<tr>
+<th>型号</th>
+<th>AM/PM 分离方法</th>
+<th>参考源结构</th>
+<th>是否内置双通道互相关</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R&amp;S FSWP</td>
+<td>模拟 I/Q 解调</td>
+<td>双独立内部参考</td>
+<td>是</td>
+</tr>
+<tr>
+<td>Microchip PhaseStation 53100A</td>
+<td>数字 I/Q 解调</td>
+<td>双独立内部参考</td>
+<td>是</td>
+</tr>
+<tr>
+<td>Holzworth HA7402B</td>
+<td>PLL + 双平衡混频鉴相</td>
+<td>双独立内部参考</td>
+<td>是</td>
+</tr>
+<tr>
+<td>Noise XT DCNTS</td>
+<td>PLL + 双平衡混频鉴相</td>
+<td>双独立内部参考</td>
+<td>是</td>
+</tr>
+<tr>
+<td>Keysight E5052B</td>
+<td>PLL + 双平衡混频鉴相</td>
+<td>单参考（标准）</td>
+<td>可选</td>
+</tr>
+<tr>
+<td>Anapico APPH6000</td>
+<td>PLL + 双平衡混频鉴相</td>
+<td>双独立内部参考</td>
+<td>是</td>
+</tr>
+</tbody>
+</table>
+<h3 id="102-四机对比示意曲线原理建模"><a class="markdownIt-Anchor" href="#102-四机对比示意曲线原理建模"></a> 10.2 四机对比示意曲线（原理建模）</h3>
+<p>下面这张图里：DUT 曲线按&quot;一只典型 ULPN 100 MHz OCXO&quot;的幂律参数构造；四台仪器的残余本底按&quot;互相关 $M&#x3D;100$、且各自内参考噪声水平略有差异&quot;的原理模型画出来。<strong>仪器曲线并非 KVG 公众号原文的实测数据</strong>，只是帮助理解&quot;同一 DUT 为什么不同仪器会给出不同但渐近一致的读数&quot;：当 $M$ 足够大、DUT 足够好时，四条曲线都会收敛到最上方的那条 DUT 真实 ℒ(f)。</p>
+<p><img src="/images/myimge/phase-noise-basics/fig10_four_instrument_comparison.png" alt="图10  四台主流仪器对同一只 ULPN OCXO 的测量曲线示意（原理建模，非 KVG 原文实测）——差异来自内部参考源噪声 + 互相关次数 + 校准；DUT 足够好时曲线都趋于 DUT 真值。" /></p>
+<blockquote>
+<p>以上为经验梳理，不带有任何选型意见。仪器架构以各厂家最新手册为准。</p>
+</blockquote>
+<hr />
+<h2 id="小结"><a class="markdownIt-Anchor" href="#小结"></a> 小结</h2>
+<ol>
+<li>写相位噪声数字：<strong>必须写 <code>dBc/Hz @ f_offset from f0</code></strong>。三个字段少任何一个都缺信息。</li>
+<li>换算链：$\mathcal{L}(f)&#x3D;S_\varphi&#x2F;2$；抖动用带宽积分；$\sigma_y(\tau)$ 用幂律斜率查表即可判断一个&quot;阿伦平台&quot;到底对应 ℒ 曲线的哪一段。</li>
+<li>选测量方法：
+<ul>
+<li>快速粗估 + 看杂散：直接频谱；</li>
+<li>数字解调、校准容易、相位/幅度同时看：I/Q 解调（53100A = 数字 I/Q，FSWP = 模拟 I/Q）；</li>
+<li>追求传统鉴相精度，且能容忍 PLL 闭环：PLL + 双平衡混频；</li>
+<li><strong>只要 DUT 可能好于内部参考（几乎所有 ULPN OCXO / 超高稳振荡器都这样），就必须开双参考 + 互相关。</strong></li>
+</ul>
+</li>
+<li>同样 DUT、不同仪器读数不同，首先看三件事：<strong>互相关平均次数 M 是否一致、内参考源谁更干净、校准有没有做过。</strong> 不是&quot;谁的仪器更好&quot;，而是&quot;哪条曲线已经越过了参考源的天花板、真正读到 DUT 本身&quot;。</li>
+</ol>
+<p>正式操作、参数、连接和一次 100 MHz OCXO 的完整实测记录见姊妹篇：《<a href="/2026/08/12/phase-noise-53100a-100mhz-ocxo/">从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声</a>》。</p>
+<h2 id="图片来源"><a class="markdownIt-Anchor" href="#图片来源"></a> 图片来源</h2>
+<ul>
+<li>Banner：<a target="_blank" rel="noopener" href="https://wallhaven.cc/w/yqg6r7">Wallhaven yqg6r7</a></li>
+<li>Cover：<a target="_blank" rel="noopener" href="https://wallhaven.cc/w/6lp3o6">Wallhaven 6lp3o6</a></li>
+<li>正文曲线图：<code>matlab/phase-noise-basics/generate_phase_noise_figures.m</code>（理论仿真）</li>
+</ul>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录" data-aos="zoom-in">学习记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E4%BF%A1%E5%8F%B7%E4%B8%8E%E7%B3%BB%E7%BB%9F/" rel="tag" title="信号与系统">信号与系统</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E6%B5%8B%E8%AF%95%E6%B5%8B%E9%87%8F/" rel="tag" title="测试测量">测试测量</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E7%9B%B8%E4%BD%8D%E5%99%AA%E5%A3%B0/" rel="tag" title="相位噪声">相位噪声</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E9%98%BF%E4%BC%A6%E6%96%B9%E5%B7%AE/" rel="tag" title="阿伦方差">阿伦方差</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E9%A2%91%E8%B0%B1%E5%88%86%E6%9E%90/" rel="tag" title="频谱分析">频谱分析</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/myimge/phase-noise-53100a-ocxo/wallhaven-oxxyjl-cover.png" data-sizes="auto" alt="从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声" class="lazyload">
+      <a href="/2026/08/12/phase-noise-53100a-100mhz-ocxo/" aria-label="后一篇: 从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声"  title="后一篇: 从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E4%BB%8E%E6%97%B6%E5%9F%9F%E6%8A%96%E5%8A%A8%E5%88%B0%E9%A2%91%E5%9F%9F%E8%BE%B9%E5%B8%A6%E5%B8%A6-%CF%86t-%E7%9A%84%E6%AD%A3%E5%BC%A6%E6%B3%A2"><span class="toc-number">1.</span> <span class="toc-text"> 一、从时域抖动到频域边带：带 φ(t) 的正弦波</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-lf-%E7%9A%84%E6%95%B0%E5%AD%A6%E5%AE%9A%E4%B9%89-%E4%BB%80%E4%B9%88%E6%98%AF-dbchz-f_offset"><span class="toc-number">2.</span> <span class="toc-text"> 二、ℒ(f) 的数学定义 + 什么是 dBc&#x2F;Hz @ f_offset</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#21-%E5%8D%95%E8%BE%B9%E5%B8%A6%E7%9B%B8%E4%BD%8D%E5%99%AA%E5%A3%B0-lf"><span class="toc-number">2.1.</span> <span class="toc-text"> 2.1 单边带相位噪声 ℒ(f)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#22-%E5%B0%8F%E7%9B%B8%E4%BD%8D%E8%B0%83%E5%88%B6%E8%BF%91%E4%BC%BC%E4%B8%8E-s%CF%86f-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">2.2.</span> <span class="toc-text"> 2.2 小相位调制近似与 Sφ(f) 的关系</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-s%CF%86f-%E6%AE%8B%E4%BD%99%E7%9B%B8%E4%BD%8D%E6%8A%96%E5%8A%A8%E4%B8%8E-rms-%E6%97%B6%E9%97%B4%E6%8A%96%E5%8A%A8%E7%9A%84%E6%8D%A2%E7%AE%97"><span class="toc-number">3.</span> <span class="toc-text"> 三、Sφ(f)、残余相位抖动与 RMS 时间抖动的换算</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#31-%E6%8C%87%E5%AE%9A%E5%B8%A6%E5%AE%BD%E5%86%85%E7%9A%84-rms-%E7%9B%B8%E4%BD%8D%E6%8A%96%E5%8A%A8"><span class="toc-number">3.1.</span> <span class="toc-text"> 3.1 指定带宽内的 RMS 相位抖动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#32-%E6%97%B6%E9%97%B4%E6%8A%96%E5%8A%A8-j_rms"><span class="toc-number">3.2.</span> <span class="toc-text"> 3.2 时间抖动 J_rms</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#33-%E9%A2%91%E7%8E%87%E6%97%B6%E9%97%B4%E7%A8%B3%E5%AE%9A%E6%80%A7%E7%9A%84%E5%8F%A6%E4%B8%80%E7%A7%8D%E5%BA%A6%E9%87%8Fs_yf"><span class="toc-number">3.3.</span> <span class="toc-text"> 3.3 频率&#x2F;时间稳定性的另一种度量：S_y(f)</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-%E5%B9%82%E5%BE%8B%E6%A8%A1%E5%9E%8B%E4%B8%8E-1f2~f2-%E7%9A%84%E4%BA%94%E4%B8%AA%E7%9B%B8%E5%99%AA%E5%88%86%E5%8C%BA"><span class="toc-number">4.</span> <span class="toc-text"> 四、幂律模型与 1&#x2F;f⁻²～f² 的五个相噪分区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E9%98%BF%E4%BC%A6%E5%81%8F%E5%B7%AE-%CF%83_y%CF%84-%E4%B8%8E-lf-%E7%9A%84%E6%96%9C%E7%8E%87%E5%AF%B9%E5%BA%94"><span class="toc-number">5.</span> <span class="toc-text"> 五、阿伦偏差 σ_y(τ) 与 ℒ(f) 的斜率对应</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#51-%CF%83_y%CF%84-%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">5.1.</span> <span class="toc-text"> 5.1 σ_y(τ) 的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#52-%E4%B8%8E-s_yf-lf-%E7%9A%84%E7%A7%AF%E5%88%86%E5%85%B3%E7%B3%BB"><span class="toc-number">5.2.</span> <span class="toc-text"> 5.2 与 S_y(f)、ℒ(f) 的积分关系</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-%E6%B5%8B%E9%87%8F%E6%96%B9%E6%B3%95-i%E7%9B%B4%E6%8E%A5%E9%A2%91%E8%B0%B1%E9%A2%91%E8%B0%B1%E4%BB%AA%E7%9B%B4%E6%8E%A5%E6%B5%8B"><span class="toc-number">6.</span> <span class="toc-text"> 六、测量方法 I：直接频谱（频谱仪直接测）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E6%B5%8B%E9%87%8F%E6%96%B9%E6%B3%95-ii%E6%A8%A1%E6%8B%9F%E6%95%B0%E5%AD%97-iq-%E8%A7%A3%E8%B0%83fswp-53100a-%E7%B1%BB%E6%96%B9%E6%A1%88"><span class="toc-number">7.</span> <span class="toc-text"> 七、测量方法 II：模拟&#x2F;数字 I&#x2F;Q 解调（FSWP &#x2F; 53100A 类方案）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E6%B5%8B%E9%87%8F%E6%96%B9%E6%B3%95-iiipll-%E5%8F%8C%E5%B9%B3%E8%A1%A1%E6%B7%B7%E9%A2%91%E9%89%B4%E7%9B%B8ha7402b-dcnts-e5052b-%E7%B1%BB%E6%96%B9%E6%A1%88"><span class="toc-number">8.</span> <span class="toc-text"> 八、测量方法 III：PLL + 双平衡混频鉴相（HA7402B &#x2F; DCNTS &#x2F; E5052B 类方案）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D-%E5%8F%82%E8%80%83%E6%BA%90%E5%A4%A9%E8%8A%B1%E6%9D%BF%E4%B8%8E%E4%BA%92%E7%9B%B8%E5%85%B3%E5%8D%95%E5%8F%82%E8%80%83-vs-%E5%8F%8C%E5%8F%82%E8%80%83"><span class="toc-number">9.</span> <span class="toc-text"> 九、参考源天花板与互相关：单参考 vs 双参考</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#91-%E5%8D%95%E5%8F%82%E8%80%83%E6%BA%90%E7%9A%84%E7%A1%AC%E5%A4%A9%E8%8A%B1%E6%9D%BF%E6%88%91%E7%9A%84%E4%B8%80%E6%89%8B%E7%BB%8F%E5%8E%86"><span class="toc-number">9.1.</span> <span class="toc-text"> 9.1 单参考源的硬天花板（我的一手经历）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#92-%E5%8F%8C%E5%8F%82%E8%80%83-%E5%8F%8C%E9%80%9A%E9%81%93%E4%BA%92%E7%9B%B8%E5%85%B3%E7%AA%81%E7%A0%B4%E5%A4%A9%E8%8A%B1%E6%9D%BF"><span class="toc-number">9.2.</span> <span class="toc-text"> 9.2 双参考 + 双通道互相关：突破天花板</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81-%E4%B8%BB%E6%B5%81%E4%BB%AA%E5%99%A8%E5%AF%B9%E7%85%A7%E8%A1%A8-%E5%9B%9B%E6%9C%BA%E5%AF%B9%E6%AF%94%E7%A4%BA%E6%84%8F%E6%9B%B2%E7%BA%BF"><span class="toc-number">10.</span> <span class="toc-text"> 十、主流仪器对照表 + 四机对比示意曲线</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#101-%E5%85%AD%E6%AC%BE%E4%B8%BB%E6%B5%81%E7%9B%B8%E5%99%AA%E4%BB%AA%E5%99%A8%E7%9A%84%E6%9E%B6%E6%9E%84%E5%AF%B9%E7%85%A7"><span class="toc-number">10.1.</span> <span class="toc-text"> 10.1 六款主流相噪仪器的架构对照</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#102-%E5%9B%9B%E6%9C%BA%E5%AF%B9%E6%AF%94%E7%A4%BA%E6%84%8F%E6%9B%B2%E7%BA%BF%E5%8E%9F%E7%90%86%E5%BB%BA%E6%A8%A1"><span class="toc-number">10.2.</span> <span class="toc-text"> 10.2 四机对比示意曲线（原理建模）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">11.</span> <span class="toc-text"> 小结</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%BE%E7%89%87%E6%9D%A5%E6%BA%90"><span class="toc-number">12.</span> <span class="toc-text"> 图片来源</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="/js/vendor/lazysizes.min.js" crossorigin="anonymous"></script>
+
+
+<script src="/js/vendor/clipboard.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型",
+          url: "https://alen9966.github.io/2026/08/18/phase-noise-definition-and-measurement-math/",
+          excerpt: "",
+          description: "从带 φ(t) 的正弦波开始，给出 ℒ(f)、Sφ(f)、阿伦偏差 σ_y(τ) 的定义与换算关系，推导幂律五分区斜率，并按直接频谱、I/Q 解调、PLL 鉴相、双通道互相关四种方法写出测量模型和适用边界。",
+          stripContent: " 关于图与数据：文中 11 张图为 MATLAB 理论仿真，由脚本 matlab/phase-noise-basics/generate_phase_noise_figures.m 导出到 source/images/myimge/phase-noise-basics/。曲线用于说明定义与测量模型，不是硬件实测。  这篇专注原理、公式和测量模型，不讨论某一只具体 OCXO 的实测结果——那些已经写在《从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声》里。本文的目标",
+          date: "Tue Aug 18 2026 19:30:00 GMT+0800",
+          updated: "Thu Aug 20 2026 16:30:48 GMT+0800",
+          cover: "/images/myimge/phase-noise-basics/wallhaven-6lp3o6-cover.jpg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+      <script src="/js/lazyload-fallback.js"></script>
+  </body>
+  </html>

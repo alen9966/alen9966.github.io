@@ -1,0 +1,650 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="从原理图到实测波形，记录硬件设计中的选择、失误与验证。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="硬件项目手记">
+<meta property="og:url" content="https://alen9966.github.io/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="从原理图到实测波形，记录硬件设计中的选择、失误与验证。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/banner.webp">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="硬件项目">
+<meta property="article:tag" content="原理图">
+<meta property="article:tag" content="PCB">
+<meta property="article:tag" content="电源设计">
+<meta property="article:tag" content="调试记录">
+<meta property="article:tag" content="Blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/banner.webp">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+      <picture>
+      </picture>
+        <img  fetchpriority="high" src="/images/myimge/wallhaven-3ze1v3.jpg" alt="">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">硬件项目手记</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+              <span id="subtitle"><span></span></span>
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container ">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+        <div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+
+    </div>
+  </div>
+  <div class="sidebar-widget">
+        <div class="widget-wrapper">
+    <div class="widget-wrap" data-aos="fade-up">
+      <h3 class="widget-title">最新文章</h3>
+      <div class="widget">
+        <ul>
+            <li>
+              <a href="/2026/08/18/phase-noise-definition-and-measurement-math/" title="相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型">相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型</a>
+            </li>
+            <li>
+              <a href="/2026/08/12/phase-noise-53100a-100mhz-ocxo/" title="从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声">从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声</a>
+            </li>
+            <li>
+              <a href="/2026/08/12/nanovna-s11-ocxo-impedance/" title="从 S11 到阻抗：用 NanoVNA 测量 100 MHz OCXO 输出网络">从 S11 到阻抗：用 NanoVNA 测量 100 MHz OCXO 输出网络</a>
+            </li>
+            <li>
+              <a href="/2026/08/06/100mhz-output-impedance-smith-chart-vna/" title="100 MHz 输出阻抗怎么测：从双负载法到史密斯圆图与 VNA">100 MHz 输出阻抗怎么测：从双负载法到史密斯圆图与 VNA</a>
+            </li>
+            <li>
+              <a href="/2026/08/03/time-synchronization-and-100mhz-clock-test-learning-log/" title="从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录">从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录</a>
+            </li>
+            <li>
+              <a href="/2026/07/29/llc-resonant-half-bridge-from-specs-to-parameters/" title="第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数">第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数</a>
+            </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+        <div class="widget-wrapper">
+    <div class="widget-wrap" data-aos="fade-up">
+      <h3 class="widget-title">分类</h3>
+      <div class="widget">
+        <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录">学习记录</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%B5%8B%E8%AF%95%E4%B8%8E%E6%B5%8B%E9%87%8F/" title="测试与测量">测试与测量</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%A1%B9%E7%9B%AE%E8%AE%B0%E5%BD%95/" title="项目记录">项目记录</a></li></ul>
+      </div>
+    </div>
+  </div>
+
+        <div class="widget-wrapper">
+    <div class="widget-wrap" data-aos="fade-up">
+      <h3 class="widget-title">归档</h3>
+      <div class="widget">
+        <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/08/">八月 2026</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2026/07/">七月 2026</a></li></ul>
+      </div>
+    </div>
+  </div>
+
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content">      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/08/18/phase-noise-definition-and-measurement-math/" aria-label="相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型" title="相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型"></a>
+    <div class="post-cover left">
+        <img data-src="/images/myimge/phase-noise-basics/wallhaven-6lp3o6-cover.jpg" data-sizes="auto" alt="相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-08-18</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-20</span>
+        <span><span class="icon-pencil"></span>3.7k 字</span>
+        <span><span class="icon-clock"></span>16 分钟</span>
+      </div>
+      <h2 class="post-title">相位噪声：从 ℒ(f) 的定义到四种测量方法的数学模型</h2>
+      <article class="post-article">
+          
+关于图与数据：文中 11 张图为 MATLAB 理论仿真，由脚本
+matlab/phase-noise-basics/generate_phase_noise_figures.m
+导出到 source/images/myimge/phase-noise-basics/。曲线用于说明定义与测量模型，不是硬件实测。
+
+这篇专注原理、公式和测量模型，不讨论某一只具体 OCXO 的实测结果——那些已经写在《从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声》里。本文的目标是回答：看到一个 -120 dBc/Hz @ 10 kHz，它在数学上到底指什么；以及同一只晶振换一
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/08/12/phase-noise-53100a-100mhz-ocxo/" aria-label="从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声" title="从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/phase-noise-53100a-ocxo/wallhaven-oxxyjl-cover.png" data-sizes="auto" alt="从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-08-12</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-20</span>
+        <span><span class="icon-pencil"></span>5.1k 字</span>
+        <span><span class="icon-clock"></span>19 分钟</span>
+      </div>
+      <h2 class="post-title">从近端噪声到远端噪声：用 53100A 测量 100 MHz OCXO 相位噪声</h2>
+      <article class="post-article">
+          最近在用 Microchip PhaseStation 53100A 测量一颗 100 MHz 恒温晶振的相位噪声。曲线出来以后，最先遇到的问题不是某一个点到底有多少 dBc/Hz，而是同一条曲线为什么会分成几段：靠近载波时下降得很快，偏移频率增大以后斜率逐渐变缓，最后又落到一个近似水平的平台。
+以前我对这件事的理解比较简单：近端相噪主要由晶体和闪烁噪声决定，远端相噪主要由热噪声和信噪比决定。这个方向没有错，但还不够准确。近端和远端并没有统一的 1 kHz 或 10 kHz 分界线，真正的转折位置与晶体的 Q 值、振荡器电路、器件闪烁噪声拐点、调谐端噪声以及测量系统底噪都有关系。
+这次先从实测
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/08/12/nanovna-s11-ocxo-impedance/" aria-label="从 S11 到阻抗：用 NanoVNA 测量 100 MHz OCXO 输出网络" title="从 S11 到阻抗：用 NanoVNA 测量 100 MHz OCXO 输出网络"></a>
+    <div class="post-cover left">
+        <img data-src="/images/myimge/wallhaven-42r7yg.jpg" data-sizes="auto" alt="从 S11 到阻抗：用 NanoVNA 测量 100 MHz OCXO 输出网络" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-08-12</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-20</span>
+        <span><span class="icon-pencil"></span>4.4k 字</span>
+        <span><span class="icon-clock"></span>17 分钟</span>
+      </div>
+      <h2 class="post-title">从 S11 到阻抗：用 NanoVNA 测量 100 MHz OCXO 输出网络</h2>
+      <article class="post-article">
+          最近开始用 NanoVNA H4 测阻抗时，我碰到一个看起来有些矛盾的结果。
+这块板的 100 MHz 恒温晶振输出用双负载法测得约为 50 Ω，但板子断电后，从 SMA 端口向内测量 S11，NanoVNA 在 100 MHz 处给出的阻抗却是：
+$$Z&amp;#x3D;39.38+j2.689\ \Omega
+$$如果两种方法测的是同一个量，那么这个差异就需要解释。但继续整理 S 参数后，我发现首先要问的不是“哪台仪器更准”，而是“两种方法看到的是不是同一个网络状态”。双负载法测量时板子正常工作，晶振输出级已经建立偏置；NanoVNA 测量时整板断电，仪器从 SMA 端向网络注入测试信号。两次测
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/08/06/100mhz-output-impedance-smith-chart-vna/" aria-label="100 MHz 输出阻抗怎么测：从双负载法到史密斯圆图与 VNA" title="100 MHz 输出阻抗怎么测：从双负载法到史密斯圆图与 VNA"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/100mhz-impedance-matching/wallhaven-7pr129-sakura-miku.jpg" data-sizes="auto" alt="100 MHz 输出阻抗怎么测：从双负载法到史密斯圆图与 VNA" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-08-06</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-20</span>
+        <span><span class="icon-pencil"></span>4.1k 字</span>
+        <span><span class="icon-clock"></span>16 分钟</span>
+      </div>
+      <h2 class="post-title">100 MHz 输出阻抗怎么测：从双负载法到史密斯圆图与 VNA</h2>
+      <article class="post-article">
+          前天测试一条 100 MHz 恒温晶振输出时，我第一次认真比较了示波器 1 MΩ 输入和 50 Ω 输入测得的 Vpp。以前我只知道高阻输入读数更高、50 Ω 终端会把幅度压低，这次才把两次读数代入公式，尝试反推出电路的输出阻抗。
+串联电阻前，SMA 端在 1 MΩ 输入下测得 2.00 Vpp，切换到 50 Ω 输入后为 1.12 Vpp，按双负载法算得等效输出阻抗约为 39.3 Ω，频谱仪测得输出功率为 4.4 dBm。加入串联 33 Ω 电阻后，两次读数分别变为 1.36 Vpp 和 0.70 Vpp，算得等效输出阻抗约为 47.1 Ω，输出功率变为 0.99 dBm。
+这条输出网络表现
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/08/03/time-synchronization-and-100mhz-clock-test-learning-log/" aria-label="从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录" title="从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录"></a>
+    <div class="post-cover left">
+        <img data-src="/images/myimge/time-sync-learning-log/time-sync-test-cover.svg" data-sizes="auto" alt="从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-08-03</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-20</span>
+        <span><span class="icon-pencil"></span>4.1k 字</span>
+        <span><span class="icon-clock"></span>15 分钟</span>
+      </div>
+      <h2 class="post-title">从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录</h2>
+      <article class="post-article">
+          今天第一次把时间同步系统中的信号、硬件和测试仪器放在一起学习。以前看到 1PPS、TOD、相位噪声和阿伦方差时，我知道它们都与“时间准不准”有关，但不清楚每个指标究竟在描述什么，也不知道一条 100 MHz 参考时钟应该怎样测。
+这次学习从最基础的幅度测量开始，依次使用示波器、频谱仪和相噪仪理解时钟信号的时域与频域指标，再把 1PPS + TOD、IRIG-B、NTP、PTP 和本地高稳定时钟放到同一套系统架构中。最后，我按器件功能梳理了 JL-BD 北斗模块中与 100 MHz 参考时钟有关的电路。
+目前完成的是方法学习和电路功能梳理，还没有形成一组可公开的实测数据。文中列出的测试项目是后续
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/29/llc-resonant-half-bridge-from-specs-to-parameters/" aria-label="第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数" title="第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/llc-resonant-half-bridge/llc-resonant-half-bridge-cover-gj9krd.jpg" data-sizes="auto" alt="第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-29</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-20</span>
+        <span><span class="icon-pencil"></span>4.2k 字</span>
+        <span><span class="icon-clock"></span>17 分钟</span>
+      </div>
+      <h2 class="post-title">第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数</h2>
+      <article class="post-article">
+          刚开始接触 LLC 时，我知道它有两个电感和一个电容，也知道它可以实现软开关，但真正拿到一组输入输出指标后，还是不知道该先算什么。Lm、Lr、Cr 之间是什么关系？开关频率为什么有时低于谐振点，有时又高于谐振点？增益曲线能覆盖输入范围以后，是不是就已经保证了 ZVS？
+这篇文章以 TI《Designing an LLC Resonant Half-Bridge Power Converter》（SLUP263）中的例子为主线，重新走一遍 375～405 VDC → 12 V / 25 A / 300 W 的第一轮设计。重点不是把 LLC 的知识点全部列出来，而是回答一个更实际的问题：拿到这些指
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/28/power-topologies-selection-from-buck-to-psfb/" aria-label="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥" title="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥"></a>
+    <div class="post-cover left">
+        <img data-src="/images/myimge/power-topologies/power-topologies-handbook-card.jpg" data-sizes="auto" alt="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-28</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-20</span>
+        <span><span class="icon-pencil"></span>4.3k 字</span>
+        <span><span class="icon-clock"></span>17 分钟</span>
+      </div>
+      <h2 class="post-title">开关电源拓扑怎么选：从 Buck、Boost 到移相全桥</h2>
+      <article class="post-article">
+          刚开始接触开关电源时，我很容易把拓扑选择理解成“降压用 Buck，升压用 Boost”。真正开始看器件应力和关键节点波形后才发现，升降压关系只是第一层：输入会不会跨过输出、是否隔离、能量在哪个开关状态送到负载、磁芯怎样复位、功率器件承受多大的峰值和 RMS 电流，都会改变最终选择。
+这篇文章以 TI《Power Topologies Handbook》为主线，把文中出现的拓扑逐一展开。重点不是罗列名称，而是把每一种电路的功率路径、关键公式和电压电流波形对应起来。文中的波形来自手册，是理想化的理论波形，不是硬件实测；公式默认理想器件、稳态和连续导通模式（CCM），实际设计还要加入器件压降、死区、
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/27/verilog-from-module-to-always/" aria-label="从一个多路选择器开始学 Verilog：module、assign 和 always" title="从一个多路选择器开始学 Verilog：module、assign 和 always"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-vq95d8.jpg" data-sizes="auto" alt="从一个多路选择器开始学 Verilog：module、assign 和 always" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-27</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-20</span>
+        <span><span class="icon-pencil"></span>2.8k 字</span>
+        <span><span class="icon-clock"></span>11 分钟</span>
+      </div>
+      <h2 class="post-title">从一个多路选择器开始学 Verilog：module、assign 和 always</h2>
+      <article class="post-article">
+          我刚开始学 Verilog 时，最容易犯的错误是把它当成 C 语言：代码从上往下执行，写几行判断和赋值，就能得到想要的结果。可真正开始写 FPGA 程序后会发现，同样是一个等号，放在 assign 里和放在 always 里含义不同；同样是 always，敏感列表写信号变化和写时钟上升沿，最后得到的电路也完全不同。
+Verilog 不是在告诉处理器“下一步做什么”，而是在描述一块数字电路“由什么组成、信号怎样连接、什么时候更新”。这篇文章从最简单的多路选择器开始，把 module、assign、always、阻塞赋值和非阻塞赋值串起来。资料采用传统 Verilog-2001 的 wire、re
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap left" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/27/transfer-function-from-differential-equation/" aria-label="从微分方程到波特图：我怎样理解传递函数" title="从微分方程到波特图：我怎样理解传递函数"></a>
+    <div class="post-cover left">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-7p3we9.jpg" data-sizes="auto" alt="从微分方程到波特图：我怎样理解传递函数" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-27</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-20</span>
+        <span><span class="icon-pencil"></span>2.8k 字</span>
+        <span><span class="icon-clock"></span>11 分钟</span>
+      </div>
+      <h2 class="post-title">从微分方程到波特图：我怎样理解传递函数</h2>
+      <article class="post-article">
+          我以前学传递函数时，记住的是“输出除以输入”，极点就是让分母等于零的点。公式会算，但看到一个电路还是不知道该从哪里下手：为什么微分方程做一次拉普拉斯变换就成了分式？同一个分式为什么既能算阶跃响应，又能画波特图？
+这篇文章就按我当时弄明白这个问题的顺序来写。先从冲激响应和卷积开始，再用串联 RLC 电路把微分方程一步步变成传递函数，最后看时域、频域和极点之间到底是什么关系。文中的曲线都是 MATLAB 理论仿真，不是硬件实测结果。
+ 一、传递函数解决的是什么问题
+先不急着写 $H(s)$，首先得知道线性时不变系统是怎样处理输入的。一个系统接收到 $u(t)$ 后产生输出 $x(t)$。只要它满足
+      </article>
+    </div>
+  </div>
+</div>
+      <div class="post-wrapper">
+  <div class="post-wrap right" data-aos="fade-up">
+      <a class="post-link" href="/2026/07/25/am-modulation-demodulation-basics/" aria-label="从一段声音到无线电波：AM 调制与解调入门" title="从一段声音到无线电波：AM 调制与解调入门"></a>
+    <div class="post-cover right">
+        <img data-src="/images/myimge/wallhaven-pink/wallhaven-qz655l.jpg" data-sizes="auto" alt="从一段声音到无线电波：AM 调制与解调入门" class="lazyload">
+    </div>
+    <div class="post-info">
+      <div class="post-meta">
+        <span><span class="icon-calendar"></span>2026-07-25</span>
+          <span><span class="icon-calendar-plus"></span>2026-08-20</span>
+        <span><span class="icon-pencil"></span>8.3k 字</span>
+        <span><span class="icon-clock"></span>31 分钟</span>
+      </div>
+      <h2 class="post-title">从一段声音到无线电波：AM 调制与解调入门</h2>
+      <article class="post-article">
+          我把这份寒假培训材料整理成博客时，想保留当时的讲解顺序。AM 的公式当然重要，但如果一开始就写乘法和边带，很容易只记住形式，却不知道为什么需要它们。培训里先从一条最普通的波形讲起，再慢慢走到调制和解调，这个顺序不变。
+本文中的公式和图都用于原理学习，暂时没有对应的硬件实测数据。后续如果补充 MATLAB 图，会明确标注为理论示意或软件仿真。
+ 一、调制与解调
+我刚开始接触这部分内容时，总觉得调制和解调只是两个相反的名词：发射端“调一下”，接收端再“解一下”。可真正的问题是，语音、视频或传感器输出本来就带着信息，为什么发送前还要处理一次？
+通信系统需要让信息适合在无线电波、导线或其他传输介质中传
+      </article>
+    </div>
+  </div>
+</div>
+  <nav id="page-nav" aria-label="Pagination navigation" data-aos="fade-up">
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">下一页 &raquo;</a>
+  </nav>
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+      <div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+
+  </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="/js/vendor/lazysizes.min.js" crossorigin="anonymous"></script>
+
+
+<script src="/js/vendor/clipboard.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+<script src="/js/vendor/typed.umd.js" crossorigin="anonymous" defer onload="initSubtitleTyping()"></script>
+
+      <script data-pjax>
+        window.subtitleTypingConfig = {
+          strings: ["从原理图到实测波形，记录每一次验证","拆解硬件架构，也保留踩坑与修正","愿好奇心与电路一起保持通电"],
+          typeSpeed: 55,
+          backSpeed: 40,
+          backDelay: 2200,
+          startDelay: 200,
+          loop: true,
+          shuffle: false,
+          showCursor: true || true,
+          cursorChar: "_",
+          smartBackspace: false || false,
+        };
+
+        function initSubtitleTyping() {
+          const subtitleElement = document.querySelector('#subtitle');
+          if (!subtitleElement || !window.Typed || !window.subtitleTypingConfig) {
+            return;
+          }
+
+          if (window.__typedInstance) {
+            window.__typedInstance.destroy();
+          }
+
+          window.__typedInstance = new Typed('#subtitle span', window.subtitleTypingConfig);
+        }
+        
+        if (!window.__typedInitialized) {
+          window.__typedInitialized = true;
+          
+          if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSubtitleTyping);
+          } else {
+            initSubtitleTyping();
+          }
+        } else {
+          initSubtitleTyping();
+        }
+      </script>
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+      <script src="/js/lazyload-fallback.js"></script>
+  </body>
+  </html>

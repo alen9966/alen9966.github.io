@@ -1,0 +1,636 @@
+  <!DOCTYPE html>
+  <html lang="zh-CN"  
+      data-theme-mode="false"
+  >
+  <head>
+  <meta charset="utf-8">
+  
+  
+  
+  <script>window.REIMU_CONFIG = {};window.REIMU_CONFIG.icon_font = '4552607_ex15nbittbh';window.REIMU_CONFIG.clipboard_tips = {"success":{"zh-CN":"复制成功 (*^▽^*)"},"fail":{"zh-CN":"复制失败 (ﾟ⊿ﾟ)ﾂ"},"copyright":{"enable":false,"count":50,"license_type":"by-nc-sa"}};window.REIMU_CONFIG.clipboard_tips.copyright.content = '本博客所有文章除特别声明外，均采用 BY-NC-SA 许可协议。转载请注明出处！';window.REIMU_CONFIG.code_block = {"expand":true};window.REIMU_CONFIG.base = 'https://alen9966.github.io';window.REIMU_CONFIG.relative = '/';</script>
+  <title>
+    第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数 | 硬件项目手记
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="preload" href="//at.alicdn.com/t/c/font_4552607_ex15nbittbh.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <meta name="description" content="以 TI SLUP263 的 375～405 VDC 输入、12 V &#x2F; 25 A &#x2F; 300 W 输出为例，从频率调制和 FHA 增益模型出发，完成变比、Lm、Lr、Cr、工作频率与 ZVS 条件的第一轮设计。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第一次设计 LLC 谐振半桥：从 390 V→12 V &#x2F; 300 W 指标走到谐振参数">
+<meta property="og:url" content="https://alen9966.github.io/2026/07/29/llc-resonant-half-bridge-from-specs-to-parameters/index.html">
+<meta property="og:site_name" content="硬件项目手记">
+<meta property="og:description" content="以 TI SLUP263 的 375～405 VDC 输入、12 V &#x2F; 25 A &#x2F; 300 W 输出为例，从频率调制和 FHA 增益模型出发，完成变比、Lm、Lr、Cr、工作频率与 ZVS 条件的第一轮设计。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/llc-resonant-half-bridge/llc-topology-fig3-slup263-page4.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/llc-resonant-half-bridge/llc-operating-waveforms-fig4-slup263-page5.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/llc-resonant-half-bridge/llc-recommended-gain-area-fig7-slup263-page12.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/llc-resonant-half-bridge/llc-design-flow-fig14-slup263-page21.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/llc-resonant-half-bridge/llc-300w-example-circuit-fig15-slup263-page22.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/llc-resonant-half-bridge/llc-gain-verification-fig16-slup263-page24.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/llc-resonant-half-bridge/llc-zvs-and-gain-regions-fig8-9-slup263-page15.png">
+<meta property="og:image" content="https://alen9966.github.io/images/myimge/llc-resonant-half-bridge/llc-ti-prototype-waveforms-fig18-slup263-page28.png">
+<meta property="article:published_time" content="2026-07-29T03:30:00.000Z">
+<meta property="article:modified_time" content="2026-08-20T08:30:48.105Z">
+<meta property="article:author" content="Alen">
+<meta property="article:tag" content="LLC">
+<meta property="article:tag" content="谐振变换器">
+<meta property="article:tag" content="开关电源">
+<meta property="article:tag" content="ZVS">
+<meta property="article:tag" content="FHA">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://alen9966.github.io/images/myimge/llc-resonant-half-bridge/llc-topology-fig3-slup263-page4.png">
+      <meta name="keywords" content="硬件项目, 原理图, PCB, 电源设计, 调试记录, Blog">
+    <link rel="alternate" href="/atom.xml" title="硬件项目手记" type="application/atom+xml">
+    <link rel="shortcut icon" href="/images/favicon.ico">
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.css" integrity="sha384-IfxC36XL/toUyJ939C73PcgMuRzAZuIzZxE38drsmO5p6jD7ei+Zx/1oA/0l8ysE" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/site-home.css">
+</head>
+
+  <body>
+    <div id="copy-tooltip"></div>
+<div id="heatmap-tooltip"></div>
+
+
+    <div id="container">
+      <div id="wrap">
+        <div id="header-nav">
+  <nav id="main-nav" aria-label="Primary navigation">
+        <a class="main-nav-link-wrap" href="/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">首页</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/projects/">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">项目</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/about">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">关于</span>
+        </a>
+        <a class="main-nav-link-wrap" href="/friend">
+            <div class="main-nav-icon icon rotate">
+                &#xe62b;
+            </div>
+          <span class="main-nav-link">友链</span>
+        </a>
+    <a id="main-nav-toggle" class="nav-icon" aria-label="Toggle navigation" role="button"></a>
+  </nav>
+  <nav id="sub-nav" aria-label="Secondary navigation">
+      <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅" aria-label="RSS 订阅" target="_blank"></a>
+      <a id="nav-search-btn" class="nav-icon popup-trigger" title="搜索" aria-label="搜索"></a>
+  </nav>
+</div>
+<header id="header" aria-label="Site header">
+    <picture></picture>
+    <img  fetchpriority="high" src="/images/myimge/llc-resonant-half-bridge/llc-resonant-half-bridge-banner-vmmw78.jpg" alt="第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数">
+  <div id="header-outer">
+    <div id="header-title">
+          <span id="logo">
+            <h1 data-aos="slide-up">第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数</h1>
+          </span>
+        <h2 id="subtitle-wrap" data-aos="slide-down">
+        </h2>
+    </div>
+  </div>
+</header>
+
+        <div id="content" aria-label="Page content"  class="sidebar-right" >
+          <aside id="sidebar" aria-label="Sidebar">
+  <div class="sidebar-wrapper-container sticky">
+  <div class="sidebar-wrapper">
+    <div class="sidebar-wrap" data-aos="fade-up">
+          <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E6%8B%BF%E5%88%B0-390-v12-v-300-w-%E6%8C%87%E6%A0%87%E5%90%8E%E5%85%88%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88"><span class="toc-number">1.</span> <span class="toc-text"> 一、拿到 390 V→12 V &#x2F; 300 W 指标后，先解决什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E4%B8%BA%E4%BB%80%E4%B9%88-buck-%E8%B0%83%E5%8D%A0%E7%A9%BA%E6%AF%94%E8%80%8C-llc-%E4%B8%BB%E8%A6%81%E8%B0%83%E9%A2%91%E7%8E%87"><span class="toc-number">2.</span> <span class="toc-text"> 二、为什么 Buck 调占空比，而 LLC 主要调频率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-lr-cr-lm-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E6%A0%B7%E8%BF%9E%E6%8E%A5"><span class="toc-number">3.</span> <span class="toc-text"> 三、Lr、Cr、Lm 为什么这样连接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-llc-%E4%B8%8D%E5%8F%AA%E6%9C%89%E4%B8%80%E4%B8%AA%E8%B0%90%E6%8C%AF%E9%A2%91%E7%8E%87"><span class="toc-number">4.</span> <span class="toc-text"> 四、LLC 不只有一个谐振频率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E5%85%88%E7%9C%8B%E7%94%B5%E6%B5%81%E6%80%8E%E6%A0%B7%E5%8F%98%E5%8C%96%E5%86%8D%E8%BF%9B%E5%85%A5-fha"><span class="toc-number">5.</span> <span class="toc-text"> 五、先看电流怎样变化，再进入 FHA</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-fha-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%83%BD%E6%8A%8A-llc-%E5%8F%98%E6%88%90%E4%BA%A4%E6%B5%81%E7%94%B5%E8%B7%AF"><span class="toc-number">6.</span> <span class="toc-text"> 六、FHA 为什么能把 LLC 变成交流电路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E5%85%88%E6%8A%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E6%8C%87%E6%A0%87%E5%8F%98%E6%88%90%E5%A2%9E%E7%9B%8A%E8%8C%83%E5%9B%B4"><span class="toc-number">7.</span> <span class="toc-text"> 七、先把输入输出指标变成增益范围</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E4%BB%8E%E6%8C%87%E6%A0%87%E8%B5%B0%E5%88%B0-n-ln-qe-cr-lr-%E5%92%8C-lm"><span class="toc-number">8.</span> <span class="toc-text"> 八、从指标走到 n、Ln、Qe、Cr、Lr 和 Lm</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#step-1%E7%A1%AE%E5%AE%9A%E5%8F%98%E5%8E%8B%E5%99%A8%E5%8F%98%E6%AF%94"><span class="toc-number">8.1.</span> <span class="toc-text"> Step 1：确定变压器变比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step-2%E9%80%89%E6%8B%A9-ln35-qe045"><span class="toc-number">8.2.</span> <span class="toc-text"> Step 2：选择 Ln&#x3D;3.5、Qe&#x3D;0.45</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step-3%E8%AE%A1%E7%AE%97-cr-lr-%E5%92%8C-lm"><span class="toc-number">8.3.</span> <span class="toc-text"> Step 3：计算 Cr、Lr 和 Lm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step-4%E9%87%8D%E6%96%B0%E8%AE%A1%E7%AE%97-f0-%E5%92%8C%E5%B7%A5%E4%BD%9C%E9%A2%91%E7%8E%87"><span class="toc-number">8.4.</span> <span class="toc-text"> Step 4：重新计算 f0 和工作频率</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D-%E5%A2%9E%E7%9B%8A%E6%9B%B2%E7%BA%BF%E6%BB%A1%E8%B6%B3%E8%A6%81%E6%B1%82%E5%B9%B6%E4%B8%8D%E4%BB%A3%E8%A1%A8%E5%B7%B2%E7%BB%8F%E5%AE%9E%E7%8E%B0-zvs"><span class="toc-number">9.</span> <span class="toc-text"> 九、增益曲线满足要求，并不代表已经实现 ZVS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81-%E7%90%86%E8%AE%BA%E8%AE%A1%E7%AE%97%E5%80%BC%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E6%98%AF%E6%9C%80%E7%BB%88%E6%A0%B7%E6%9C%BA%E5%8F%82%E6%95%B0"><span class="toc-number">10.</span> <span class="toc-text"> 十、理论计算值为什么不是最终样机参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%80-ti-%E7%A4%BA%E4%BE%8B%E6%A0%B7%E6%9C%BA%E9%AA%8C%E8%AF%81%E4%BA%86%E4%BB%80%E4%B9%88"><span class="toc-number">11.</span> <span class="toc-text"> 十一、TI 示例样机验证了什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%BA%8C-%E7%AC%AC%E4%B8%80%E6%AC%A1%E8%AE%BE%E8%AE%A1-llc-%E6%97%B6%E6%88%91%E4%BC%9A%E6%8C%89%E4%BB%80%E4%B9%88%E9%A1%BA%E5%BA%8F%E6%A3%80%E6%9F%A5"><span class="toc-number">12.</span> <span class="toc-text"> 十二、第一次设计 LLC 时，我会按什么顺序检查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%84%E6%96%99%E6%9D%A5%E6%BA%90"><span class="toc-number">13.</span> <span class="toc-text"> 资料来源</span></a></li></ol>
+</div>
+</div>
+          <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+          <div class="sidebar-btn-wrapper" style="position:static">
+            <div class="sidebar-toc-btn current"></div>
+            <div class="sidebar-common-btn"></div>
+          </div>
+    </div>
+  </div>
+  <div class="sidebar-widget">
+  </div>
+  </div>
+</aside>
+
+          <section id="main" aria-label="Main content"><article id="post-llc-resonant-half-bridge-from-specs-to-parameters" class="h-entry article" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner" data-aos="fade-up">
+    <div class="article-meta">
+      <div class="article-date">
+  <span class="article-date-link icon-calendar" data-aos="zoom-in">
+    <time datetime="2026-07-29T03:30:00.000Z" itemprop="datePublished">2026-07-29</time>
+    <time style="display: none;" id="post-update-time">2026-08-20</time>
+  </span>
+    <span class="article-date-link icon-calendar-plus" data-aos="zoom-in">
+      <time datetime="2026-08-20T08:30:48.105Z" itemprop="dateModified">2026-08-20</time>
+    </span>
+</div>
+
+    </div>
+    
+    <div class="hr-line"></div>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+        <p>刚开始接触 LLC 时，我知道它有两个电感和一个电容，也知道它可以实现软开关，但真正拿到一组输入输出指标后，还是不知道该先算什么。<code>Lm</code>、<code>Lr</code>、<code>Cr</code> 之间是什么关系？开关频率为什么有时低于谐振点，有时又高于谐振点？增益曲线能覆盖输入范围以后，是不是就已经保证了 ZVS？</p>
+<p>这篇文章以 TI《Designing an LLC Resonant Half-Bridge Power Converter》（SLUP263）中的例子为主线，重新走一遍 <code>375～405 VDC → 12 V / 25 A / 300 W</code> 的第一轮设计。重点不是把 LLC 的知识点全部列出来，而是回答一个更实际的问题：拿到这些指标后，我应该按什么顺序确定变比、<code>Lm</code>、<code>Lr</code>、<code>Cr</code>、工作频率和 ZVS 条件。</p>
+<p>这里使用的是公开资料中的理论计算和 TI 样机测试。我目前没有自己的 LLC 样机，因此文中的波形不能当作我的实测结果。</p>
+<h2 id="一-拿到-390-v12-v-300-w-指标后先解决什么"><a class="markdownIt-Anchor" href="#一-拿到-390-v12-v-300-w-指标后先解决什么"></a> 一、拿到 390 V→12 V / 300 W 指标后，先解决什么</h2>
+<p>TI 示例给出的主要指标为：</p>
+<ul>
+<li>输入电压：<code>375～405 VDC</code></li>
+<li>额定输出：<code>12 V / 25 A</code></li>
+<li>额定功率：<code>300 W</code></li>
+<li>正常开关频率：<code>70～150 kHz</code></li>
+<li>线性调整率：不超过 <code>1%</code></li>
+<li>负载调整率：不超过 <code>1%</code></li>
+<li>满载输出纹波：不超过 <code>120 mVpp</code></li>
+<li><code>390 V</code> 输入、<code>25 A</code> 输出时效率目标：不低于 <code>90%</code></li>
+</ul>
+<p>从 <code>390 V</code> 左右的直流母线得到 <code>12 V / 25 A</code>，不只是一个大比例降压问题。高压 MOSFET 如果继续硬开关，开关损耗和 EMI 会随着频率提高而变得明显；输出侧又是低压大电流，变压器、整流器和谐振电流的 RMS 值都会影响效率。</p>
+<p>因此这次选择 LLC，主要是希望利用谐振电流完成一次侧 MOSFET 的零电压开通，同时通过变压器实现隔离和大比例降压。问题也随之改变：设计不再只需要确定一个占空比，而要先得到一条能够覆盖输入、负载和损耗变化的增益曲线。</p>
+<h2 id="二-为什么-buck-调占空比而-llc-主要调频率"><a class="markdownIt-Anchor" href="#二-为什么-buck-调占空比而-llc-主要调频率"></a> 二、为什么 Buck 调占空比，而 LLC 主要调频率</h2>
+<p>普通 Buck 的基本控制量是占空比。理想连续导通模式下：</p>
+<p>$$V_o&#x3D;D V_{in}
+$$</p><p>占空比 <code>D</code> 变化，每个开关周期施加到电感上的平均电压随之变化，输出电压也就改变。</p>
+<p>标准对称半桥 LLC 的两颗 MOSFET 通常保持接近 <code>50%</code> 的互补驱动，中间留出死区。这样做可以让变压器得到对称的正负激励，减少磁通偏移。它的主要控制量是开关频率，而不是占空比：</p>
+<p><code>改变 fsw → 改变谐振网络阻抗 → 改变谐振电流和电压增益 → 调整输出电压</code></p>
+<p>简单地说，Buck 主要改变“一个周期内开多久”，标准变频 LLC 主要改变“谐振网络被多快地激励”。这不是说所有 LLC 控制都绝对不能改变占空比，而是本文讨论的对称半桥 LLC 以变频控制为主。</p>
+<h2 id="三-lr-cr-lm-为什么这样连接"><a class="markdownIt-Anchor" href="#三-lr-cr-lm-为什么这样连接"></a> 三、Lr、Cr、Lm 为什么这样连接</h2>
+<p><img src="/images/myimge/llc-resonant-half-bridge/llc-topology-fig3-slup263-page4.png" alt="LLC 谐振半桥的典型结构与简化电路" /></p>
+<p><em>资料：TI《Designing an LLC Resonant Half-Bridge Power Converter》，SLUP263，PDF 第 4 页，Fig.3。</em></p>
+<p>半桥先把直流母线变成高频方波，<code>Lr</code>、<code>Cr</code> 和 <code>Lm</code> 决定这个方波怎样变成谐振电流，变压器再把能量送到次级整流和输出电容。</p>
+<p><code>Lr</code> 是串联谐振电感。它和 <code>Cr</code> 串在主要功率路径中，直接限制谐振电流的变化速度。<code>Cr</code> 在每个周期与电感交换能量，同时隔断谐振网络中的直流分量。两者共同决定最基本的串联谐振频率。</p>
+<p><code>Lm</code> 是变压器励磁电感，但在 LLC 中不能把它当成无关紧要的寄生参数。它会参与第二个谐振过程，并决定励磁电流大小。<code>Lm</code> 变小，励磁电流增加，MOSFET 换流时可利用的电感能量更多，ZVS 余量可能提高；代价是一次侧 RMS 电流和导通损耗也会增加。<code>Lm</code> 变大则相反。</p>
+<p>因此 <code>Lm</code> 同时影响增益曲线、环流、导通损耗和 ZVS，不能只根据变压器空载电流单独选择。</p>
+<h2 id="四-llc-不只有一个谐振频率"><a class="markdownIt-Anchor" href="#四-llc-不只有一个谐振频率"></a> 四、LLC 不只有一个谐振频率</h2>
+<p>首先是 <code>Lr</code> 和 <code>Cr</code> 决定的串联谐振频率：</p>
+<p>$$f_0&#x3D;\frac{1}{2\pi\sqrt{L_rC_r}}
+$$</p><p>第二个频率由 <code>Lr+Lm</code> 和 <code>Cr</code> 决定：</p>
+<p>$$f_p&#x3D;\frac{1}{2\pi\sqrt{(L_r+L_m)C_r}}
+$$</p><p>因为 <code>Lm</code> 为正，所以 <code>fp</code> 一定低于 <code>f0</code>。</p>
+<p>还有一个容易混淆的量：负载相关的实际增益峰值频率，SLUP263 中记为 <code>fc0</code>。它不是固定元件参数，而会随负载移动：</p>
+<p>$$f_p\leq f_{c0}\leq f_0
+$$</p><p>空载时，峰值频率接近 <code>fp</code>；负载逐渐加重时，峰值向 <code>f0</code> 移动。后面判断感性区和容性区时，真正的边界是这条随负载移动的增益峰值轨迹，不能只看 <code>fsw</code> 是否低于 <code>f0</code>。</p>
+<h2 id="五-先看电流怎样变化再进入-fha"><a class="markdownIt-Anchor" href="#五-先看电流怎样变化再进入-fha"></a> 五、先看电流怎样变化，再进入 FHA</h2>
+<p><img src="/images/myimge/llc-resonant-half-bridge/llc-operating-waveforms-fig4-slup263-page5.png" alt="LLC 在谐振点、低于谐振点和高于谐振点时的波形" /></p>
+<p><em>资料：SLUP263，PDF 第 5 页，Fig.4。图中是理论工作波形，不是硬件实测。</em></p>
+<p>在 <code>fsw=f0</code> 附近，<code>Lr</code> 和 <code>Cr</code> 的电抗互相抵消，输入能量比较直接地送到负载。在理想 FHA 模型中，这个点的归一化增益为 1，而且不同负载的增益曲线都会经过 <code>(fn, Mg)=(1,1)</code>。</p>
+<p>当开关频率低于 <code>f0</code> 时，次级电流会在半个驱动周期结束前降到零，谐振电流中用于传递功率的部分停止，但励磁电流仍然存在。为了传递同样的功率，低频侧通常需要更大的环流，导通损耗也会增加。</p>
+<p>这里需要注意：<code>fsw&lt;f0</code> 不等于电路一定呈容性。如果工作点仍在负载相关增益峰值的右侧，也就是 <code>fc0&lt;fsw&lt;f0</code>，输入阻抗仍可能呈感性，并保留一次侧 ZVS。只有继续降低频率、越过峰值边界后，电路才进入容性区。</p>
+<p>当 <code>fsw&gt;f0</code> 时，输入通常呈感性，谐振电流滞后于半桥电压，有利于一次侧 MOSFET 在死区内完成换流。这个区域的环流较小，但轻载时可能需要把频率升得很高，频率范围和磁性器件损耗仍然要限制。</p>
+<h2 id="六-fha-为什么能把-llc-变成交流电路"><a class="markdownIt-Anchor" href="#六-fha-为什么能把-llc-变成交流电路"></a> 六、FHA 为什么能把 LLC 变成交流电路</h2>
+<p>FHA 的全称是 Fundamental Harmonic Approximation，也就是基波近似。</p>
+<p>半桥输出是方波，里面包含基波和许多高次谐波。LLC 通常工作在串联谐振点附近，谐振网络对基波的响应最强，因此可以先忽略高次谐波，只保留方波的基波分量。次级整流器、输出电容和负载也可以折算成一次侧的等效交流电阻：</p>
+<p>$$R_e&#x3D;\frac{8n^2}{\pi^2}R_L
+$$</p><p>这样，原本包含开关和整流器的非线性电路，就暂时变成了一个由正弦电压源驱动的线性交流网络。接下来可以定义三个归一化参数：</p>
+<p>$$f_n&#x3D;\frac{f_{sw}}{f_0}
+$$</p><p>$$L_n&#x3D;\frac{L_m}{L_r}
+$$</p><p>$$Q_e&#x3D;\frac{\sqrt{L_r&#x2F;C_r}}{R_e}
+$$</p><p>对应的 FHA 增益幅值可以写成：</p>
+<p>$$M_g&#x3D;\frac{L_nf_n^2}{\sqrt{\left[(L_n+1)f_n^2-1\right]^2+\left[(f_n^2-1)f_nQ_eL_n\right]^2}}
+$$</p><p><code>fn</code> 是控制器能够改变的量，<code>Ln</code> 决定励磁支路与串联谐振支路的比例，<code>Qe</code> 则把负载和谐振阻抗联系起来。负载变化会改变 <code>Re</code> 和 <code>Qe</code>，所以同一组元件会得到一族不同的增益曲线。</p>
+<p>FHA 不是 LLC 的精确开关模型。它在 <code>f0</code> 附近比较有效，远离谐振点以后，高次谐波、整流器换流和寄生参数的影响增大，误差也会增加。它适合完成第一轮参数设计，让每个参数仍有清楚的物理意义；最终值还要通过开关仿真和样机测试收敛。</p>
+<h2 id="七-先把输入输出指标变成增益范围"><a class="markdownIt-Anchor" href="#七-先把输入输出指标变成增益范围"></a> 七、先把输入输出指标变成增益范围</h2>
+<p>在选 <code>Lm</code>、<code>Lr</code>、<code>Cr</code> 之前，需要先知道谐振网络必须提供多大增益。</p>
+<p>输入最高、输出要求最低时，需要的增益最小。TI 示例把次级二极管压降按 <code>0.7 V</code> 计入，得到：</p>
+<p>$$M_{g\_min}&#x3D;\frac{n\left(V_{o\_min}+V_F\right)}{V_{in\_max}&#x2F;2}\approx0.99
+$$</p><p>输入最低、输出要求最高时，还要补偿整流压降和功率损耗。资料按 <code>92%</code> 效率估算，将损耗折算成约 <code>1.05 V</code> 的输出侧压降：</p>
+<p>$$M_{g\_max}&#x3D;\frac{n\left(V_{o\_max}+V_F+V_{loss}\right)}{V_{in\_min}&#x2F;2}\approx1.18
+$$</p><p>为了覆盖 <code>110%</code> 过载，TI 又把设计用最大增益提高到约 <code>1.30</code>。因此后面选出的增益曲线至少要覆盖 <code>0.99～1.30</code>，同时工作点不能越过容性区边界。</p>
+<p><img src="/images/myimge/llc-resonant-half-bridge/llc-recommended-gain-area-fig7-slup263-page12.png" alt="SLUP263 推荐的增益工作区域" /></p>
+<p><em>资料：SLUP263，PDF 第 12 页，Fig.7。绿色区域表示文中建议的增益与频率工作范围。</em></p>
+<p>这一步解释了为什么不能一开始就凭经验拍一个 <code>Lm</code> 或 <code>Cr</code>：如果所需最大增益没有先算清楚，就不知道曲线在输入低压和过载时还有没有余量。</p>
+<h2 id="八-从指标走到-n-ln-qe-cr-lr-和-lm"><a class="markdownIt-Anchor" href="#八-从指标走到-n-ln-qe-cr-lr-和-lm"></a> 八、从指标走到 n、Ln、Qe、Cr、Lr 和 Lm</h2>
+<p>SLUP263 把计算过程整理成了一个迭代流程。先根据指标确定变比和增益窗口，再选择 <code>Ln</code>、<code>Qe</code>，计算元件值，最后回到增益曲线检查频率范围。如果不满足，就重新选择 <code>Ln</code>、<code>Qe</code>，而不是强行接受第一次结果。</p>
+<p><img src="/images/myimge/llc-resonant-half-bridge/llc-design-flow-fig14-slup263-page21.png" alt="LLC 谐振网络参数设计流程" /></p>
+<p><em>资料：SLUP263，PDF 第 21 页，Fig.14。</em></p>
+<p>TI 示例使用 UCC25600 完成变频控制。这里引用它是为了说明原资料的实现方式，不把 UCC25600 当作当前设计的唯一选择。文章重点仍然是功率级参数。</p>
+<p><img src="/images/myimge/llc-resonant-half-bridge/llc-300w-example-circuit-fig15-slup263-page22.png" alt="TI 300 W LLC 示例电路" /></p>
+<p><em>资料：SLUP263，PDF 第 22 页，Fig.15。该图是 TI 示例电路，不是我的项目原理图。</em></p>
+<h3 id="step-1确定变压器变比"><a class="markdownIt-Anchor" href="#step-1确定变压器变比"></a> Step 1：确定变压器变比</h3>
+<p>先让额定输入 <code>390 V</code>、额定输出 <code>12 V</code> 对应 <code>Mg≈1</code>。半桥施加到谐振网络的电压按母线的一半计算：</p>
+<p>$$n&#x3D;\frac{V_{in\_nom}&#x2F;2}{V_{o\_nom}}&#x3D;\frac{390&#x2F;2}{12}&#x3D;16.25
+$$</p><p>第一轮设计取 <code>n=16</code>。这只是用来建立增益曲线的初始整数变比，最终变压器仍要结合可实现匝数、漏感和样机增益调整。</p>
+<h3 id="step-2选择-ln35-qe045"><a class="markdownIt-Anchor" href="#step-2选择-ln35-qe045"></a> Step 2：选择 Ln=3.5、Qe=0.45</h3>
+<p><code>Ln</code> 和 <code>Qe</code> 没有唯一答案。当前目标是让满载及 <code>110%</code> 过载曲线能够达到 <code>Mg=1.30</code>，并且在允许的频率范围内保持在增益峰值右侧。</p>
+<p>TI 从峰值增益曲线中选择：</p>
+<p><code>Ln=3.5，Qe=0.45</code></p>
+<p>对应的可实现峰值增益约为 <code>1.56</code>，高于所需的 <code>1.30</code>。<code>Ln</code> 如果继续减小，峰值增益和励磁电流都会增加，ZVS 余量可能更大，但导通损耗也会上升；<code>Ln</code> 太大则可能没有足够增益和换流能量。<code>Qe</code> 也会同时影响峰值增益和调频范围，因此这里只把 <code>3.5</code>、<code>0.45</code> 当作一个折中起点。</p>
+<h3 id="step-3计算-cr-lr-和-lm"><a class="markdownIt-Anchor" href="#step-3计算-cr-lr-和-lm"></a> Step 3：计算 Cr、Lr 和 Lm</h3>
+<p>先把串联谐振频率初步定在 <code>130 kHz</code>。满载等效负载为：</p>
+<p>$$R_e&#x3D;\frac{8n^2}{\pi^2}\frac{V_o}{I_o}
+&#x3D;\frac{8\times16^2}{\pi^2}\frac{12}{25}
+\approx99.7\ \Omega
+$$</p><p>由 <code>Qe</code> 的定义得到谐振电容：</p>
+<p>$$C_r&#x3D;\frac{1}{2\pi Q_ef_0R_e}\approx27.3\ \mathrm{nF}
+$$</p><p>再由串联谐振频率计算 <code>Lr</code>：</p>
+<p>$$L_r&#x3D;\frac{1}{(2\pi f_0)^2C_r}\approx54.9\ \mu\mathrm{H}
+$$</p><p>取可实现值 <code>Lr=60 µH</code>，则：</p>
+<p>$$L_m&#x3D;L_nL_r&#x3D;3.5\times60\ \mu\mathrm{H}&#x3D;210\ \mu\mathrm{H}
+$$</p><p>第一轮谐振网络参数因此为：</p>
+<ul>
+<li><code>Cr=27.3 nF</code></li>
+<li><code>Lr=60 µH</code></li>
+<li><code>Lm=210 µH</code></li>
+</ul>
+<h3 id="step-4重新计算-f0-和工作频率"><a class="markdownIt-Anchor" href="#step-4重新计算-f0-和工作频率"></a> Step 4：重新计算 f0 和工作频率</h3>
+<p><code>Lr</code> 取整以后，实际串联谐振频率不再是最初设定的 <code>130 kHz</code>：</p>
+<p>$$f_0&#x3D;\frac{1}{2\pi\sqrt{60\ \mu\mathrm{H}\times27.3\ \mathrm{nF}}}
+\approx124.4\ \mathrm{kHz}
+$$</p><p>元件取值改变后，满载 <code>Qe</code> 约为 <code>0.47</code>，<code>110%</code> 过载时约为 <code>0.52</code>。增益曲线给出的归一化频率范围约为：</p>
+<p><code>fn_min=0.65，fn_max=1.02</code></p>
+<p>因此实际开关频率约为：</p>
+<p>$$f_{sw\_min}&#x3D;0.65\times124.4\ \mathrm{kHz}\approx80.7\ \mathrm{kHz}
+$$</p><p>$$f_{sw\_max}&#x3D;1.02\times124.4\ \mathrm{kHz}\approx126.9\ \mathrm{kHz}
+$$</p><p>这个结果落在原指标规定的 <code>70～150 kHz</code> 内。</p>
+<p><img src="/images/myimge/llc-resonant-half-bridge/llc-gain-verification-fig16-slup263-page24.png" alt="TI 示例的增益与工作频率校核" /></p>
+<p><em>资料：SLUP263，PDF 第 24 页，Fig.16。该曲线用于校核理论设计点。</em></p>
+<p>到这里，增益范围和频率范围都满足第一轮要求，但设计还不能结束。</p>
+<h2 id="九-增益曲线满足要求并不代表已经实现-zvs"><a class="markdownIt-Anchor" href="#九-增益曲线满足要求并不代表已经实现-zvs"></a> 九、增益曲线满足要求，并不代表已经实现 ZVS</h2>
+<p><img src="/images/myimge/llc-resonant-half-bridge/llc-zvs-and-gain-regions-fig8-9-slup263-page15.png" alt="LLC 的 ZVS 换流过程与感性、容性区域" /></p>
+<p><em>资料：SLUP263，PDF 第 15 页，Fig.8、Fig.9。增益峰值轨迹是感性区和容性区的分界。</em></p>
+<p>工作点位于感性区时，谐振电流滞后于半桥电压。MOSFET 关断后，电流还能在死区内继续流动，给一颗 MOSFET 的输出电容充电，同时给另一颗放电，随后由体二极管把即将导通器件的漏源电压钳在接近零的位置。</p>
+<p>但感性区只提供了正确的电流方向，是 ZVS 的必要条件，不是充分条件。还要检查电感储存的能量能不能完成两颗 MOSFET 输出电容的换流：</p>
+<p>$$\frac{1}{2}(L_m+L_r)I_{m\_peak}^2
+\geq
+\frac{1}{2}(2C_{eq})V_{in}^2
+$$</p><p>死区时间也必须足够：</p>
+<p>$$t_{dead}\geq16C_{eq}f_{sw}L_m
+$$</p><p>SLUP263 按 <code>Ceq=200 pF</code> 估算，电感侧可用能量约为 <code>286.5 µJ</code>，高于输出电容换流所需的约 <code>32.8 µJ</code>；计算最低死区约为 <code>85 ns</code>，最终选择 <code>100 ns</code>。</p>
+<p>这仍然只是资料中的简化校核。真实 MOSFET 的 <code>Coss</code> 会随漏源电压改变，器件数据表中的 <code>Qoss</code>、<code>Eoss</code> 往往比单一固定电容更适合最终核算。变压器漏感、绕组电容、驱动延迟和 PCB 寄生参数也会改变换流过程，所以“进入感性区即可自动 ZVS”是不成立的。</p>
+<h2 id="十-理论计算值为什么不是最终样机参数"><a class="markdownIt-Anchor" href="#十-理论计算值为什么不是最终样机参数"></a> 十、理论计算值为什么不是最终样机参数</h2>
+<p>SLUP263 最后给出的样机参数与第一轮 FHA 计算并不相同：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th style="text-align:right">FHA 初始计算</th>
+<th style="text-align:right">TI 最终样机</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>变比</td>
+<td style="text-align:right"><code>16</code></td>
+<td style="text-align:right"><code>17:1:1</code></td>
+</tr>
+<tr>
+<td><code>Lm</code></td>
+<td style="text-align:right"><code>210 µH</code></td>
+<td style="text-align:right"><code>280 µH</code></td>
+</tr>
+<tr>
+<td><code>Lr</code></td>
+<td style="text-align:right"><code>60 µH</code></td>
+<td style="text-align:right"><code>60 µH</code></td>
+</tr>
+<tr>
+<td><code>Cr</code></td>
+<td style="text-align:right"><code>27.3 nF</code></td>
+<td style="text-align:right"><code>24 nF</code></td>
+</tr>
+</tbody>
+</table>
+<p>这个差异不应该隐藏。FHA 忽略了高次谐波、整流换流和多种寄生参数，实际变压器又受到匝数、漏感、磁芯和绕组结构限制。MOSFET <code>Coss</code>、死区、整流压降和实际损耗还会继续改变增益与 ZVS 边界。</p>
+<p>所以理论计算的作用，是先找到一个合理、可实现的参数区域。开关仿真可以减少迭代次数，但最终参数仍要根据实际变压器、器件特性、频率范围、温升和样机波形调整。</p>
+<h2 id="十一-ti-示例样机验证了什么"><a class="markdownIt-Anchor" href="#十一-ti-示例样机验证了什么"></a> 十一、TI 示例样机验证了什么</h2>
+<p><img src="/images/myimge/llc-resonant-half-bridge/llc-ti-prototype-waveforms-fig18-slup263-page28.png" alt="TI LLC 示例样机的效率、纹波与谐振网络波形" /></p>
+<p><em>资料：SLUP263，PDF 第 28 页，Fig.18。以上均为 TI 示例样机测试结果，不是我的硬件实测。</em></p>
+<p>效率曲线给出了 <code>375 V</code>、<code>390 V</code> 和 <code>405 V</code> 三种输入下随负载变化的趋势：轻载时固定损耗占比明显，负载升高后效率趋于稳定。这里不从曲线人工估读一个更精确的效率数字，只保留资料能够支持的趋势。</p>
+<p>满载输出纹波图标注约 <code>90 mV</code>，低于原设计的 <code>120 mVpp</code> 目标。其余两组示波器波形展示了谐振电容、谐振电感、励磁电感以及 Q2 漏源电压之间的时序关系，用于检查谐振过程和开通前换流状态。</p>
+<p>这些结果说明 TI 的样机完成了从 FHA 初始设计到硬件调整的闭环，但不能证明换一套变压器、MOSFET 或 PCB 后仍会得到同样结果。</p>
+<h2 id="十二-第一次设计-llc-时我会按什么顺序检查"><a class="markdownIt-Anchor" href="#十二-第一次设计-llc-时我会按什么顺序检查"></a> 十二、第一次设计 LLC 时，我会按什么顺序检查</h2>
+<p>回头看这次计算，真正有用的不是记住 <code>Lm=210 µH</code> 或 <code>Cr=27.3 nF</code>，而是确定设计顺序：</p>
+<p><code>输入输出指标</code></p>
+<p><code>→ 变比和所需增益窗口</code></p>
+<p><code>→ Ln、Qe 与可实现峰值增益</code></p>
+<p><code>→ Cr、Lr、Lm</code></p>
+<p><code>→ 增益和工作频率范围</code></p>
+<p><code>→ 感性工作区域</code></p>
+<p><code>→ ZVS 能量与死区时间</code></p>
+<p><code>→ 器件电流、电压和温升</code></p>
+<p><code>→ 开关仿真与样机调整</code></p>
+<p>这篇文章完成的是基于公开资料的第一轮设计复盘。下一步如果真正做一块 LLC 电源，还需要把选定 MOSFET 的非线性输出电容、变压器漏感和绕组电容、整流器损耗、控制器频率限制以及 PCB 寄生参数带回模型，再用样机波形确认 ZVS、谐振电流和温升。</p>
+<h2 id="资料来源"><a class="markdownIt-Anchor" href="#资料来源"></a> 资料来源</h2>
+<ul>
+<li>Texas Instruments, <a target="_blank" rel="noopener" href="https://www.ti.com/lit/ml/slup263/slup263.pdf">Designing an LLC Resonant Half-Bridge Power Converter, SLUP263</a>，正文局部图分别取自 PDF 第 4、5、12、15、21、22、24、28 页。</li>
+<li>Banner 图片：<a target="_blank" rel="noopener" href="https://wallhaven.cc/w/vmmw78">Wallhaven vmmw78</a>，SFW / Anime。</li>
+<li>Cover 图片：<a target="_blank" rel="noopener" href="https://wallhaven.cc/w/gj9krd">Wallhaven gj9krd</a>，SFW / Anime。</li>
+</ul>
+
+    </div>
+    <footer class="article-footer">
+        <a class="article-category-link" href="/categories/%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="学习记录" data-aos="zoom-in">学习记录</a>
+
+        <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/FHA/" rel="tag" title="FHA">FHA</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/LLC/" rel="tag" title="LLC">LLC</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/ZVS/" rel="tag" title="ZVS">ZVS</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E5%BC%80%E5%85%B3%E7%94%B5%E6%BA%90/" rel="tag" title="开关电源">开关电源</a></li><li class="article-tag-list-item" data-aos="zoom-in"><a class="article-tag-list-link" href="/tags/%E8%B0%90%E6%8C%AF%E5%8F%98%E6%8D%A2%E5%99%A8/" rel="tag" title="谐振变换器">谐振变换器</a></li></ul>
+
+    </footer>
+  </div>
+    <nav id="article-nav" aria-label="Article navigation" data-aos="fade-up">
+      <div class="article-nav-link-wrap left">
+          <img data-src="/images/myimge/time-sync-learning-log/time-sync-test-cover.svg" data-sizes="auto" alt="从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录" class="lazyload">
+        <a href="/2026/08/03/time-synchronization-and-100mhz-clock-test-learning-log/" aria-label="前一篇: 从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录" title="前一篇: 从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录"></a>
+        <div class="article-nav-caption">前一篇</div>
+        <h3 class="article-nav-title">
+            从 1 MΩ、50 Ω 测量到 100 MHz 时钟链路：时间同步系统学习记录
+        </h3>
+      </div>
+    <div class="article-nav-link-wrap right">
+        <img data-src="/images/myimge/power-topologies/power-topologies-handbook-card.jpg" data-sizes="auto" alt="开关电源拓扑怎么选：从 Buck、Boost 到移相全桥" class="lazyload">
+      <a href="/2026/07/28/power-topologies-selection-from-buck-to-psfb/" aria-label="后一篇: 开关电源拓扑怎么选：从 Buck、Boost 到移相全桥"  title="后一篇: 开关电源拓扑怎么选：从 Buck、Boost 到移相全桥"></a>
+      <div class="article-nav-caption">后一篇</div>
+      <h3 class="article-nav-title">
+          开关电源拓扑怎么选：从 Buck、Boost 到移相全桥
+      </h3>
+    </div>
+  </nav>
+
+</article>
+
+
+</section>
+        </div>
+        <footer id="footer" aria-label="Site footer">
+  <div style="width: 100%; overflow: hidden">
+    <div class="footer-line"></div>
+  </div>
+  <div id="footer-info">
+    <div>
+      <span class="icon-copyright"></span>
+        2026
+        <span class="footer-info-sep rotate"></span>
+      Alen
+    </div>
+  </div>
+</footer>
+
+          <div class="sidebar-top">
+            <div class="sidebar-top-taichi rotate"></div>
+            <div class="arrow-up"></div>
+          </div>
+        <div id="mask" class="hide"></div>
+      </div>
+      <nav id="mobile-nav" aria-label="Mobile navigation">
+  <div class="sidebar-wrap">
+        <div class="sidebar-toc-sidebar"><h3 class="toc-title">文章目录</h3>
+<div class="sidebar-toc-wrapper toc-div-class" >
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80-%E6%8B%BF%E5%88%B0-390-v12-v-300-w-%E6%8C%87%E6%A0%87%E5%90%8E%E5%85%88%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88"><span class="toc-number">1.</span> <span class="toc-text"> 一、拿到 390 V→12 V &#x2F; 300 W 指标后，先解决什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C-%E4%B8%BA%E4%BB%80%E4%B9%88-buck-%E8%B0%83%E5%8D%A0%E7%A9%BA%E6%AF%94%E8%80%8C-llc-%E4%B8%BB%E8%A6%81%E8%B0%83%E9%A2%91%E7%8E%87"><span class="toc-number">2.</span> <span class="toc-text"> 二、为什么 Buck 调占空比，而 LLC 主要调频率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89-lr-cr-lm-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E6%A0%B7%E8%BF%9E%E6%8E%A5"><span class="toc-number">3.</span> <span class="toc-text"> 三、Lr、Cr、Lm 为什么这样连接</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B-llc-%E4%B8%8D%E5%8F%AA%E6%9C%89%E4%B8%80%E4%B8%AA%E8%B0%90%E6%8C%AF%E9%A2%91%E7%8E%87"><span class="toc-number">4.</span> <span class="toc-text"> 四、LLC 不只有一个谐振频率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94-%E5%85%88%E7%9C%8B%E7%94%B5%E6%B5%81%E6%80%8E%E6%A0%B7%E5%8F%98%E5%8C%96%E5%86%8D%E8%BF%9B%E5%85%A5-fha"><span class="toc-number">5.</span> <span class="toc-text"> 五、先看电流怎样变化，再进入 FHA</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD-fha-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%83%BD%E6%8A%8A-llc-%E5%8F%98%E6%88%90%E4%BA%A4%E6%B5%81%E7%94%B5%E8%B7%AF"><span class="toc-number">6.</span> <span class="toc-text"> 六、FHA 为什么能把 LLC 变成交流电路</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83-%E5%85%88%E6%8A%8A%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA%E6%8C%87%E6%A0%87%E5%8F%98%E6%88%90%E5%A2%9E%E7%9B%8A%E8%8C%83%E5%9B%B4"><span class="toc-number">7.</span> <span class="toc-text"> 七、先把输入输出指标变成增益范围</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB-%E4%BB%8E%E6%8C%87%E6%A0%87%E8%B5%B0%E5%88%B0-n-ln-qe-cr-lr-%E5%92%8C-lm"><span class="toc-number">8.</span> <span class="toc-text"> 八、从指标走到 n、Ln、Qe、Cr、Lr 和 Lm</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#step-1%E7%A1%AE%E5%AE%9A%E5%8F%98%E5%8E%8B%E5%99%A8%E5%8F%98%E6%AF%94"><span class="toc-number">8.1.</span> <span class="toc-text"> Step 1：确定变压器变比</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step-2%E9%80%89%E6%8B%A9-ln35-qe045"><span class="toc-number">8.2.</span> <span class="toc-text"> Step 2：选择 Ln&#x3D;3.5、Qe&#x3D;0.45</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step-3%E8%AE%A1%E7%AE%97-cr-lr-%E5%92%8C-lm"><span class="toc-number">8.3.</span> <span class="toc-text"> Step 3：计算 Cr、Lr 和 Lm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#step-4%E9%87%8D%E6%96%B0%E8%AE%A1%E7%AE%97-f0-%E5%92%8C%E5%B7%A5%E4%BD%9C%E9%A2%91%E7%8E%87"><span class="toc-number">8.4.</span> <span class="toc-text"> Step 4：重新计算 f0 和工作频率</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D-%E5%A2%9E%E7%9B%8A%E6%9B%B2%E7%BA%BF%E6%BB%A1%E8%B6%B3%E8%A6%81%E6%B1%82%E5%B9%B6%E4%B8%8D%E4%BB%A3%E8%A1%A8%E5%B7%B2%E7%BB%8F%E5%AE%9E%E7%8E%B0-zvs"><span class="toc-number">9.</span> <span class="toc-text"> 九、增益曲线满足要求，并不代表已经实现 ZVS</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81-%E7%90%86%E8%AE%BA%E8%AE%A1%E7%AE%97%E5%80%BC%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E6%98%AF%E6%9C%80%E7%BB%88%E6%A0%B7%E6%9C%BA%E5%8F%82%E6%95%B0"><span class="toc-number">10.</span> <span class="toc-text"> 十、理论计算值为什么不是最终样机参数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%B8%80-ti-%E7%A4%BA%E4%BE%8B%E6%A0%B7%E6%9C%BA%E9%AA%8C%E8%AF%81%E4%BA%86%E4%BB%80%E4%B9%88"><span class="toc-number">11.</span> <span class="toc-text"> 十一、TI 示例样机验证了什么</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E4%BA%8C-%E7%AC%AC%E4%B8%80%E6%AC%A1%E8%AE%BE%E8%AE%A1-llc-%E6%97%B6%E6%88%91%E4%BC%9A%E6%8C%89%E4%BB%80%E4%B9%88%E9%A1%BA%E5%BA%8F%E6%A3%80%E6%9F%A5"><span class="toc-number">12.</span> <span class="toc-text"> 十二、第一次设计 LLC 时，我会按什么顺序检查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B5%84%E6%96%99%E6%9D%A5%E6%BA%90"><span class="toc-number">13.</span> <span class="toc-text"> 资料来源</span></a></li></ol>
+</div>
+</div>
+        <div class="sidebar-common-sidebar hidden"><div class="sidebar-author">
+  <img data-src="/avatar/avatar.webp" data-sizes="auto" alt="Alen" class="lazyload">
+  <div class="sidebar-author-name">Alen</div>
+  <div class="sidebar-description">从原理图到实测波形，记录硬件设计中的选择、失误与验证。</div>
+</div>
+<div class="sidebar-state">
+  <div class="sidebar-state-article">
+    <div>文章</div>
+    <div class="sidebar-state-number">16</div>
+  </div>
+  <div class="sidebar-state-category">
+    <div>分类</div>
+    <div class="sidebar-state-number">3</div>
+  </div>
+  <div class="sidebar-state-tag">
+    <div>标签</div>
+    <div class="sidebar-state-number">53</div>
+  </div>
+</div>
+<div class="sidebar-social" >
+    <div class="icon-github sidebar-social-icon">
+      <a href=https://github.com/alen9966 itemprop="url" target="_blank" aria-label="github" rel="noopener nofollow noreferrer"></a>
+    </div>
+</div>
+<div class="sidebar-menu">
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/" aria-label="首页"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">首页</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/projects/" aria-label="项目"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">项目</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/about" aria-label="关于"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">关于</div>
+      </div>
+      <div class="sidebar-menu-link-wrap">
+        <a class="sidebar-menu-link-dummy" href="/friend" aria-label="友链"></a>
+          <div class="sidebar-menu-icon icon rotate">
+              &#xe62b;
+          </div>
+        <div class="sidebar-menu-link">友链</div>
+      </div>
+</div>
+</div>
+  </div>
+      <div class="sidebar-btn-wrapper">
+        <div class="sidebar-toc-btn current"></div>
+        <div class="sidebar-common-btn"></div>
+      </div>
+</nav>
+
+    </div>
+      <div class="site-search">
+        <div class="reimu-popup popup">
+          <div class="reimu-search">
+            <div class="reimu-search-input-icon"></div>
+            <div id="reimu-search-input"></div>
+            <div class="popup-btn-close"></div>
+          </div>
+          <div class="reimu-results">
+            <div id="reimu-stats"></div>
+            <div id="reimu-hits"></div>
+            <div id="reimu-pagination" class="reimu-pagination"></div>
+          </div>
+          <img class="reimu-bg" src="/images/myimge/wallhaven-3ze1v3.jpg" loading="lazy" decoding="async" fetchpriority="low"/>
+        </div>
+      </div>
+    
+<script src="/js/vendor/lazysizes.min.js" crossorigin="anonymous"></script>
+
+
+<script src="/js/vendor/clipboard.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+<script src="/js/pjax_script.js" data-pjax></script>
+
+
+  
+<script src="/js/generator_search.js" defer></script>
+
+
+
+
+
+
+
+
+<div id="lazy-script">
+  <div>
+      
+      
+      <script data-pjax>
+        window.REIMU_POST = {
+          author: "Alen",
+          title: "第一次设计 LLC 谐振半桥：从 390 V→12 V / 300 W 指标走到谐振参数",
+          url: "https://alen9966.github.io/2026/07/29/llc-resonant-half-bridge-from-specs-to-parameters/",
+          excerpt: "",
+          description: "以 TI SLUP263 的 375～405 VDC 输入、12 V / 25 A / 300 W 输出为例，从频率调制和 FHA 增益模型出发，完成变比、Lm、Lr、Cr、工作频率与 ZVS 条件的第一轮设计。",
+          stripContent: "刚开始接触 LLC 时，我知道它有两个电感和一个电容，也知道它可以实现软开关，但真正拿到一组输入输出指标后，还是不知道该先算什么。Lm、Lr、Cr 之间是什么关系？开关频率为什么有时低于谐振点，有时又高于谐振点？增益曲线能覆盖输入范围以后，是不是就已经保证了 ZVS？ 这篇文章以 TI《Designing an LLC Resonant Half-Bridge Power Converter》（SLUP263）中的例子为主线，重新走一遍 375～405 VDC → 12 V / 25 A / 3",
+          date: "Wed Jul 29 2026 11:30:00 GMT+0800",
+          updated: "Thu Aug 20 2026 16:30:48 GMT+0800",
+          cover: "/images/myimge/llc-resonant-half-bridge/llc-resonant-half-bridge-cover-gj9krd.jpg",
+        };
+      </script>
+        
+<script src="/js/insert_highlight.js" data-pjax></script>
+
+      
+<script src="/js/tabs.js" data-pjax defer></script>
+
+      <script type="module" data-pjax>
+        (async () => {
+          const PhotoSwipeLightbox = (await safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js", "sha384-DiL6M/gG+wmTxmCRZyD1zee6lIhawn5TGvED0FOh7fXcN9B0aZ9dexSF/N6lrZi/")).default;
+          const initPswp = (gallery, children) => {
+            if (_$$(`${gallery} ${children}`).length > 0) {
+              new PhotoSwipeLightbox({
+                gallery,
+                children,
+                pswpModule: () => safeImport("https://npm.webcache.cn/photoswipe@5.4.4/dist/photoswipe.esm.min.js", "sha384-WkkO3GCmgkC3VQWpaV8DqhKJqpzpF9JoByxDmnV8+oTJ7m3DfYEWX1fu1scuS4+s")
+              }).init();
+            }
+          }
+          const pswp = () => {
+            initPswp('.article-entry', 'a.article-gallery-item');
+            initPswp('.article-gallery', 'a.article-gallery-item');
+          }
+          pswp();
+        })();
+      </script>
+        
+
+
+  </div>
+</div>
+
+
+  <script>
+    console.log(String.raw`%c 
+ ______     ______     __     __    __     __  __    
+/\  == \   /\  ___\   /\ \   /\ "-./  \   /\ \/\ \   
+\ \  __<   \ \  __\   \ \ \  \ \ \-./\ \  \ \ \_\ \  
+ \ \_\ \_\  \ \_____\  \ \_\  \ \_\ \ \_\  \ \_____\ 
+  \/_/ /_/   \/_____/   \/_/   \/_/  \/_/   \/_____/ 
+                                                  
+`,'color: #ff5252;')
+    console.log('%c Theme.Reimu v' + '1.12.5' + ' %c https://github.com/D-Sketon/hexo-theme-reimu ', 'color: white; background: #ff5252; padding:5px 0;', 'padding:4px;border:1px solid #ff5252;')
+  </script>
+  
+
+
+
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  }
+</script>
+
+
+    
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js" crossorigin="anonymous" defer data-pjax></script>
+
+    <script data-pjax>
+      window.MathJax = {"tex":{"tags":"ams","useLabelIds":true,"inlineMath":[["$","$"],["\\\\(","\\\\)"]],"displayMath":[["$$","$$"],["\\\\[","\\\\]"]],"processEscapes":true,"processEnvironments":true,"autoload":{"color":[],"colorv2":["color"]},"packages":{"[+]":["noerrors"]}},"options":{"skipHtmlTags":["script","noscript","style","textarea","pre","code"],"ignoreHtmlClass":"tex2jax_ignore","processHtmlClass":"tex2jax_process"},"loader":{"load":["input/asciimath","[tex]/noerrors"]}};
+    </script>
+
+
+
+      <script src="/js/lazyload-fallback.js"></script>
+  </body>
+  </html>
